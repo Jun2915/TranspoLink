@@ -1,0 +1,91 @@
+﻿@model ReserveVM
+
+@{
+    ViewBag.Title = "Home | Reserve";
+    // CheckIn within 30 days range
+    string min = DateTime.Today.ToString("yyyy-MM-dd");
+    string max = DateTime.Today.AddDays(30).ToString("yyyy-MM-dd");
+}
+
+<p>
+    - CheckIn within 30 days range (@min to @max)<br>
+    - CheckOut within 10 days range (after CheckIn)
+</p>
+
+<form class="form" method="post">
+    <div asp-validation-summary="ModelOnly"></div>
+    
+    <label asp-for="TypeId"></label>
+    <select asp-for="TypeId" asp-items="ViewBag.TypeList">
+        <option value="">- Select One -</option>
+    </select>
+    <span asp-validation-for="TypeId"></span>
+
+    <label asp-for="CheckIn"></label>
+    <input asp-for="CheckIn" min="@min" max="@max">
+    <span asp-validation-for="CheckIn"></span>
+
+    <label asp-for="CheckOut"></label>
+    <input asp-for="CheckOut">
+    <span asp-validation-for="CheckOut"></span>
+
+    <label>Days</label>
+    <span id="days"></span>
+    <br>
+
+    <section>
+        <button>Reserve</button>
+        <button type="reset">Reset</button>
+    </section>
+</form>
+
+@section foot {
+    <script>
+        // 1. Extend built-in Date object
+        //    d.addDays(days) --> return new Date object after days added
+        Date.prototype.addDays = function (days) {
+            // TODO
+            const d = new Date(this);
+            d.setDate(d.getDate() + days);
+            return d;
+        };
+
+        // 2. Extend built-in Date object
+        //    d.format() --> return value in YYYY-MM-DD format
+        Date.prototype.format = function () {
+            // TODO
+            return this.toISOString().substring(0,10);
+        };
+
+        // 3. #CheckIn input event
+        //    --> Update #CheckOut min = #CheckIn +  1 day 
+        //    --> Update #CheckOut max = #CheckIn + 10 days
+        //    --> Adjust #CheckOut value (within range)
+        $('#CheckIn').on('input', e => {
+            // TODO
+            const ci = $('#CheckIn')[0];
+            const co = $('#CheckOut')[0];
+
+            co.min = ci.valueAsDate.addDays(1).format();
+            co.max = ci.valueAsDate.addDays(10).format();
+
+            if(co.value < co.min) co.value = co.min;
+            if(co.value > co.max) co.value = co.max;
+        });
+
+        // 4. #CheckIn, #CheckOut input event
+        //    --> Calculate days difference
+        //    --> 1 day = 24 * 60 * 60 * 1000 ms
+        $('#CheckIn,#CheckOut').on('input', e => {
+            // TODO
+            const ci = $('#CheckIn')[0];
+            const co = $('#CheckOut')[0];
+            const ms = co.valueAsDate - ci.valueAsDate;
+            const days = parseInt(ms / (24 * 60 * 60 * 1000));
+            $('#days').text(days);
+        });
+
+        // 5. Run #CheckIn input event for once
+        $('#CheckIn').trigger('input');
+    </script>
+}
