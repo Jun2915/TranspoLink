@@ -97,7 +97,7 @@ public class AccountController(DB db,
                 Email = vm.Email,
                 Hash = hp.HashPassword(vm.Password),
                 Name = vm.Name,
-                PhotoURL = hp.SavePhoto(vm.Photo, "photos"),
+                PhotoURL = hp.SavePhoto(vm.Photo, "images"),
             });
             db.SaveChanges();
 
