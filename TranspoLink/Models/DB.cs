@@ -18,7 +18,7 @@ public class DB(DbContextOptions options) : DbContext(options)
     public DbSet<Vehicle> Vehicles { get; set; }
     public DbSet<Booking> Bookings { get; set; }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+   /* protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
@@ -41,7 +41,7 @@ public class DB(DbContextOptions options) : DbContext(options)
                 Name = "System Administrator"
             }
         );
-    }
+    }*/
 }
 
 // Entity Classes -------------------------------------------------------------
