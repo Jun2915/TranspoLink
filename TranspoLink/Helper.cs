@@ -20,16 +20,22 @@ public class Helper(IWebHostEnvironment en,
 
     public string ValidatePhoto(IFormFile f)
     {
+        // Add null check
+        if (f == null || f.Length == 0)
+        {
+            return "Please select a photo.";
+        }
+
         var reType = new Regex(@"^image\/(jpeg|png)$", RegexOptions.IgnoreCase);
         var reName = new Regex(@"^.+\.(jpeg|jpg|png)$", RegexOptions.IgnoreCase);
 
         if (!reType.IsMatch(f.ContentType) || !reName.IsMatch(f.FileName))
         {
-            return "Only JPG and PNG photo is allowed.";
+            return "Only JPG and PNG photos are allowed.";
         }
         else if (f.Length > 1 * 1024 * 1024)
         {
-            return "Photo size cannot more than 1MB.";
+            return "Photo size cannot exceed 1MB.";
         }
 
         return "";
@@ -61,6 +67,14 @@ public class Helper(IWebHostEnvironment en,
         File.Delete(path);
     }
 
+    public bool PhotoExists(string file, string folder)
+    {
+        if (string.IsNullOrEmpty(file)) return false;
+
+        file = Path.GetFileName(file);
+        var path = Path.Combine(en.WebRootPath, folder, file);
+        return File.Exists(path);
+    }
 
 
     // ------------------------------------------------------------------------
