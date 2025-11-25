@@ -22,7 +22,6 @@ public class DB(DbContextOptions options) : DbContext(options)
     {
         base.OnModelCreating(modelBuilder);
 
-        // Configure TPH (Table Per Hierarchy) for User inheritance
         modelBuilder.Entity<User>()
             .HasDiscriminator<string>("Role")
             .HasValue<Admin>("Admin")
