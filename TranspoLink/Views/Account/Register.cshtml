@@ -25,6 +25,19 @@
         <form method="post" enctype="multipart/form-data" class="auth-form">
             <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
 
+            <!-- Photo Upload -->
+            <div class="auth-photo-upload">
+                <label class="auth-photo-label">
+                    Profile Photo
+                </label>
+                <label class="upload auth-upload">
+                    <input asp-for="Photo" accept="image/jpeg,image/png" hidden>
+                    <img src="/images/add_photo.png" alt="Upload Photo">
+                    <span class="auth-upload-text">Click to upload photo</span>
+                </label>
+                <span asp-validation-for="Photo" class="field-validation-error"></span>
+            </div>
+
             <!-- Email / Phone Option -->
             <div class="auth-option-group">
                 <button type="button" class="auth-option active" data-register-type="email">
@@ -100,19 +113,6 @@
                 </button>
             </div>
             <span asp-validation-for="Confirm" class="field-validation-error"></span>
-
-            <!-- Photo Upload -->
-            <div class="auth-photo-upload">
-                <label class="auth-photo-label">
-                    Profile Photo
-                </label>
-                <label class="upload auth-upload">
-                    <input asp-for="Photo" accept="image/jpeg,image/png" hidden>
-                    <img src="/images/add_photo.png" alt="Upload Photo">
-                    <span class="auth-upload-text">Click to upload photo</span>
-                </label>
-                <span asp-validation-for="Photo" class="field-validation-error"></span>
-            </div>
 
             <!-- Register Button -->
             <button type="submit" class="auth-submit-btn">Sign Up</button>
