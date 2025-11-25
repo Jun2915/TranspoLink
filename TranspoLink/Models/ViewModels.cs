@@ -82,18 +82,40 @@ public class ResetPasswordVM
     public string Email { get; set; }
 }
 
-// Reservation
-
-public class ReserveVM
+public class SearchTripVM
 {
-    [DisplayName("Room Type")]
-    public string TypeId { get; set; }
+    [Required]
+    [StringLength(100)]
+    public string Origin { get; set; }
 
-    [DisplayName("Check In Date")]
-    [DataType(DataType.Date)]
-    public DateOnly CheckIn { get; set; }
+    [Required]
+    [StringLength(100)]
+    public string Destination { get; set; }
 
-    [DisplayName("Check Out Date")]
+    [Required]
     [DataType(DataType.Date)]
-    public DateOnly CheckOut { get; set; }
+    [DisplayName("Departure Date")]
+    public DateTime DepartDate { get; set; }
+
+    [DataType(DataType.Date)]
+    [DisplayName("Return Date")]
+    public DateTime? ReturnDate { get; set; }
+
+    [Range(1, 10)]
+    public int Passengers { get; set; } = 1;
+
+    [MaxLength(20)]
+    public string? TransportType { get; set; } // Bus, Train, Ferry
+}
+
+public class BookTripVM
+{
+    [Required]
+    public int TripId { get; set; }
+
+    [Required]
+    [Range(1, 10)]
+    public int NumberOfSeats { get; set; } = 1;
+
+    public string? SpecialRequests { get; set; }
 }
