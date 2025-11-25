@@ -8,7 +8,7 @@ using System.Security.Claims;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace Demo;
+namespace TranspoLink;
 
 public class Helper(IWebHostEnvironment en,
                     IHttpContextAccessor ct,

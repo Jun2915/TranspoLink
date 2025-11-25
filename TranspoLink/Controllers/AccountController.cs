@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Mail;
 
-namespace Demo.Controllers;
+namespace TranspoLink.Controllers;
 
 public class AccountController(DB db, 
                                IWebHostEnvironment en, 

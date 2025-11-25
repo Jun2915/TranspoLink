@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Text.Json;
 
-namespace Demo;
+namespace TranspoLink;
 
 public static class Extensions
 {

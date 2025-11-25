@@ -1,5 +1,5 @@
-global using Demo.Models;
-global using Demo;
+global using TranspoLink.Models;
+global using TranspoLink;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();

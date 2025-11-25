@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace Demo.Models;
+namespace TranspoLink.Models;
 
 #nullable disable warnings
 

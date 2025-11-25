@@ -6,57 +6,36 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title</title>
-    <link rel="shortcut icon" href="/images/favicon.png">
+    <link rel="shortcut icon" href="/images/shortcut_icon.png">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
     <link rel="stylesheet" href="/css/pager.css">
     <link rel="stylesheet" href="/css/app.css" asp-append-version="true">
     @RenderSection("head", false)
 </head>
 <body>
-    <div class="info">@Html.Raw(TempData["Info"])</div>
-
-    <header>
-        <h1><a href="/">@ViewBag.Title</a></h1>
-
-        @if (User.Identity!.IsAuthenticated)
-        {
-            <div>
-                @User.Identity.Name |
-                @(User.IsInRole("Admin")  ? "Admin"  : "")
-                @(User.IsInRole("Member") ? "Member" : "")
-            </div>
-        }
-
-        @if (User.IsInRole("Member"))
-        {
-            var photoURL = db.Members.Find(User.Identity!.Name)!.PhotoURL;
-            <img src="/photos/@photoURL">
-        }
-    </header>
+    <div class="top-bar">
+        <div class="top-bar-item">
+            🌐 Language
+        </div>
+        <div class="top-bar-item">
+            📋 Check My Booking
+        </div>
+        <div class="top-bar-item">
+            <a href="/Account/Register">🔐 Login / Sign Up</a>
+        </div>
+    </div>
 
     <nav>
-        <a href="/">Index</a>
-        <a href="/Home/Reserve">Reserve</a>
-        <a href="/Home/List">List</a>
-        <a href="/Home/Status">Status</a>
-
-        <div></div>
-
-        @if (User.Identity.IsAuthenticated)
-        {
-            <a href="/Account/Logout">Logout</a>
-            <a href="/Account/UpdatePassword">Update Password</a>
-        }
-        else
-        {
-            <a href="/Account/Login">Login</a>
-            <a href="/Account/Register">Register</a>
-            <a href="/Account/ResetPassword">Reset Password</a>
-        }
-        @if (User.IsInRole("Member"))
-        {
-            <a href="/Account/UpdateProfile">Update Profile</a>
-        }
+        <div class="logo">
+            <img src="/images/shortcut_icon.png" alt="TranspoLink Logo" style="width:50px; height:50px;" />
+            <span>TranspoLink</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#trending">News & Offers</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
     </nav>
 
     <main>
@@ -64,7 +43,7 @@
     </main>
 
     <footer>
-        Developed by <b>BAE SUZY</b> &middot;
+        Developed by <b>BMIT 2023 Web And Mobile System</b> &middot;
         Copyrighted &copy; @DateTime.Today.Year
     </footer>
 

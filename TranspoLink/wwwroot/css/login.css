@@ -1,0 +1,879 @@
+﻿/* ============================================================================
+   AUTHENTICATION PAGES - COMPLETE CSS
+   Add this to your app.css file or create a separate auth.css file
+   ============================================================================ */
+
+/* ============================================================================
+   AUTH CONTAINER & CARD
+   ============================================================================ */
+
+.auth-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    position: relative;
+}
+
+.auth-card {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    width: 100%;
+    max-width: 420px;
+    overflow: hidden;
+    animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================================================
+   AUTH TABS
+   ============================================================================ */
+
+.auth-tabs {
+    display: flex;
+    border-bottom: 2px solid #f0f0f0;
+    background: #fafafa;
+}
+
+.auth-tab {
+    flex: 1;
+    padding: 20px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 600;
+    color: #999;
+    text-decoration: none;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s ease;
+    position: relative;
+    cursor: pointer;
+}
+
+    .auth-tab:hover {
+        color: #667eea;
+        background: #f5f5f5;
+    }
+
+    .auth-tab.active {
+        color: #0066cc;
+        background: #fff;
+        border-bottom-color: #0066cc;
+    }
+
+/* ============================================================================
+   AUTH FORM
+   ============================================================================ */
+
+.auth-form {
+    padding: 35px 30px 30px;
+}
+
+/* ============================================================================
+   AUTH OPTION GROUP (Email/Phone Toggle)
+   ============================================================================ */
+
+.auth-option-group {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.auth-option {
+    flex: 1;
+    padding: 14px 18px;
+    background: #fff;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+    overflow: hidden;
+}
+
+    .auth-option:hover {
+        background: #f9fafb;
+        border-color: #bbb;
+    }
+
+    .auth-option.active {
+        background: #e8f0fe;
+        border-color: #0066cc;
+        color: #0066cc;
+        font-weight: 600;
+    }
+
+.auth-option-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #0066cc;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    flex-shrink: 0;
+}
+
+.auth-option:not(.active) .auth-option-icon {
+    display: none;
+}
+
+.auth-option-icon-empty {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.auth-option.active .auth-option-icon-empty {
+    display: none;
+}
+
+/* ============================================================================
+   AUTH INPUT GROUP
+   ============================================================================ */
+
+.auth-input-group {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+    .auth-input-group input {
+        width: 100%;
+        padding: 14px 14px 14px 45px;
+        font-size: 15px;
+        border: 2px solid #ddd;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        background: #f9fafb;
+        box-sizing: border-box;
+    }
+
+        .auth-input-group input:focus {
+            outline: none;
+            border-color: #0066cc;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+        }
+
+        .auth-input-group input::placeholder {
+            color: #999;
+        }
+
+    .auth-input-group.input-error input,
+    .auth-input-group.error input {
+        border-color: #dc3545;
+        background: #fff5f5;
+    }
+
+    .auth-input-group.focused {
+        transform: translateY(-1px);
+    }
+
+    .auth-input-group.filled input {
+        background: #fff;
+    }
+
+/* Input Icons */
+.auth-input-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Password Toggle Button */
+.auth-toggle-password {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    border-radius: 4px;
+}
+
+    .auth-toggle-password:hover {
+        background: #f0f0f0;
+    }
+
+    .auth-toggle-password:active {
+        transform: translateY(-50%) scale(0.95);
+    }
+
+/* ============================================================================
+   VALIDATION MESSAGES
+   ============================================================================ */
+
+.field-validation-error {
+    display: block;
+    color: #dc3545;
+    font-size: 13px;
+    margin-top: 5px;
+    margin-left: 5px;
+    font-weight: 500;
+}
+
+.validation-summary-errors {
+    background: #fff5f5;
+    border: 2px solid #dc3545;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+    .validation-summary-errors ul {
+        margin: 0;
+        padding-left: 20px;
+        color: #dc3545;
+    }
+
+    .validation-summary-errors li {
+        margin: 5px 0;
+    }
+
+/* ============================================================================
+   AUTH OPTIONS ROW (Remember Me & Forgot Password)
+   ============================================================================ */
+
+.auth-options-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-top: 5px;
+}
+
+.auth-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+}
+
+    .auth-checkbox input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+        accent-color: #0066cc;
+    }
+
+.auth-checkbox-label {
+    font-size: 14px;
+    color: #666;
+    font-weight: 500;
+}
+
+.auth-link {
+    color: #0066cc;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+    .auth-link:hover {
+        color: #004a99;
+        text-decoration: underline;
+    }
+
+/* ============================================================================
+   AUTH SUBMIT BUTTON
+   ============================================================================ */
+
+.auth-submit-btn {
+    width: 100%;
+    padding: 15px;
+    background: #ff6633;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(255, 102, 51, 0.3);
+    margin-bottom: 20px;
+}
+
+    .auth-submit-btn:hover {
+        background: #ff5522;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 102, 51, 0.4);
+    }
+
+    .auth-submit-btn:active {
+        transform: translateY(0);
+    }
+
+    .auth-submit-btn:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+/* Loading Spinner */
+.auth-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 0.8s linear infinite;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ============================================================================
+   AUTH DIVIDER
+   ============================================================================ */
+
+.auth-divider {
+    text-align: center;
+    position: relative;
+    margin: 25px 0;
+}
+
+    .auth-divider::before,
+    .auth-divider::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        width: 40%;
+        height: 1px;
+        background: #e0e0e0;
+    }
+
+    .auth-divider::before {
+        left: 0;
+    }
+
+    .auth-divider::after {
+        right: 0;
+    }
+
+    .auth-divider span {
+        background: #fff;
+        padding: 0 15px;
+        color: #999;
+        font-size: 14px;
+        position: relative;
+    }
+
+/* ============================================================================
+   SOCIAL LOGIN BUTTONS
+   ============================================================================ */
+
+.auth-social-buttons {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.auth-social-btn {
+    flex: 1;
+    padding: 13px 18px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    background: white;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    color: #333;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+    .auth-social-btn:hover {
+        border-color: #ccc;
+        background: #f8f9fa;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .auth-social-btn:active {
+        transform: translateY(0);
+    }
+
+    .auth-social-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .auth-social-btn.google:hover {
+        border-color: #4285F4;
+    }
+
+    .auth-social-btn.facebook:hover {
+        border-color: #1877F2;
+    }
+
+/* ============================================================================
+   AUTH FOOTER TEXT
+   ============================================================================ */
+
+.auth-footer-text {
+    text-align: center;
+    font-size: 14px;
+    color: #666;
+}
+
+.auth-link-bold {
+    color: #0066cc;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+    .auth-link-bold:hover {
+        color: #004a99;
+        text-decoration: underline;
+    }
+
+/* ============================================================================
+   PASSWORD STRENGTH INDICATOR
+   ============================================================================ */
+
+.password-strength {
+    margin-top: 10px;
+    margin-bottom: 15px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    background: #f8f9fa;
+}
+
+.password-strength-bars {
+    height: 6px;
+    background: #e0e0e0;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.password-strength-bar {
+    height: 100%;
+    width: 0;
+    transition: width 0.4s ease, background-color 0.4s ease;
+    border-radius: 3px;
+}
+
+.password-strength.weak .password-strength-bar {
+    background: #dc3545;
+}
+
+.password-strength.medium .password-strength-bar {
+    background: #ffc107;
+}
+
+.password-strength.strong .password-strength-bar {
+    background: #28a745;
+}
+
+.password-strength.very-strong .password-strength-bar {
+    background: #007bff;
+}
+
+.password-strength-text {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.password-strength.weak .password-strength-text {
+    color: #dc3545;
+}
+
+.password-strength.medium .password-strength-text {
+    color: #d97706;
+}
+
+.password-strength.strong .password-strength-text {
+    color: #28a745;
+}
+
+.password-strength.very-strong .password-strength-text {
+    color: #007bff;
+}
+
+/* ============================================================================
+   PHOTO UPLOAD
+   ============================================================================ */
+
+.auth-photo-upload {
+    margin: 25px 0;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.auth-photo-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.auth-upload {
+    display: inline-block;
+    cursor: pointer;
+    text-align: center;
+}
+
+    .auth-upload img {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        border: 3px solid #e0e0e0;
+        object-fit: cover;
+        transition: all 0.3s ease;
+        display: block;
+        margin: 0 auto 10px;
+    }
+
+    .auth-upload:hover img {
+        border-color: #667eea;
+        transform: scale(1.05);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+.auth-upload-text {
+    display: block;
+    font-size: 13px;
+    color: #667eea;
+    font-weight: 500;
+}
+
+/* ============================================================================
+   ERROR TOAST
+   ============================================================================ */
+
+.auth-error-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #dc3545;
+    color: white;
+    padding: 16px 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(220, 53, 69, 0.4);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 9999;
+    transform: translateX(400px);
+    opacity: 0;
+    transition: all 0.3s ease;
+    max-width: 350px;
+    font-weight: 500;
+}
+
+    .auth-error-toast.show {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    .auth-error-toast svg {
+        flex-shrink: 0;
+    }
+
+/* ============================================================================
+   RIPPLE EFFECT
+   ============================================================================ */
+
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.6);
+    transform: scale(0);
+    pointer-events: none;
+}
+
+.ripple-effect {
+    animation: ripple-animation 0.6s ease-out;
+}
+
+@keyframes ripple-animation {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* ============================================================================
+   RESPONSIVE DESIGN
+   ============================================================================ */
+
+@media (max-width: 768px) {
+    .auth-container {
+        padding: 20px 15px;
+    }
+
+    .auth-card {
+        max-width: 100%;
+        border-radius: 15px;
+    }
+
+    .auth-form {
+        padding: 30px 25px;
+    }
+
+    .auth-tab {
+        padding: 16px;
+        font-size: 16px;
+    }
+
+    .auth-option-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .auth-social-buttons {
+        flex-direction: column;
+    }
+
+    .auth-options-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .auth-error-toast {
+        right: 15px;
+        left: 15px;
+        max-width: calc(100% - 30px);
+    }
+}
+
+@media (max-width: 480px) {
+    .auth-form {
+        padding: 25px 20px;
+    }
+
+    .auth-input-group input {
+        padding: 14px 14px 14px 44px;
+        font-size: 14px;
+    }
+
+    .auth-submit-btn {
+        padding: 14px;
+        font-size: 15px;
+    }
+
+    .auth-social-btn {
+        padding: 12px 16px;
+        font-size: 14px;
+    }
+}
+
+/* ============================================================================
+   PRINT STYLES
+   ============================================================================ */
+
+@media print {
+    .auth-container {
+        display: none;
+    }
+}
+
+/* ============================================================================
+   ACCESSIBILITY
+   ============================================================================ */
+
+/* Focus visible for keyboard navigation */
+.auth-option:focus-visible,
+.auth-input-group input:focus-visible,
+.auth-submit-btn:focus-visible,
+.auth-social-btn:focus-visible,
+.auth-toggle-password:focus-visible {
+    outline: 3px solid #0066cc;
+    outline-offset: 2px;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .auth-input-group input {
+        border-width: 3px;
+    }
+
+    .auth-option {
+        border-width: 3px;
+    }
+
+    .auth-submit-btn {
+        border: 3px solid currentColor;
+    }
+}
+
+/* Dark mode support (optional) */
+@media (prefers-color-scheme: dark) {
+    /* Uncomment if you want dark mode support
+    .auth-card {
+        background: #1a1a1a;
+        color: #fff;
+    }
+
+    .auth-input-group input {
+        background: #2a2a2a;
+        border-color: #444;
+        color: #fff;
+    }
+
+    .auth-tabs {
+        background: #2a2a2a;
+        border-bottom-color: #444;
+    }
+
+    .auth-tab {
+        color: #999;
+    }
+
+    .auth-tab.active {
+        color: #4d9fff;
+        background: #1a1a1a;
+    }
+    */
+}
+
+/* ============================================================================
+   ANIMATIONS
+   ============================================================================ */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+/* Apply animations to elements */
+.auth-card {
+    animation: fadeIn 0.5s ease-out;
+}
+
+.auth-input-group {
+    animation: slideInUp 0.3s ease-out backwards;
+}
+
+    .auth-input-group:nth-child(1) {
+        animation-delay: 0.05s;
+    }
+
+    .auth-input-group:nth-child(2) {
+        animation-delay: 0.1s;
+    }
+
+    .auth-input-group:nth-child(3) {
+        animation-delay: 0.15s;
+    }
+
+    .auth-input-group:nth-child(4) {
+        animation-delay: 0.2s;
+    }
+
+    .auth-input-group:nth-child(5) {
+        animation-delay: 0.25s;
+    }
+
+/* ============================================================================
+   UTILITY CLASSES
+   ============================================================================ */
+
+.auth-text-center {
+    text-align: center;
+}
+
+.auth-mt-10 {
+    margin-top: 10px;
+}
+
+.auth-mt-20 {
+    margin-top: 20px;
+}
+
+.auth-mb-10 {
+    margin-bottom: 10px;
+}
+
+.auth-mb-20 {
+    margin-bottom: 20px;
+}
