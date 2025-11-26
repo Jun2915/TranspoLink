@@ -66,6 +66,10 @@ public class AccountController(DB db,
     {
         return !db.Users.Any(u => u.Email == email);
     }
+    public bool CheckPhone(string phoneNumber)
+    {
+        return !db.Users.Any(u => u.Phone == phoneNumber);
+    }
 
     public IActionResult Register()
     {
