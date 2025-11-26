@@ -50,6 +50,7 @@ public class AdminController(DB db, Helper hp) : Controller
         {
             query = query.Where(m =>
                 m.Email.Contains(search) ||
+                m.Phone.Contains(search) || // Added search by phone
                 m.Name.Contains(search));
         }
 
@@ -100,14 +101,15 @@ public class AdminController(DB db, Helper hp) : Controller
         }
 
         // Check if member has bookings
-        if (db.Bookings.Any(b => b.MemberEmail == member.Email))
+        // FIX: Changed from MemberEmail to MemberId check
+        if (db.Bookings.Any(b => b.MemberId == member.Id))
         {
             TempData["Info"] = "Cannot delete member with existing bookings.";
             return RedirectToAction("Members");
         }
 
         // Delete photo if exists
-        if (member.PhotoURL != "/images/add_photo.png")
+        if (member.PhotoURL != null && member.PhotoURL != "/images/add_photo.png")
         {
             hp.DeletePhoto(member.PhotoURL, "photos");
         }

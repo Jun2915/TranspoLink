@@ -22,18 +22,21 @@ public class DB(DbContextOptions options) : DbContext(options)
     {
         base.OnModelCreating(modelBuilder);
 
-        // Configure indexes
         modelBuilder.Entity<User>()
             .HasIndex(u => u.Email)
-            .IsUnique();
+            .IsUnique()
+            .HasFilter("[Email] IS NOT NULL"); 
 
+        modelBuilder.Entity<User>()
+            .HasIndex(u => u.Phone)
+            .IsUnique()
+            .HasFilter("[Phone] IS NOT NULL"); 
 
         modelBuilder.Entity<Booking>()
-       .HasOne(b => b.Member)
-       .WithMany(m => m.Bookings)
-       .HasForeignKey(b => b.MemberEmail)
-       .HasPrincipalKey(m => m.Email)
-       .OnDelete(DeleteBehavior.Restrict);
+           .HasOne(b => b.Member)
+           .WithMany(m => m.Bookings)
+           .HasForeignKey(b => b.MemberId) 
+           .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Booking>()
             .HasOne(b => b.Trip)
@@ -63,9 +66,16 @@ public class User
     public int Id { get; set; }
 
     [MaxLength(100)]
-    public string Email { get; set; }
+    [EmailAddress]
+    public string? Email { get; set; } 
+
+    [MaxLength(20)]
+    [Phone]
+    public string? Phone { get; set; } 
+
     [MaxLength(100)]
     public string Hash { get; set; }
+
     [MaxLength(100)]
     public string Name { get; set; }
 
@@ -81,8 +91,6 @@ public class Member : User
 {
     [MaxLength(100)]
     public string PhotoURL { get; set; }
-
-    // Navigation Properties
     public virtual ICollection<Booking> Bookings { get; set; }
 }
 
@@ -160,8 +168,7 @@ public class Booking
     [Key]
     public int Id { get; set; }
 
-    [MaxLength(100)]
-    public string MemberEmail { get; set; }
+    public int MemberId { get; set; }
 
     public int TripId { get; set; }
 

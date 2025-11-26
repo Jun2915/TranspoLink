@@ -12,7 +12,11 @@ public class LoginVM
 {
     [StringLength(100)]
     [EmailAddress]
-    public string Email { get; set; }
+    public string? Email { get; set; }
+
+    [StringLength(20)]
+    [DisplayName("Phone Number")]
+    public string? Phone { get; set; }
 
     [StringLength(100, MinimumLength = 5)]
     [DataType(DataType.Password)]
@@ -26,7 +30,12 @@ public class RegisterVM
     [StringLength(100)]
     [EmailAddress]
     [Remote("CheckEmail", "Account", ErrorMessage = "Duplicated {0}.")]
-    public string Email { get; set; }
+    public string? Email { get; set; }
+
+    [StringLength(20)]
+    [DisplayName("Phone Number")]
+    [Remote("CheckPhone", "Account", ErrorMessage = "Duplicated {0}.")] 
+    public string? PhoneNumber { get; set; }
 
     [StringLength(100, MinimumLength = 5)]
     [DataType(DataType.Password)]
@@ -66,6 +75,7 @@ public class UpdatePasswordVM
 public class UpdateProfileVM
 {
     public string? Email { get; set; }
+    public string? Phone { get; set; }
 
     [StringLength(100)]
     public string Name { get; set; }

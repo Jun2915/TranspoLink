@@ -4,8 +4,8 @@ using System.Net.Mail;
 
 namespace TranspoLink.Controllers;
 
-public class AccountController(DB db, 
-                               IWebHostEnvironment en, 
+public class AccountController(DB db,
+                               IWebHostEnvironment en,
                                Helper hp) : Controller
 {
     // GET: Account/Login
@@ -18,7 +18,17 @@ public class AccountController(DB db,
     [HttpPost]
     public IActionResult Login(LoginVM vm, string? returnURL)
     {
-        var u = db.Users.FirstOrDefault(u => u.Email == vm.Email);
+        // Fix: Use FirstOrDefault instead of Find(string)
+        User? u = null;
+
+        if (!string.IsNullOrEmpty(vm.Email))
+        {
+            u = db.Users.FirstOrDefault(x => x.Email == vm.Email);
+        }
+        else if (!string.IsNullOrEmpty(vm.Phone))
+        {
+            u = db.Users.FirstOrDefault(x => x.Phone == vm.Phone);
+        }
 
         if (u == null || !hp.VerifyPassword(u.Hash, vm.Password))
         {
@@ -29,14 +39,20 @@ public class AccountController(DB db,
         {
             TempData["Info"] = "Login successfully.";
 
-            hp.SignIn(u!.Email, u.Role, vm.RememberMe);
-            
+            // Use User.Id or User.Name as the identifier claim if you prefer, 
+            // but typical Identity setup uses Name/Email. 
+            // Using Email/Phone here for display name.
+            string identifier = u!.Email ?? u.Phone ?? u.Id.ToString();
+
+            hp.SignIn(identifier, u.Role, vm.RememberMe);
+
             if (string.IsNullOrEmpty(returnURL))
             {
                 return RedirectToAction("Index", "Home");
             }
+            return Redirect(returnURL);
         }
-        
+
         return View(vm);
     }
 
@@ -55,8 +71,6 @@ public class AccountController(DB db,
     {
         return View();
     }
-
-
 
     // ------------------------------------------------------------------------
     // Others
@@ -78,26 +92,37 @@ public class AccountController(DB db,
     [HttpPost]
     public IActionResult Register(RegisterVM vm)
     {
-        if (ModelState.IsValid("Email") &&
-            db.Users.Any(u => u.Email == vm.Email))
+        // Custom Validation: Must have Email OR Phone
+        if (string.IsNullOrEmpty(vm.Email) && string.IsNullOrEmpty(vm.PhoneNumber))
+        {
+            ModelState.AddModelError("", "Please provide either an Email or a Phone number.");
+        }
+
+        if (!string.IsNullOrEmpty(vm.Email) && db.Users.Any(u => u.Email == vm.Email))
         {
             ModelState.AddModelError("Email", "Duplicated Email.");
         }
 
-        if (ModelState.IsValid("Photo"))
+        if (!string.IsNullOrEmpty(vm.PhoneNumber) && db.Users.Any(u => u.Phone == vm.PhoneNumber))
+        {
+            ModelState.AddModelError("PhoneNumber", "Duplicated Phone Number.");
+        }
+
+        if (vm.Photo != null)
         {
             var err = hp.ValidatePhoto(vm.Photo);
             if (err != "") ModelState.AddModelError("Photo", err);
         }
-        
+
         if (ModelState.IsValid)
         {
-            db.Members.Add(new()
+            db.Members.Add(new Member()
             {
-                Email = vm.Email,
+                Email = vm.Email,       // Can be null
+                Phone = vm.PhoneNumber, // Added Phone mapping
                 Hash = hp.HashPassword(vm.Password),
                 Name = vm.Name,
-                PhotoURL = hp.SavePhoto(vm.Photo, "images"),
+                PhotoURL = vm.Photo != null ? hp.SavePhoto(vm.Photo, "images") : "/images/add_photo.png",
             });
             db.SaveChanges();
 
@@ -120,7 +145,10 @@ public class AccountController(DB db,
     [HttpPost]
     public IActionResult UpdatePassword(UpdatePasswordVM vm)
     {
-        var u = db.Users.Find(User.Identity!.Name);
+        // Find by currently logged in user name (which is Email or Phone)
+        var identifier = User.Identity!.Name;
+        var u = db.Users.FirstOrDefault(u => u.Email == identifier || u.Phone == identifier);
+
         if (u == null) return RedirectToAction("Index", "Home");
 
         if (!hp.VerifyPassword(u.Hash, vm.Current))
@@ -144,12 +172,15 @@ public class AccountController(DB db,
     [Authorize(Roles = "Member")]
     public IActionResult UpdateProfile()
     {
-        var m = db.Members.Find(User.Identity!.Name);
+        var identifier = User.Identity!.Name;
+        var m = db.Members.FirstOrDefault(u => u.Email == identifier || u.Phone == identifier);
+
         if (m == null) return RedirectToAction("Index", "Home");
 
         var vm = new UpdateProfileVM
         {
             Email = m.Email,
+            Phone = m.Phone,
             Name = m.Name,
             PhotoURL = m.PhotoURL,
         };
@@ -162,7 +193,9 @@ public class AccountController(DB db,
     [HttpPost]
     public IActionResult UpdateProfile(UpdateProfileVM vm)
     {
-        var m = db.Members.Find(User.Identity!.Name);
+        var identifier = User.Identity!.Name;
+        var m = db.Members.FirstOrDefault(u => u.Email == identifier || u.Phone == identifier);
+
         if (m == null) return RedirectToAction("Index", "Home");
 
         if (vm.Photo != null)
@@ -174,10 +207,15 @@ public class AccountController(DB db,
         if (ModelState.IsValid)
         {
             m.Name = vm.Name;
+            // m.Email = vm.Email; // Generally we don't allow changing unique ID easily without re-verification
+            // m.Phone = vm.Phone; 
 
             if (vm.Photo != null)
             {
-                hp.DeletePhoto(m.PhotoURL, "photos");
+                if (m.PhotoURL != null && m.PhotoURL != "/images/add_photo.png")
+                {
+                    hp.DeletePhoto(m.PhotoURL, "photos");
+                }
                 m.PhotoURL = hp.SavePhoto(vm.Photo, "photos");
             }
 
@@ -188,6 +226,7 @@ public class AccountController(DB db,
         }
 
         vm.Email = m.Email;
+        vm.Phone = m.Phone;
         vm.PhotoURL = m.PhotoURL;
         return View(vm);
     }
@@ -202,7 +241,7 @@ public class AccountController(DB db,
     [HttpPost]
     public IActionResult ResetPassword(ResetPasswordVM vm)
     {
-        var u = db.Users.Find(vm.Email);
+        var u = db.Users.FirstOrDefault(x => x.Email == vm.Email);
 
         if (u == null)
         {
@@ -216,10 +255,18 @@ public class AccountController(DB db,
             u!.Hash = hp.HashPassword(password);
             db.SaveChanges();
 
-            // Send reset password email
-            SendResetPasswordEmail(u, password);
+            // Send reset password email (Only works if user has email)
+            if (!string.IsNullOrEmpty(u.Email))
+            {
+                SendResetPasswordEmail(u, password);
+                TempData["Info"] = $"Password reset. Check your email.";
+            }
+            else
+            {
+                // If registered by phone only, we can't email. 
+                TempData["Info"] = $"Password reset to: {password} (Please copy this)";
+            }
 
-            TempData["Info"] = $"Password reset. Check your email.";
             return RedirectToAction();
         }
 
@@ -228,6 +275,8 @@ public class AccountController(DB db,
 
     private void SendResetPasswordEmail(User u, string password)
     {
+        if (string.IsNullOrEmpty(u.Email)) return;
+
         var mail = new MailMessage();
         mail.To.Add(new MailAddress(u.Email, u.Name));
         mail.Subject = "Reset Password";
@@ -237,18 +286,19 @@ public class AccountController(DB db,
 
         var path = u switch
         {
-            Admin    => Path.Combine(en.WebRootPath, "photos", "admin.jpg"),
-            Member m => Path.Combine(en.WebRootPath, "photos", m.PhotoURL),
-            _        => "",
+            Admin => Path.Combine(en.WebRootPath, "photos", "admin.jpg"),
+            Member m => Path.Combine(en.WebRootPath, "photos", m.PhotoURL ?? "default.jpg"),
+            _ => "",
         };
 
-        var att = new Attachment(path);
-        mail.Attachments.Add(att);
-        att.ContentId = "photo";
+        if (System.IO.File.Exists(path))
+        {
+            var att = new Attachment(path);
+            mail.Attachments.Add(att);
+            att.ContentId = "photo";
+        }
 
         mail.Body = $@"
-            <img src='cid:photo' style='width: 200px; height: 200px;
-                                        border: 1px solid #333'>
             <p>Dear {u.Name},<p>
             <p>Your password has been reset to:</p>
             <h1 style='color: red'>{password}</h1>
