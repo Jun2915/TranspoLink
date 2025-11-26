@@ -29,10 +29,11 @@ public class DB(DbContextOptions options) : DbContext(options)
 
 
         modelBuilder.Entity<Booking>()
-           .HasOne(b => b.Member)
-           .WithMany(m => m.Bookings)
-           .HasForeignKey(b => b.MemberEmail)
-           .OnDelete(DeleteBehavior.Restrict);
+       .HasOne(b => b.Member)
+       .WithMany(m => m.Bookings)
+       .HasForeignKey(b => b.MemberEmail)
+       .HasPrincipalKey(m => m.Email)
+       .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Booking>()
             .HasOne(b => b.Trip)

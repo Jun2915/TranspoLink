@@ -18,7 +18,7 @@ public class AccountController(DB db,
     [HttpPost]
     public IActionResult Login(LoginVM vm, string? returnURL)
     {
-        var u = db.Users.Find(vm.Email);
+        var u = db.Users.FirstOrDefault(u => u.Email == vm.Email);
 
         if (u == null || !hp.VerifyPassword(u.Hash, vm.Password))
         {
