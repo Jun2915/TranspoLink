@@ -7,10 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="Views\Admin\MemberDetails.cshtml" />
     <Content Remove="Views\Home\Error.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="Views\Admin\MemberDetails.cshtml" />
     <Compile Include="Views\Home\Error.cshtml" />
   </ItemGroup>
 

@@ -115,7 +115,7 @@ public class AccountController(DB db,
                 Phone = vm.PhoneNumber,
                 Hash = hp.HashPassword(vm.Password),
                 Name = vm.Name,
-                PhotoURL = vm.Photo != null ? hp.SavePhoto(vm.Photo, "photos") : "add_photo.png",
+                PhotoURL = vm.Photo != null ? hp.SavePhoto(vm.Photo, "images") : "add_photo.png",
             };
 
             db.Members.Add(newMember);
