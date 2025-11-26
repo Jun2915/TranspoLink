@@ -40,8 +40,10 @@ namespace TranspoLink.Migrations
                     b.Property<bool>("IsPaid")
                         .HasColumnType("bit");
 
-                    b.Property<int>("MemberId")
-                        .HasColumnType("int");
+                    b.Property<string>("MemberId")
+                        .IsRequired()
+                        .HasMaxLength(5)
+                        .HasColumnType("nvarchar(5)");
 
                     b.Property<int>("NumberOfSeats")
                         .HasColumnType("int");
@@ -145,12 +147,9 @@ namespace TranspoLink.Migrations
 
             modelBuilder.Entity("TranspoLink.Models.User", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(4)
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<string>("Id")
+                        .HasMaxLength(5)
+                        .HasColumnType("nvarchar(5)");
 
                     b.Property<string>("Discriminator")
                         .IsRequired()
@@ -229,6 +228,16 @@ namespace TranspoLink.Migrations
             modelBuilder.Entity("TranspoLink.Models.Admin", b =>
                 {
                     b.HasBaseType("TranspoLink.Models.User");
+
+                    b.Property<string>("PhotoURL")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.ToTable("Users", t =>
+                        {
+                            t.Property("PhotoURL")
+                                .HasColumnName("Admin_PhotoURL");
+                        });
 
                     b.HasDiscriminator().HasValue("Admin");
                 });

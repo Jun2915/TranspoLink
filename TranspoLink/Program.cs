@@ -50,9 +50,11 @@ using (var scope = app.Services.CreateScope())
     {
         var admin = new Admin
         {
+            Id = "A001",
             Email = "admin@transpolink.com",
             Hash = hp.HashPassword("Admin123"),
-            Name = "System Administrator"
+            Name = "System Administrator",
+            PhotoURL = "/images/beauty_admin.png" 
         };
 
         db.Admins.Add(admin);
@@ -60,6 +62,7 @@ using (var scope = app.Services.CreateScope())
 
         Console.WriteLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
         Console.WriteLine("✅ Admin Account Created!");
+        Console.WriteLine("🆔 ID: A001");
         Console.WriteLine("📧 Email: admin@transpolink.com");
         Console.WriteLine("🔑 Password: Admin123");
         Console.WriteLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━");

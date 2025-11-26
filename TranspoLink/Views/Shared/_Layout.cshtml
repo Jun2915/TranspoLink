@@ -13,6 +13,9 @@
     @RenderSection("head", false)
 </head>
 <body>
+    @* Flash Message Container *@
+    <div class="info">@TempData["Info"]</div>
+
     <div class="top-bar">
         <div class="top-bar-item">
             🌐 Language
@@ -22,8 +25,33 @@
         </div>
         @if (User.Identity.IsAuthenticated)
         {
-            <div class="top-bar-item">
-                👋 Welcome, @User.Identity.Name
+            // Fetch User Details from DB
+            var identifier = User.Identity.Name;
+            var currentUser = db.Users.FirstOrDefault(u => u.Email == identifier || u.Phone == identifier);
+
+            // Default fallback
+            string photoUrl = "/images/default_photo.png";
+
+            // Logic for Member Photo
+            if (currentUser is Member m && !string.IsNullOrEmpty(m.PhotoURL))
+            {
+                if (m.PhotoURL == "default_photo.png")
+                {
+                    photoUrl = "/images/default_photo.png";
+                }
+                else
+                {
+                    photoUrl = "/photos/" + m.PhotoURL;
+                }
+            }
+            else if (currentUser is Admin a && !string.IsNullOrEmpty(a.PhotoURL))
+            {
+                photoUrl = a.PhotoURL;
+            }
+
+            <div class="top-bar-item user-profile-display">
+                <img src="@photoUrl" class="nav-user-photo" alt="Profile" onerror="this.src='/images/add_photo.png'">
+                <span>👋 Welcome, <b>@(currentUser?.Name ?? User.Identity.Name)</b></span>
             </div>
             <div class="top-bar-item">
                 <a href="/Account/Logout">🚪 Logout</a>

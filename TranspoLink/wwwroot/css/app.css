@@ -85,6 +85,21 @@ footer {
             color: #ffd700;
         }
 
+/* NEW: User Profile in Header */
+.user-profile-display {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-user-photo {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #fff;
+}
+
 /* Navigation ----------------------------------------------------------------- */
 
 nav {
@@ -112,7 +127,7 @@ nav {
         border-radius: 8px;
     }
 
-    .logo a{
+    .logo a {
         color: inherit;
         text-decoration: none;
     }
@@ -548,10 +563,17 @@ nav {
     opacity: 0;
     box-shadow: 0 4px 20px rgba(0,0,0,0.2);
     font-weight: 500;
+    z-index: 1000;
+    /* Default animation */
+    animation: fade 5s;
 }
 
-    .info:not(:empty) {
-        animation: fade 5s;
+    .info:empty {
+        display: none;
+    }
+
+    .info.fast-fade {
+        animation: fade-fast 1.5s forwards;
     }
 
 @keyframes fade {
@@ -567,6 +589,28 @@ nav {
 
     90% {
         top: 30px;
+        opacity: 1;
+    }
+
+    100% {
+        top: -100px;
+        opacity: 0;
+    }
+}
+
+@keyframes fade-fast {
+    0% {
+        top: -100px;
+        opacity: 0;
+    }
+
+    15% {
+        top: 100px;
+        opacity: 1;
+    }
+
+    85% {
+        top: 100px;
         opacity: 1;
     }
 

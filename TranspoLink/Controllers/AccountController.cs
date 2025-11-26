@@ -36,8 +36,10 @@ public class AccountController(DB db,
 
         if (ModelState.IsValid)
         {
-            TempData["Info"] = "Login successfully.";
-            string identifier = u!.Email ?? u.Phone ?? u.Id.ToString();
+            TempData["Info"] = $"Welcome, {u!.Name}!";
+
+            // u.Id is now a string (e.g., C001), so no need for ToString()
+            string identifier = u!.Email ?? u.Phone ?? u.Id;
             hp.SignIn(identifier, u.Role, vm.RememberMe);
 
             if (string.IsNullOrEmpty(returnURL))
@@ -80,13 +82,11 @@ public class AccountController(DB db,
     [HttpPost]
     public IActionResult Register(RegisterVM vm)
     {
-        // 1. Ensure at least one contact method
         if (string.IsNullOrEmpty(vm.Email) && string.IsNullOrEmpty(vm.PhoneNumber))
         {
             ModelState.AddModelError("", "Please provide either an Email or a Phone number.");
         }
 
-        // 2. Check for Duplicates
         if (!string.IsNullOrEmpty(vm.Email) && db.Users.Any(u => u.Email == vm.Email))
         {
             ModelState.AddModelError("Email", "Duplicated Email.");
@@ -97,7 +97,6 @@ public class AccountController(DB db,
             ModelState.AddModelError("PhoneNumber", "Duplicated Phone Number.");
         }
 
-        // 3. Validate Photo
         if (vm.Photo != null)
         {
             var err = hp.ValidatePhoto(vm.Photo);
@@ -106,29 +105,29 @@ public class AccountController(DB db,
 
         if (ModelState.IsValid)
         {
-            // 4. Create Member
+            // Generate ID C001, C002, etc.
+            string nextId = hp.GetNextId(db, "Member");
+
             var newMember = new Member()
             {
+                Id = nextId,
                 Email = vm.Email,
                 Phone = vm.PhoneNumber,
                 Hash = hp.HashPassword(vm.Password),
                 Name = vm.Name,
-                PhotoURL = vm.Photo != null ? hp.SavePhoto(vm.Photo, "images") : "add_photo.png",
+                PhotoURL = vm.Photo != null ? hp.SavePhoto(vm.Photo, "photos") : "add_photo.png",
             };
 
             db.Members.Add(newMember);
             db.SaveChanges();
 
-            // 5. TRIGGER SUCCESS POPUP
             ViewBag.Success = true;
             ViewBag.RegisteredName = vm.Name;
             ViewBag.RegisteredContact = !string.IsNullOrEmpty(vm.Email) ? vm.Email : vm.PhoneNumber;
 
-            // Return the view (modal will show), JS handles redirect after 5s
             return View(vm);
         }
 
-        // If we are here, something failed. Return view with errors.
         return View(vm);
     }
 

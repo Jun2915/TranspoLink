@@ -15,6 +15,33 @@ public class Helper(IWebHostEnvironment en,
                     IConfiguration cf)
 {
     // ------------------------------------------------------------------------
+    // ID Generator Helper
+    // ------------------------------------------------------------------------
+    public string GetNextId(DB db, string role)
+    {
+        string prefix = role == "Admin" ? "A" : "C";
+
+        var lastId = db.Users
+            .Where(u => u.Id.StartsWith(prefix))
+            .OrderByDescending(u => u.Id)
+            .Select(u => u.Id)
+            .FirstOrDefault();
+
+        if (string.IsNullOrEmpty(lastId))
+        {
+            return prefix + "001";
+        }
+
+        // Extract number (e.g. C005 -> 5) and increment
+        if (int.TryParse(lastId.Substring(1), out int lastNum))
+        {
+            return prefix + (lastNum + 1).ToString("D3");
+        }
+
+        return prefix + "001"; // Fallback
+    }
+
+    // ------------------------------------------------------------------------
     // Photo Upload Helper Functions
     // ------------------------------------------------------------------------
 
@@ -123,14 +150,14 @@ public class Helper(IWebHostEnvironment en,
     {
         string s = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         string password = "";
-        
+
         Random r = new();
 
         for (int i = 1; i <= 10; i++)
         {
             password += s[r.Next(s.Length)];
         }
-       
+
         return password;
     }
 

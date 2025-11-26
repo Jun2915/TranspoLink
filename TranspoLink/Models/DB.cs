@@ -25,17 +25,17 @@ public class DB(DbContextOptions options) : DbContext(options)
         modelBuilder.Entity<User>()
             .HasIndex(u => u.Email)
             .IsUnique()
-            .HasFilter("[Email] IS NOT NULL"); 
+            .HasFilter("[Email] IS NOT NULL");
 
         modelBuilder.Entity<User>()
             .HasIndex(u => u.Phone)
             .IsUnique()
-            .HasFilter("[Phone] IS NOT NULL"); 
+            .HasFilter("[Phone] IS NOT NULL");
 
         modelBuilder.Entity<Booking>()
            .HasOne(b => b.Member)
            .WithMany(m => m.Bookings)
-           .HasForeignKey(b => b.MemberId) 
+           .HasForeignKey(b => b.MemberId)
            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Booking>()
@@ -62,16 +62,18 @@ public class DB(DbContextOptions options) : DbContext(options)
 
 public class User
 {
-    [Key, MaxLength(4)]
-    public int Id { get; set; }
+    // CHANGED: Id is now String and Manual Entry
+    [Key, MaxLength(5)]
+    [DatabaseGenerated(DatabaseGeneratedOption.None)]
+    public string Id { get; set; }
 
     [MaxLength(100)]
     [EmailAddress]
-    public string? Email { get; set; } 
+    public string? Email { get; set; }
 
     [MaxLength(20)]
     [Phone]
-    public string? Phone { get; set; } 
+    public string? Phone { get; set; }
 
     [MaxLength(100)]
     public string Hash { get; set; }
@@ -84,7 +86,8 @@ public class User
 
 public class Admin : User
 {
-
+    [MaxLength(100)]
+    public string? PhotoURL { get; set; }
 }
 
 public class Member : User
@@ -168,7 +171,9 @@ public class Booking
     [Key]
     public int Id { get; set; }
 
-    public int MemberId { get; set; }
+    // CHANGED: FK to Member is now string
+    [MaxLength(5)]
+    public string MemberId { get; set; }
 
     public int TripId { get; set; }
 

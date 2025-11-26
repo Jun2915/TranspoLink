@@ -50,7 +50,7 @@ public class AdminController(DB db, Helper hp) : Controller
         {
             query = query.Where(m =>
                 m.Email.Contains(search) ||
-                m.Phone.Contains(search) || // Added search by phone
+                m.Phone.Contains(search) ||
                 m.Name.Contains(search));
         }
 
@@ -70,8 +70,8 @@ public class AdminController(DB db, Helper hp) : Controller
         return View(members);
     }
 
-    // GET: Admin/MemberDetails/5
-    public IActionResult MemberDetails(int id)
+    // GET: Admin/MemberDetails/C001
+    public IActionResult MemberDetails(string id) // CHANGED: int -> string
     {
         var member = db.Members
             .Include(m => m.Bookings)
@@ -88,9 +88,9 @@ public class AdminController(DB db, Helper hp) : Controller
         return View(member);
     }
 
-    // POST: Admin/DeleteMember/5
+    // POST: Admin/DeleteMember/C001
     [HttpPost]
-    public IActionResult DeleteMember(int id)
+    public IActionResult DeleteMember(string id) // CHANGED: int -> string
     {
         var member = db.Members.Find(id);
 
@@ -101,7 +101,6 @@ public class AdminController(DB db, Helper hp) : Controller
         }
 
         // Check if member has bookings
-        // FIX: Changed from MemberEmail to MemberId check
         if (db.Bookings.Any(b => b.MemberId == member.Id))
         {
             TempData["Info"] = "Cannot delete member with existing bookings.";

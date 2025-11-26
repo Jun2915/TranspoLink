@@ -38,14 +38,14 @@ $('[type=reset]').on('click', e => {
 $('[data-check]').on('click', e => {
     e.preventDefault();
     const name = e.target.dataset.check;
-    $`[name=${name}]`).prop('checked', true);
+    $(`[name=${name}]`).prop('checked', true);
 });
 
 // Uncheck all checkboxes
 $('[data-uncheck]').on('click', e => {
     e.preventDefault();
     const name = e.target.dataset.uncheck;
-    $`[name=${name}]`).prop('checked', false);
+    $(`[name=${name}]`).prop('checked', false);
 });
 
 // Row checkable (AJAX-supported)
@@ -154,10 +154,6 @@ $(document).ready(function () {
         const btn = $(this).find('.search-btn');
         btn.prop('disabled', true);
         btn.html('🔍 Searching...');
-
-        // Note: The form will submit normally after this
-        // If you want to prevent actual submission for testing, uncomment below:
-        // e.preventDefault();
     });
 
     // Smooth scroll for navigation links
@@ -176,7 +172,6 @@ $(document).ready(function () {
         }
     });
 
-    // Add autocomplete suggestions for popular cities (optional)
     const popularCities = [
         'Kuala Lumpur',
         'Penang',
@@ -325,9 +320,27 @@ $(document).ready(function () {
         }, 600);
     });
 
-    // Show flash message if exists (for booking confirmations)
-    if ($('.info').text().trim().length > 0) {
-        console.log('Flash message displayed');
+    // ------------------------------------------------------------------------
+    // FLASH MESSAGE LOGIC (UPDATED)
+    // ------------------------------------------------------------------------
+    const infoBox = $('.info');
+    if (infoBox.text().trim().length > 0) {
+
+        // If it's a "Welcome" message, apply the fast-fade class
+        if (infoBox.text().includes('Welcome')) {
+            infoBox.addClass('fast-fade');
+            // Force removal after animation to be safe
+            setTimeout(() => {
+                infoBox.hide();
+            }, 1500);
+        }
+        else {
+            // Normal message handling (CSS animation 'fade' handles appearance)
+            // Just ensure it hides eventually if animation ends
+            setTimeout(() => {
+                infoBox.hide();
+            }, 5500);
+        }
     }
 
 });

@@ -33,18 +33,18 @@ namespace TranspoLink.Migrations
                 name: "Users",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", maxLength: 4, nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Id = table.Column<string>(type: "nvarchar(5)", maxLength: 5, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    Phone = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
                     Hash = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Discriminator = table.Column<string>(type: "nvarchar(8)", maxLength: 8, nullable: false),
+                    Admin_PhotoURL = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     PhotoURL = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
-                    table.UniqueConstraint("AK_Users_Email", x => x.Email);
                 });
 
             migrationBuilder.CreateTable(
@@ -101,7 +101,7 @@ namespace TranspoLink.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    MemberEmail = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    MemberId = table.Column<string>(type: "nvarchar(5)", maxLength: 5, nullable: false),
                     TripId = table.Column<int>(type: "int", nullable: false),
                     BookingDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     NumberOfSeats = table.Column<int>(type: "int", nullable: false),
@@ -120,17 +120,17 @@ namespace TranspoLink.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Bookings_Users_MemberEmail",
-                        column: x => x.MemberEmail,
+                        name: "FK_Bookings_Users_MemberId",
+                        column: x => x.MemberId,
                         principalTable: "Users",
-                        principalColumn: "Email",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Bookings_MemberEmail",
+                name: "IX_Bookings_MemberId",
                 table: "Bookings",
-                column: "MemberEmail");
+                column: "MemberId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Bookings_TripId",
@@ -151,7 +151,15 @@ namespace TranspoLink.Migrations
                 name: "IX_Users_Email",
                 table: "Users",
                 column: "Email",
-                unique: true);
+                unique: true,
+                filter: "[Email] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_Phone",
+                table: "Users",
+                column: "Phone",
+                unique: true,
+                filter: "[Phone] IS NOT NULL");
         }
 
         /// <inheritdoc />
