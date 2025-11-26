@@ -1,4 +1,4 @@
-global using TranspoLink.Models;
+﻿global using TranspoLink.Models;
 global using TranspoLink;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,8 +38,36 @@ builder.Services.AddSession(options =>
 
 var app = builder.Build();
 
+// Auto-create admin if not exists
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<DB>();
+    var hp = scope.ServiceProvider.GetRequiredService<Helper>();
+
+    db.Database.EnsureCreated();
+
+    if (!db.Admins.Any())
+    {
+        var admin = new Admin
+        {
+            Email = "admin@transpolink.com",
+            Hash = hp.HashPassword("Admin123"),
+            Name = "System Administrator"
+        };
+
+        db.Admins.Add(admin);
+        db.SaveChanges();
+
+        Console.WriteLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+        Console.WriteLine("✅ Admin Account Created!");
+        Console.WriteLine("📧 Email: admin@transpolink.com");
+        Console.WriteLine("🔑 Password: Admin123");
+        Console.WriteLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+    }
+}
+
 //Exception Handling
-if(app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
 }

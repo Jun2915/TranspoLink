@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 
-namespace Demo.Controllers;
+namespace TranspoLink.Controllers;
 
 public class HomeController(DB db) : Controller
 {

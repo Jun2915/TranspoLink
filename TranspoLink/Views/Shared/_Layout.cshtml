@@ -20,21 +20,51 @@
         <div class="top-bar-item">
             📋 Check My Booking
         </div>
-        <div class="top-bar-item">
-            <a href="/Account/Login">🔐 Login </a>/<a href="/Account/Register"> Sign Up</a>
-        </div>
+        @if (User.Identity.IsAuthenticated)
+        {
+            <div class="top-bar-item">
+                👋 Welcome, @User.Identity.Name
+            </div>
+            <div class="top-bar-item">
+                <a href="/Account/Logout">🚪 Logout</a>
+            </div>
+        }
+        else
+        {
+            <div class="top-bar-item">
+                <a href="/Account/Login">🔐 Login</a> / <a href="/Account/Register">Sign Up</a>
+            </div>
+        }
     </div>
 
     <nav>
         <div class="logo">
-            <a href="/Home/Index"><img src="/images/shortcut_icon.png" alt="TranspoLink Logo" style="width:50px; height:50px;" /></a>
-            <a href="/Home/Index"><span>TranspoLink</span></a>
+            <img src="/images/shortcut_icon.png" alt="TranspoLink Logo" style="width:50px; height:50px;" />
+            <span>TranspoLink</span>
         </div>
         <ul class="nav-links">
             <li><a href="/">Home</a></li>
-            <li><a href="#features">Features</a></li>
-            <li><a href="#trending">News & Offers</a></li>
-            <li><a href="#contact">Contact</a></li>
+            @if (User.IsInRole("Admin"))
+            {
+                <li><a href="/Admin">Dashboard</a></li>
+                <li><a href="/Admin/Members">Members</a></li>
+                <li><a href="/Admin/Routes">Routes</a></li>
+                <li><a href="/Admin/Vehicles">Vehicles</a></li>
+                <li><a href="/Admin/Trips">Trips</a></li>
+                <li><a href="/Admin/Bookings">Bookings</a></li>
+            }
+            else if (User.Identity.IsAuthenticated)
+            {
+                <li><a href="#features">Features</a></li>
+                <li><a href="#trending">News & Offers</a></li>
+                <li><a href="/Account/UpdateProfile">Profile</a></li>
+            }
+            else
+            {
+                <li><a href="#features">Features</a></li>
+                <li><a href="#trending">News & Offers</a></li>
+                <li><a href="#contact">Contact</a></li>
+            }
         </ul>
     </nav>
 

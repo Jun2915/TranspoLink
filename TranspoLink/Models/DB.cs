@@ -18,37 +18,50 @@ public class DB(DbContextOptions options) : DbContext(options)
     public DbSet<Vehicle> Vehicles { get; set; }
     public DbSet<Booking> Bookings { get; set; }
 
-   /* protected override void OnModelCreating(ModelBuilder modelBuilder)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-
-        modelBuilder.Entity<User>()
-            .HasDiscriminator<string>("Role")
-            .HasValue<Admin>("Admin")
-            .HasValue<Member>("Member");
 
         // Configure indexes
         modelBuilder.Entity<User>()
             .HasIndex(u => u.Email)
             .IsUnique();
 
-        // Add seed data
-        modelBuilder.Entity<Admin>().HasData(
-            new Admin
-            {
-                Email = "admin@transpolink.com",
-                Hash = "AQAAAAIAAYagAAAAEFake123Hash456...", // Use hp.HashPassword("Admin123")
-                Name = "System Administrator"
-            }
-        );
-    }*/
+
+        modelBuilder.Entity<Booking>()
+           .HasOne(b => b.Member)
+           .WithMany(m => m.Bookings)
+           .HasForeignKey(b => b.MemberEmail)
+           .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Booking>()
+            .HasOne(b => b.Trip)
+            .WithMany(t => t.Bookings)
+            .HasForeignKey(b => b.TripId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Trip>()
+            .HasOne(t => t.Route)
+            .WithMany(r => r.Trips)
+            .HasForeignKey(t => t.RouteId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Trip>()
+            .HasOne(t => t.Vehicle)
+            .WithMany(v => v.Trips)
+            .HasForeignKey(t => t.VehicleId)
+            .OnDelete(DeleteBehavior.Restrict);
+    }
 }
 
 // Entity Classes -------------------------------------------------------------
 
 public class User
 {
-    [Key, MaxLength(100)]
+    [Key, MaxLength(4)]
+    public int Id { get; set; }
+
+    [MaxLength(100)]
     public string Email { get; set; }
     [MaxLength(100)]
     public string Hash { get; set; }

@@ -1,0 +1,122 @@
+﻿@{
+    ViewBag.Title += " |Admin Dashboard";
+}
+
+@section header{
+    <link rel="stylesheet" href="/css/admin.css" />
+}
+<div class="admin-container">
+    <div class="admin-header">
+        <h1>🎯 Admin Dashboard</h1>
+        <p>Welcome back! Here's what's happening with TranspoLink today.</p>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">👥 Total Members</div>
+            <div class="stat-value">@ViewBag.TotalMembers</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">🗺️ Active Routes</div>
+            <div class="stat-value">@ViewBag.TotalRoutes</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">🚌 Total Vehicles</div>
+            <div class="stat-value">@ViewBag.TotalVehicles</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">📋 Total Bookings</div>
+            <div class="stat-value">@ViewBag.TotalBookings</div>
+        </div>
+        <div class="stat-card pending">
+            <div class="stat-label">⏳ Pending Bookings</div>
+            <div class="stat-value">@ViewBag.PendingBookings</div>
+        </div>
+        <div class="stat-card today">
+            <div class="stat-label">📅 Today's Bookings</div>
+            <div class="stat-value">@ViewBag.TodayBookings</div>
+        </div>
+    </div>
+
+    <!-- Quick Navigation -->
+    <div class="admin-nav">
+        <a href="/Admin/Members" class="nav-card">
+            <div class="nav-card-icon">👥</div>
+            <div class="nav-card-title">Members</div>
+            <div class="nav-card-desc">Manage user accounts</div>
+        </a>
+        <a href="/Admin/Routes" class="nav-card">
+            <div class="nav-card-icon">🗺️</div>
+            <div class="nav-card-title">Routes</div>
+            <div class="nav-card-desc">Manage transportation routes</div>
+        </a>
+        <a href="/Admin/Vehicles" class="nav-card">
+            <div class="nav-card-icon">🚌</div>
+            <div class="nav-card-title">Vehicles</div>
+            <div class="nav-card-desc">Manage fleet</div>
+        </a>
+        <a href="/Admin/Trips" class="nav-card">
+            <div class="nav-card-icon">🎫</div>
+            <div class="nav-card-title">Trips</div>
+            <div class="nav-card-desc">Manage scheduled trips</div>
+        </a>
+        <a href="/Admin/Bookings" class="nav-card">
+            <div class="nav-card-icon">📋</div>
+            <div class="nav-card-title">Bookings</div>
+            <div class="nav-card-desc">View all bookings</div>
+        </a>
+        <a href="/Admin/Reports" class="nav-card">
+            <div class="nav-card-icon">📊</div>
+            <div class="nav-card-title">Reports</div>
+            <div class="nav-card-desc">Analytics & insights</div>
+        </a>
+    </div>
+
+    <!-- Recent Bookings -->
+    <div class="recent-section">
+        <h2>📋 Recent Bookings</h2>
+        @if (Model.Any())
+        {
+            <table class="booking-table">
+                <thead>
+                    <tr>
+                        <th>Booking ID</th>
+                        <th>Member</th>
+                        <th>Route</th>
+                        <th>Date</th>
+                        <th>Seats</th>
+                        <th>Total Price</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var booking in Model)
+                    {
+                        <tr>
+                            <td>#@booking.Id</td>
+                            <td>@booking.Member.Name</td>
+                            <td>@booking.Trip.Route.Origin → @booking.Trip.Route.Destination</td>
+                            <td>@booking.BookingDate.ToString("dd MMM yyyy")</td>
+                            <td>@booking.NumberOfSeats</td>
+                            <td>RM @booking.TotalPrice.ToString("N2")</td>
+                            <td>
+                                <span class="status-badge status-@booking.Status.ToLower()">
+                                    @booking.Status
+                                </span>
+                            </td>
+                            <td>
+                                <a href="/Admin/BookingDetails/@booking.Id" class="btn-view">View</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p style="text-align: center; color: #666; padding: 40px;">No bookings yet.</p>
+        }
+    </div>
+</div>
