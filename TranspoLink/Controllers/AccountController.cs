@@ -18,7 +18,6 @@ public class AccountController(DB db,
     [HttpPost]
     public IActionResult Login(LoginVM vm, string? returnURL)
     {
-        // Fix: Use FirstOrDefault instead of Find(string)
         User? u = null;
 
         if (!string.IsNullOrEmpty(vm.Email))
@@ -38,12 +37,7 @@ public class AccountController(DB db,
         if (ModelState.IsValid)
         {
             TempData["Info"] = "Login successfully.";
-
-            // Use User.Id or User.Name as the identifier claim if you prefer, 
-            // but typical Identity setup uses Name/Email. 
-            // Using Email/Phone here for display name.
             string identifier = u!.Email ?? u.Phone ?? u.Id.ToString();
-
             hp.SignIn(identifier, u.Role, vm.RememberMe);
 
             if (string.IsNullOrEmpty(returnURL))
@@ -56,33 +50,23 @@ public class AccountController(DB db,
         return View(vm);
     }
 
-    // GET: Account/Logout
     public IActionResult Logout(string? returnURL)
     {
         TempData["Info"] = "Logout successfully.";
-
         hp.SignOut();
-
         return RedirectToAction("Index", "Home");
     }
 
-    // GET: Account/AccessDenied
     public IActionResult AccessDenied(string? returnURL)
     {
         return View();
     }
 
-    // ------------------------------------------------------------------------
-    // Others
-    // ------------------------------------------------------------------------
-
-    // GET: Account/CheckEmail
     public bool CheckEmail(string email)
     {
         return !db.Users.Any(u => u.Email == email);
     }
 
-    // GET: Account/Register
     public IActionResult Register()
     {
         return View();
@@ -92,7 +76,6 @@ public class AccountController(DB db,
     [HttpPost]
     public IActionResult Register(RegisterVM vm)
     {
-        // Custom Validation: Must have Email OR Phone
         if (string.IsNullOrEmpty(vm.Email) && string.IsNullOrEmpty(vm.PhoneNumber))
         {
             ModelState.AddModelError("", "Please provide either an Email or a Phone number.");
@@ -116,36 +99,40 @@ public class AccountController(DB db,
 
         if (ModelState.IsValid)
         {
-            db.Members.Add(new Member()
+            var newMember = new Member()
             {
-                Email = vm.Email,       // Can be null
-                Phone = vm.PhoneNumber, // Added Phone mapping
+                Email = vm.Email,
+                Phone = vm.PhoneNumber,
                 Hash = hp.HashPassword(vm.Password),
                 Name = vm.Name,
-                PhotoURL = vm.Photo != null ? hp.SavePhoto(vm.Photo, "images") : "/images/add_photo.png",
-            });
+                PhotoURL = vm.Photo != null ? hp.SavePhoto(vm.Photo, "images") : "add_photo.png",
+            };
+
+            db.Members.Add(newMember);
             db.SaveChanges();
 
-            TempData["Info"] = "Register successfully. Please login.";
-            return RedirectToAction("Login");
+            // SUCCESS! Pass data to ViewBag to trigger the popup
+            ViewBag.Success = true;
+            ViewBag.RegisteredName = vm.Name;
+            ViewBag.RegisteredContact = vm.Email ?? vm.PhoneNumber;
+
+            // Return the view (do not redirect yet) so the modal can show
+            return View(vm);
         }
 
         return View(vm);
     }
 
-    // GET: Account/UpdatePassword
     [Authorize]
     public IActionResult UpdatePassword()
     {
         return View();
     }
 
-    // POST: Account/UpdatePassword
     [Authorize]
     [HttpPost]
     public IActionResult UpdatePassword(UpdatePasswordVM vm)
     {
-        // Find by currently logged in user name (which is Email or Phone)
         var identifier = User.Identity!.Name;
         var u = db.Users.FirstOrDefault(u => u.Email == identifier || u.Phone == identifier);
 
@@ -168,7 +155,6 @@ public class AccountController(DB db,
         return View();
     }
 
-    // GET: Account/UpdateProfile
     [Authorize(Roles = "Member")]
     public IActionResult UpdateProfile()
     {
@@ -188,7 +174,6 @@ public class AccountController(DB db,
         return View(vm);
     }
 
-    // POST: Account/UpdateProfile
     [Authorize(Roles = "Member")]
     [HttpPost]
     public IActionResult UpdateProfile(UpdateProfileVM vm)
@@ -207,12 +192,10 @@ public class AccountController(DB db,
         if (ModelState.IsValid)
         {
             m.Name = vm.Name;
-            // m.Email = vm.Email; // Generally we don't allow changing unique ID easily without re-verification
-            // m.Phone = vm.Phone; 
 
             if (vm.Photo != null)
             {
-                if (m.PhotoURL != null && m.PhotoURL != "/images/add_photo.png")
+                if (m.PhotoURL != null && m.PhotoURL != "add_photo.png")
                 {
                     hp.DeletePhoto(m.PhotoURL, "photos");
                 }
@@ -220,7 +203,6 @@ public class AccountController(DB db,
             }
 
             db.SaveChanges();
-
             TempData["Info"] = "Profile updated.";
             return RedirectToAction();
         }
@@ -231,13 +213,11 @@ public class AccountController(DB db,
         return View(vm);
     }
 
-    // GET: Account/ResetPassword
     public IActionResult ResetPassword()
     {
         return View();
     }
 
-    // POST: Account/ResetPassword
     [HttpPost]
     public IActionResult ResetPassword(ResetPasswordVM vm)
     {
@@ -251,20 +231,13 @@ public class AccountController(DB db,
         if (ModelState.IsValid)
         {
             string password = hp.RandomPassword();
-
             u!.Hash = hp.HashPassword(password);
             db.SaveChanges();
 
-            // Send reset password email (Only works if user has email)
             if (!string.IsNullOrEmpty(u.Email))
             {
                 SendResetPasswordEmail(u, password);
                 TempData["Info"] = $"Password reset. Check your email.";
-            }
-            else
-            {
-                // If registered by phone only, we can't email. 
-                TempData["Info"] = $"Password reset to: {password} (Please copy this)";
             }
 
             return RedirectToAction();
@@ -287,7 +260,7 @@ public class AccountController(DB db,
         var path = u switch
         {
             Admin => Path.Combine(en.WebRootPath, "photos", "admin.jpg"),
-            Member m => Path.Combine(en.WebRootPath, "photos", m.PhotoURL ?? "default.jpg"),
+            Member m => Path.Combine(en.WebRootPath, "photos", m.PhotoURL ?? "add_photo.png"),
             _ => "",
         };
 
@@ -302,10 +275,6 @@ public class AccountController(DB db,
             <p>Dear {u.Name},<p>
             <p>Your password has been reset to:</p>
             <h1 style='color: red'>{password}</h1>
-            <p>
-                Please <a href='{url}'>login</a>
-                with your new password.
-            </p>
             <p>From, 🐱 Super Admin</p>
         ";
 
