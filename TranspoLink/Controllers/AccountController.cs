@@ -76,11 +76,13 @@ public class AccountController(DB db,
     [HttpPost]
     public IActionResult Register(RegisterVM vm)
     {
+        // 1. Ensure at least one contact method
         if (string.IsNullOrEmpty(vm.Email) && string.IsNullOrEmpty(vm.PhoneNumber))
         {
             ModelState.AddModelError("", "Please provide either an Email or a Phone number.");
         }
 
+        // 2. Check for Duplicates
         if (!string.IsNullOrEmpty(vm.Email) && db.Users.Any(u => u.Email == vm.Email))
         {
             ModelState.AddModelError("Email", "Duplicated Email.");
@@ -91,6 +93,7 @@ public class AccountController(DB db,
             ModelState.AddModelError("PhoneNumber", "Duplicated Phone Number.");
         }
 
+        // 3. Validate Photo
         if (vm.Photo != null)
         {
             var err = hp.ValidatePhoto(vm.Photo);
@@ -99,6 +102,7 @@ public class AccountController(DB db,
 
         if (ModelState.IsValid)
         {
+            // 4. Create Member
             var newMember = new Member()
             {
                 Email = vm.Email,
@@ -111,15 +115,16 @@ public class AccountController(DB db,
             db.Members.Add(newMember);
             db.SaveChanges();
 
-            // SUCCESS! Pass data to ViewBag to trigger the popup
+            // 5. TRIGGER SUCCESS POPUP
             ViewBag.Success = true;
             ViewBag.RegisteredName = vm.Name;
-            ViewBag.RegisteredContact = vm.Email ?? vm.PhoneNumber;
+            ViewBag.RegisteredContact = !string.IsNullOrEmpty(vm.Email) ? vm.Email : vm.PhoneNumber;
 
-            // Return the view (do not redirect yet) so the modal can show
+            // Return the view (modal will show), JS handles redirect after 5s
             return View(vm);
         }
 
+        // If we are here, something failed. Return view with errors.
         return View(vm);
     }
 

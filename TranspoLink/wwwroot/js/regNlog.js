@@ -23,10 +23,12 @@ function initAuthPages() {
         $('.auth-input-group input:visible:first').focus();
     }, 300);
 
-    // PERSISTENCE: Check which fields have values on load (in case of error)
-    // If Phone has a value, switch to the phone tab automatically
-    if ($('input[name="PhoneNumber"]').val() || $('input[name="Phone"]').val()) {
+    // PERSISTENCE: If the server returned the page with data (error state),
+    // switch to the correct tab automatically so the user doesn't lose focus.
+    if ($('input[name="PhoneNumber"]').val()) {
         $('[data-register-type="phone"]').click();
+    }
+    if ($('input[name="Phone"]').val()) {
         $('[data-login-type="phone"]').click();
     }
 }
@@ -47,9 +49,11 @@ function setupPasswordToggle() {
         // Toggle Eye Icon
         const $svg = $btn.find('svg path');
         if (newType === 'text') {
+            // Eye Off Icon
             $svg.attr('d', 'M11.83,9L15,12.16C15,12.11 15,12.05 15,12A3,3 0 0,0 12,9C11.94,9 11.89,9 11.83,9M7.53,9.8L9.08,11.35C9.03,11.56 9,11.77 9,12A3,3 0 0,0 12,15C12.22,15 12.44,14.97 12.65,14.92L14.2,16.47C13.53,16.8 12.79,17 12,17A5,5 0 0,1 7,12C7,11.21 7.2,10.47 7.53,9.8M2,4.27L4.28,6.55L4.73,7C3.08,8.3 1.78,10 1,12C2.73,16.39 7,19.5 12,19.5C13.55,19.5 15.03,19.2 16.38,18.66L16.81,19.08L19.73,22L21,20.73L3.27,3M12,7A5,5 0 0,1 17,12C17,12.64 16.87,13.26 16.64,13.82L19.57,16.75C21.07,15.5 22.27,13.86 23,12C21.27,7.61 17,4.5 12,4.5C10.6,4.5 9.26,4.75 8,5.2L10.17,7.35C10.74,7.13 11.35,7 12,7Z');
         } else {
-            $svg.attr('d', 'M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z');
+            // Eye On Icon
+            $svg.attr('d', 'M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z');
         }
     });
 }
@@ -78,19 +82,13 @@ function setupLoginTypeToggle() {
         if (loginType === 'email') {
             $('#email-input-group').show();
             $('#phone-input-group').hide();
-            // Clear phone value so validation doesn't complain about it
-            // $('input[name="Phone"]').val(''); 
+            // We don't clear values anymore so user data persists if they switch back and forth
         } else {
             $('#email-input-group').hide();
             $('#phone-input-group').show();
-            // Clear email value
-            // $('input[name="Email"]').val('');
         }
 
-        // Focus input
-        setTimeout(() => {
-            $('.auth-input-group:visible input').first().focus();
-        }, 50);
+        setTimeout(() => { $('.auth-input-group:visible input').first().focus(); }, 50);
     });
 }
 
@@ -120,28 +118,20 @@ function setupRegisterTypeToggle() {
             $('#reg-phone-input-group').show();
         }
 
-        setTimeout(() => {
-            $('.auth-input-group:visible input').first().focus();
-        }, 50);
+        setTimeout(() => { $('.auth-input-group:visible input').first().focus(); }, 50);
     });
 }
 
-// ============================================================================
-// FORM VALIDATION
-// ============================================================================
 function setupFormValidation() {
-    // Relaxed Phone Validation
+    // Very flexible phone validation. Just checking if it contains valid characters.
+    // No strict Malaysian regex here.
     $(document).on('input', 'input[name="Phone"], input[name="PhoneNumber"]', function () {
         let value = $(this).val();
-        // Just allow numbers and plus sign, don't force aggressive formatting
-        // This makes it less annoying ("gg") for users
-        const $errorSpan = $(this).parent().siblings('.field-validation-error');
-
-        if (value.length > 0 && !/^[0-9+]*$/.test(value)) {
-            // Only error if they type letters
-            $(this).addClass('input-error');
+        // Allow only numbers, spaces, dashes, and plus sign
+        if (value.length > 0 && !/^[0-9+\-\s]*$/.test(value)) {
+            $(this).addClass('input-error'); // Highlight red
         } else {
-            $(this).removeClass('input-error');
+            $(this).removeClass('input-error'); // Remove red
         }
     });
 
@@ -159,30 +149,36 @@ function setupFormValidation() {
 }
 
 // ============================================================================
-// PHOTO UPLOAD (FIXED: Removed double click handler)
+// PHOTO UPLOAD (FIXED: Removed the "click" event that caused double opening)
 // ============================================================================
 function setupPhotoUpload() {
-    // Only handle the change event. 
-    // The Label > Input structure in HTML handles the click automatically.
+    // We only listen for the CHANGE event now.
+    // The <label> HTML tag handles the click automatically.
     $(document).on('change', '.auth-upload input[type="file"]', function (e) {
         const file = e.target.files[0];
         const $input = $(this);
         const $img = $input.siblings('img');
         const $uploadText = $input.siblings('.auth-upload-text');
 
+        // Save original src if not saved
         if (!$img.data('original-src')) {
             $img.data('original-src', $img.attr('src'));
         }
 
         if (file) {
+            // Basic check to ensure it's an image
+            if (!file.type.startsWith('image/')) {
+                alert("Please select a valid image (JPG or PNG).");
+                return;
+            }
+
             const reader = new FileReader();
             reader.onload = function (e) {
                 $img.attr('src', e.target.result);
-                // Apply styling to indicate selected
                 $img.css({
-                    'border': '3px solid #0066cc'
+                    'border': '3px solid #0066cc' // Show blue border when selected
                 });
-                if ($uploadText.length) $uploadText.text('Change photo');
+                if ($uploadText.length) $uploadText.text('Photo Selected');
             };
             reader.readAsDataURL(file);
         }
@@ -207,27 +203,8 @@ function setupInputAnimations() {
 function setupSocialLogin() {
     $(document).on('click', '.auth-social-btn', function (e) {
         e.preventDefault();
-        const provider = $(this).text().trim();
-        alert(provider + ' login coming soon!');
+        // Just a placeholder
+        const provider = $(this).hasClass('facebook') ? "Facebook" : "Google";
+        console.log("Social login clicked: " + provider);
     });
-}
-
-// ============================================================================
-// HELPER FOR RIPPLE EFFECT
-// ============================================================================
-function addRippleEffect($element, event) {
-    const $ripple = $('<span class="ripple"></span>');
-    $element.css('position', 'relative').css('overflow', 'hidden');
-    $element.append($ripple);
-    const rect = $element[0].getBoundingClientRect();
-    const x = event.pageX - rect.left - $(window).scrollLeft();
-    const y = event.pageY - rect.top - $(window).scrollTop();
-    $ripple.css({
-        left: x + 'px', top: y + 'px',
-        position: 'absolute', width: '10px', height: '10px',
-        'border-radius': '50%', background: 'rgba(255, 255, 255, 0.5)',
-        transform: 'scale(0)', animation: 'ripple-animation 0.6s ease-out',
-        'pointer-events': 'none'
-    });
-    setTimeout(() => { $ripple.remove(); }, 600);
 }

@@ -7,7 +7,7 @@
     align-items: center;
     justify-content: center;
     padding: 20px;
-    background: #f0f2f5; /* Softer background like modern apps */
+    background: #f0f2f5;
 }
 
 .auth-card {
@@ -70,7 +70,7 @@
 }
 
 /* ============================================================================
-   TOGGLE GROUP (Email vs Phone)
+   TOGGLE GROUP (Email vs Phone) - PILL STYLE
    ============================================================================ */
 .auth-option-group {
     display: flex;
@@ -90,17 +90,18 @@
     cursor: pointer;
     display: flex;
     align-items: center;
-    justify-content: center; /* Center content */
+    justify-content: center;
     gap: 8px;
     transition: all 0.2s ease;
 }
 
-    /* Active State (Blue border, Blue bg tint) */
+    /* Active State (Blue border, Blue bg tint, Bold text) */
     .auth-option.active {
         background: #eef6ff;
         border-color: #0066cc;
         color: #0066cc;
-        font-weight: 600;
+        font-weight: 700;
+        border-width: 2px; /* Thicker border for active */
     }
 
 .auth-option-icon,
@@ -136,13 +137,13 @@
 
     .auth-input-group input {
         width: 100%;
-        padding: 14px 14px 14px 45px;
+        padding: 12px 12px 12px 45px; /* Left padding for icon */
         font-size: 15px;
         border: 1px solid #ddd;
         border-radius: 8px;
-        background: #f9faff; /* Slight tint */
-        transition: all 0.3s ease;
+        background: #f9faff;
         box-sizing: border-box;
+        transition: all 0.3s ease;
     }
 
         .auth-input-group input:focus {
@@ -152,12 +153,19 @@
             box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
         }
 
+/* Error State */
+.input-error {
+    border-color: #dc3545 !important;
+    background: #fff8f8 !important;
+}
+
 .auth-input-icon {
     position: absolute;
     left: 15px;
     top: 50%;
     transform: translateY(-50%);
     z-index: 1;
+    color: #888;
 }
 
 .auth-toggle-password {
@@ -169,6 +177,7 @@
     border: none;
     cursor: pointer;
     padding: 0;
+    color: #888;
 }
 
 /* ============================================================================
@@ -177,7 +186,7 @@
 .auth-submit-btn {
     width: 100%;
     padding: 14px;
-    background: #f95f35; /* Orange color from your pic */
+    background: #f95f35; /* Orange */
     color: white;
     border: none;
     border-radius: 8px;
@@ -254,17 +263,18 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0,0,0,0.6);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 9999;
+    backdrop-filter: blur(5px);
 }
 
 .success-card {
     background: white;
     padding: 40px;
-    border-radius: 16px;
+    border-radius: 20px;
     text-align: center;
     width: 90%;
     max-width: 400px;
@@ -312,14 +322,9 @@
     }
 }
 
-/* Errors */
+/* Validation Text */
 .field-validation-error {
     color: #dc3545;
     font-size: 12px;
     margin-left: 5px;
-}
-
-.input-error input {
-    border-color: #dc3545;
-    background: #fff8f8;
 }
