@@ -1,4 +1,5 @@
 ﻿@inject DB db
+@using Microsoft.AspNetCore.Authentication
 
 <!DOCTYPE html>
 <html lang="en">
@@ -33,6 +34,18 @@
         {
             var identifier = User.Identity.Name;
             var currentUser = db.Users.FirstOrDefault(u => u.Email == identifier || u.Phone == identifier);
+
+            // ==============================================
+            // 🚫 FORCE LOGOUT IF BLOCKED OR DELETED 🚫
+            // ==============================================
+            if (currentUser == null || currentUser.IsBlocked)
+            {
+                Context.SignOutAsync("Cookies");
+                Context.Response.Redirect("/Account/Login");
+                return; // Stop rendering
+            }
+            // ==============================================
+
             string photoUrl = "/images/default_photo.png";
             if (currentUser is Member m && !string.IsNullOrEmpty(m.PhotoURL))
             {

@@ -37,7 +37,15 @@ public class AccountController(DB db,
             u = db.Users.FirstOrDefault(x => x.Phone == vm.Phone);
         }
 
-        // 3. CHECK IF BLOCKED
+        // --- [NEW] CHECK IF BLOCKED ---
+        if (u != null && u.IsBlocked)
+        {
+            ModelState.AddModelError("", "Your account has been blocked by Admin. Please contact support.");
+            return View(vm);
+        }
+        // ------------------------------
+
+        // 3. CHECK IF LOCKED OUT (Existing logic)
         if (u != null && u.LockoutEnd > DateTime.Now)
         {
             var timeLeft = u.LockoutEnd.Value - DateTime.Now;

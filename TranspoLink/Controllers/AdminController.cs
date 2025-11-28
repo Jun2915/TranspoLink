@@ -134,6 +134,27 @@ public class AdminController(DB db, Helper hp) : Controller
         return RedirectToAction("Members");
     }
 
+    [HttpPost]
+    public IActionResult ToggleBlockMember(string id)
+    {
+        var member = db.Members.Find(id);
+        if (member == null)
+        {
+            TempData["Info"] = "Member not found.";
+            return RedirectToAction("Members");
+        }
+
+        // Toggle the blocked status
+        member.IsBlocked = !member.IsBlocked;
+        db.SaveChanges();
+
+        string status = member.IsBlocked ? "blocked" : "unblocked";
+        TempData["Info"] = $"Member {member.Name} has been {status}.";
+
+        // Redirect back to details to see the change
+        return RedirectToAction("MemberDetails", new { id = member.Id });
+    }
+
     // ============================================================================
     // ROUTE MANAGEMENT
     // ============================================================================

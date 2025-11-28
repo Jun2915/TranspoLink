@@ -713,7 +713,8 @@ header {
 }
 
 .btn-manage:hover {
-    background: rgba(102, 126, 238, 0.1);
+    background: rgba(102, 126, 238, 0.8);
+    color: white;
 }
 
 .btn-logout:hover {

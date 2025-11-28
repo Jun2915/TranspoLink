@@ -20,7 +20,7 @@
         <!-- 1. Left Side: Profile Card -->
         <div class="profile-card">
             <div class="profile-header-img">
-                <img src="/photos/@Model.PhotoURL" onerror="this.src='/images/default_photo.png'" alt="Profile Photo">
+                <img src="/images/@Model.PhotoURL" onerror="this.src='/images/default_photo.png'" alt="Profile Photo">
             </div>
             <h2 class="profile-name">@Model.Name</h2>
             <p class="profile-id">Member ID: <b>@Model.Id</b></p>
@@ -40,9 +40,20 @@
                 </div>
             </div>
 
-            <div class="profile-actions">
-                <!-- Trigger Button (Opens Modal) -->
-                <button type="button" class="btn-delete-large" onclick="openDeleteModal('@Model.Name')">Delete Member Account</button>
+            <div class="profile-actions" style="display: flex; gap: 10px;">
+
+                <form method="post" action="/Admin/ToggleBlockMember/@Model.Id" style="flex: 1;">
+                    @if (Model.IsBlocked)
+                    {
+                        <button type="submit" class="btn-tool" style="width:100%; background-color: #2ed573;">Unblock Account</button>
+                    }
+                    else
+                    {
+                        <button type="submit" class="btn-tool" style="width:100%; background-color: #f59e0b;">Block Account</button>
+                    }
+                </form>
+
+                <button type="button" class="btn-delete-large" onclick="openDeleteModal('@Model.Name')" style="flex: 1; margin-top: 0;">Delete Account</button>
             </div>
         </div>
 

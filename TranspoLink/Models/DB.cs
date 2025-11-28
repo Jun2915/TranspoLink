@@ -83,6 +83,8 @@ public class User
     public int LoginRetryCount { get; set; } = 0;
     public DateTime? LockoutEnd { get; set; }
 
+    public bool IsBlocked { get; set; } = false;
+
     public string Role => GetType().Name;
 }
 
