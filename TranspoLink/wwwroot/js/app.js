@@ -79,6 +79,41 @@ $('.upload input').on('change', e => {
 // ============================================================================
 
 $(document).ready(function () {
+    // ============================================================================
+    // 🌙 THEME TOGGLE LOGIC (Added here!)
+    // ============================================================================
+    const themeToggle = $('#themeToggle');
+    const themeIcon = $('#themeIcon');
+    const themeText = $('#themeText');
+    const htmlElement = document.documentElement; // The <html> tag
+
+    // 1. Check saved theme on load
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+        htmlElement.setAttribute('data-theme', 'dark');
+        themeIcon.text('🌙');
+        themeText.text('Night'); 
+    } else {
+        htmlElement.removeAttribute('data-theme');
+        themeIcon.text('☀️');
+        themeText.text('Light');
+    }
+
+    // 2. Handle Click
+    themeToggle.on('click', function () {
+        if (htmlElement.hasAttribute('data-theme')) {
+            htmlElement.removeAttribute('data-theme');
+            themeIcon.text('☀️');
+            themeText.text('Light');
+            localStorage.setItem('theme', 'light');
+        } else {
+            // Switch to Dark
+            htmlElement.setAttribute('data-theme', 'dark');
+            themeIcon.text('🌙');
+            themeText.text('Night'); 
+            localStorage.setItem('theme', 'dark');
+        }
+    });
 
     // ============================================================================
     // PROFILE DROPDOWN LOGIC

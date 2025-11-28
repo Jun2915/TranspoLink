@@ -246,6 +246,17 @@
     margin-top: 2px;
 }
 
+.field-validation-error,
+.validation-summary-errors {
+    color: #dc3545 !important; /* 强制红色 */
+    font-weight: 600;
+}
+
+.validation-summary-errors ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
 /* ============================================================================
    BUTTONS & FOOTER
    ============================================================================ */
