@@ -27,42 +27,22 @@
         @* --- USER DROPDOWN LOGIC START --- *@
         @if (User.Identity.IsAuthenticated)
         {
-            // Fetch User Details from DB
             var identifier = User.Identity.Name;
             var currentUser = db.Users.FirstOrDefault(u => u.Email == identifier || u.Phone == identifier);
-
-            // Default fallback
             string photoUrl = "/images/default_photo.png";
 
-            // Logic for Member Photo
             if (currentUser is Member m && !string.IsNullOrEmpty(m.PhotoURL))
             {
-                if (m.PhotoURL == "default_photo.png")
-                {
-                    photoUrl = "/images/default_photo.png";
-                }
-                else
-                {
-                    // Pointing to 'photos' folder
-                    photoUrl = "/photos/" + m.PhotoURL;
-                }
+                if (m.PhotoURL == "default_photo.png") { photoUrl = "/images/default_photo.png"; }
+                else { photoUrl = "/photos/" + m.PhotoURL; }
             }
-            // Logic for Admin Photo
             else if (currentUser is Admin a && !string.IsNullOrEmpty(a.PhotoURL))
             {
-                // If it's the default static image or a custom uploaded one
-                if (a.PhotoURL.StartsWith("/images/"))
-                {
-                    photoUrl = a.PhotoURL;
-                }
-                else
-                {
-                    photoUrl = "/photos/" + a.PhotoURL;
-                }
+                if (a.PhotoURL.StartsWith("/images/")) { photoUrl = a.PhotoURL; }
+                else { photoUrl = "/photos/" + a.PhotoURL; }
             }
 
             <div class="user-dropdown-container">
-
                 <div class="top-bar-item user-profile-display" id="profileTrigger">
                     <img src="@photoUrl" class="nav-user-photo" alt="Profile" onerror="this.src='/images/default_photo.png'">
                     <span>👋 Welcome, <b>@(currentUser?.Name ?? User.Identity.Name)</b></span>
@@ -78,8 +58,7 @@
 
                     <div class="dropdown-actions">
                         <a href="/Account/UpdateProfile" class="dropdown-btn btn-manage">Manage Account</a>
-
-                        <a href="/Account/Logout" class="dropdown-btn btn-logout">Sign Out</a>
+                        <a href="/Account/Logout" class="dropdown-btn btn-logout">Log Out</a>
                     </div>
                 </div>
             </div>
@@ -90,7 +69,6 @@
                 <a href="/Account/Login">🔐 Login</a> / <a href="/Account/Register">Sign Up</a>
             </div>
         }
-        @* --- USER DROPDOWN LOGIC END --- *@
     </div>
 
     <nav>
@@ -138,6 +116,8 @@
     <script src="/js/jquery.validate.min.js"></script>
     <script src="/js/jquery.validate.unobtrusive.min.js"></script>
     <script src="/js/app.js" asp-append-version="true"></script>
+    <script src="/js/user.js" asp-append-version="true"></script>
+
     @RenderSection("foot", false)
 </body>
 </html>

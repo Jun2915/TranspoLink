@@ -69,19 +69,20 @@
 }
 
 /* =========================================================
-   3. ACTION BUTTONS BALANCING (THE FIX)
+   3. ACTION BUTTONS ALIGNMENT FIX
    ========================================================= */
+
 .action-links {
-    display: flex;
-    gap: 10px;
-    align-items: center;
+    display: flex; /* aligns items in a row */
+    align-items: center; /* vertically centers them */
+    gap: 10px; /* space between buttons */
 }
 
-    /* Remove default margin from the form */
+    /* CRITICAL FIX: The form tag adds invisible margins. This removes them. */
     .action-links form {
         margin: 0;
         padding: 0;
-        display: flex;
+        display: flex; /* Shrinks the form to fit the button exactly */
     }
 
 /* Make both buttons TWINS (Identical Size & Alignment) */
@@ -90,12 +91,12 @@
     align-items: center; /* Centers text vertically */
     justify-content: center; /* Centers text horizontally */
 
-    height: 38px; /* Fixed height for BOTH */
-    padding: 0 20px; /* Fixed width padding */
+    height: 30px; /* Fixed height for BOTH (Small size) */
+    padding: 0 15px; /* Fixed width padding */
 
     border: none;
-    border-radius: 6px;
-    font-size: 14px;
+    border-radius: 4px;
+    font-size: 13px;
     font-weight: 500;
     text-decoration: none;
     cursor: pointer;
@@ -111,7 +112,7 @@
 
     .btn-view:hover {
         background: #5a6fd1;
-        transform: translateY(-2px);
+        transform: translateY(-1px);
     }
 
 /* Delete Button (Red) */
@@ -122,5 +123,274 @@
 
     .btn-delete:hover {
         background: #ff2e43;
-        transform: translateY(-2px);
+        transform: translateY(-1px);
     }
+
+/* =========================================================
+   4. MEMBER DETAILS PAGE STYLES
+   ========================================================= */
+
+.btn-back {
+    display: inline-block;
+    color: #666;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+    .btn-back:hover {
+        color: #0f1b3d;
+    }
+
+.details-grid {
+    display: grid;
+    grid-template-columns: 350px 1fr; /* Fixed sidebar, flexible content */
+    gap: 30px;
+    align-items: start;
+}
+
+/* Profile Card (Left) */
+.profile-card {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    text-align: center;
+}
+
+.profile-header-img {
+    margin-bottom: 15px;
+}
+
+    .profile-header-img img {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid #f0f0f0;
+    }
+
+.profile-name {
+    margin: 0 0 5px 0;
+    font-size: 22px;
+    color: #0f1b3d;
+}
+
+.profile-id {
+    color: #888;
+    margin: 0 0 20px 0;
+    font-size: 14px;
+}
+
+.profile-info-list {
+    text-align: left;
+    margin-top: 20px;
+    border-top: 1px solid #f0f0f0;
+    padding-top: 20px;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    font-size: 14px;
+}
+
+    .info-item .label {
+        color: #666;
+        font-weight: 500;
+    }
+
+    .info-item .value {
+        color: #0f1b3d;
+        font-weight: 600;
+    }
+
+.btn-delete-large {
+    width: 100%;
+    padding: 12px;
+    background: #ff4757;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    margin-top: 20px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+    .btn-delete-large:hover {
+        background: #ff2e43;
+    }
+
+/* Activity Section (Right) */
+.activity-section {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    min-height: 400px;
+}
+
+    .activity-section h3 {
+        margin: 0 0 20px 0;
+        color: #0f1b3d;
+        border-bottom: 2px solid #f0f0f0;
+        padding-bottom: 15px;
+    }
+
+.empty-state {
+    text-align: center;
+    color: #999;
+    padding: 40px;
+    font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .details-grid {
+        grid-template-columns: 1fr; /* Stack vertically on tablets */
+    }
+}
+
+/* =========================================================
+   5. GITHUB STYLE DELETE MODAL (THE PART YOU WERE MISSING)
+   ========================================================= */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Dim background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    animation: fadeIn 0.2s;
+}
+
+.modal-box {
+    background: white;
+    width: 450px;
+    border-radius: 6px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    border: 1px solid #d1d5da;
+}
+
+.modal-header {
+    background: #f6f8fa;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e1e4e8;
+    border-radius: 6px 6px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    color: #24292e;
+}
+
+.close-btn {
+    cursor: pointer;
+    font-size: 20px;
+    color: #586069;
+}
+
+    .close-btn:hover {
+        color: #24292e;
+    }
+
+.modal-body {
+    padding: 20px;
+    color: #24292e;
+    font-size: 14px;
+    text-align: left; /* Ensure left alignment */
+}
+
+.warning-box {
+    background: #fff8c5;
+    border: 1px solid #ffe58f;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 3px;
+    color: #735c0f;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.modal-label {
+    display: block;
+    margin-bottom: 5px;
+    margin-top: 15px;
+    color: #24292e;
+}
+
+.modal-input {
+    width: 100%;
+    padding: 5px 12px;
+    font-size: 14px;
+    line-height: 20px;
+    color: #24292e;
+    vertical-align: middle;
+    background-color: #fff;
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    border: 1px solid #e1e4e8;
+    border-radius: 6px;
+    outline: none;
+    box-shadow: inset 0 1px 0 rgba(225,228,232,0.2);
+    margin-bottom: 15px;
+    box-sizing: border-box; /* IMPORTANT to keep input inside box */
+}
+
+    .modal-input:focus {
+        border-color: #0366d6;
+        box-shadow: 0 0 0 3px rgba(3,102,214,0.3);
+    }
+
+.btn-modal-delete {
+    display: block;
+    width: 100%;
+    text-align: center;
+    background-color: #f9f9f9; /* Disabled color */
+    color: #d73a49; /* Red text */
+    border: 1px solid rgba(27,31,35,0.15);
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: not-allowed;
+    border-radius: 6px;
+    opacity: 0.6;
+    transition: 0.2s;
+}
+
+    /* When the input matches (Active State) */
+    .btn-modal-delete.active {
+        background-color: #d73a49;
+        color: #fff;
+        cursor: pointer;
+        opacity: 1;
+        border: 1px solid #d73a49;
+    }
+
+        .btn-modal-delete.active:hover {
+            background-color: #cb2431;
+        }
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}

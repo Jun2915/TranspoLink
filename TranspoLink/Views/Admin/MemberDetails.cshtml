@@ -1,1 +1,126 @@
-﻿
+﻿@model Member
+
+@{
+    ViewBag.Title += " | Member Details";
+}
+
+@section head {
+    <link rel="stylesheet" href="/css/admin.css" asp-append-version="true" />
+    <link rel="stylesheet" href="/css/member.css" asp-append-version="true" />
+}
+
+<div class="admin-container">
+
+    <!-- Back Button -->
+    <div style="margin-bottom: 20px;">
+        <a href="/Admin/Members" class="btn-back">← Back to Members</a>
+    </div>
+
+    <div class="details-grid">
+        <!-- 1. Left Side: Profile Card -->
+        <div class="profile-card">
+            <div class="profile-header-img">
+                <img src="/photos/@Model.PhotoURL" onerror="this.src='/images/default_photo.png'" alt="Profile Photo">
+            </div>
+            <h2 class="profile-name">@Model.Name</h2>
+            <p class="profile-id">Member ID: <b>@Model.Id</b></p>
+
+            <div class="profile-info-list">
+                <div class="info-item">
+                    <span class="label">📧 Email</span>
+                    <span class="value">@(Model.Email ?? "-")</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">📞 Phone</span>
+                    <span class="value">@(Model.Phone ?? "-")</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">🔒 Role</span>
+                    <span class="value">Member</span>
+                </div>
+            </div>
+
+            <div class="profile-actions">
+                <!-- Trigger Button (Opens Modal) -->
+                <button type="button" class="btn-delete-large" onclick="openDeleteModal('@Model.Name')">Delete Member Account</button>
+            </div>
+        </div>
+
+        <!-- 2. Right Side: Recent Activity -->
+        <div class="activity-section">
+            <h3>📅 Recent Bookings</h3>
+
+            @if (Model.Bookings != null && Model.Bookings.Any())
+            {
+                <table class="booking-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Date</th>
+                            <th>Route</th>
+                            <th>Status</th>
+                            <th>Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var booking in Model.Bookings.OrderByDescending(b => b.BookingDate).Take(5))
+                        {
+                            <tr>
+                                <td>#@booking.Id</td>
+                                <td>@booking.BookingDate.ToString("dd MMM yyyy")</td>
+                                <td>
+                                    @if (booking.Trip?.Route != null)
+                                    {
+                                        <span>@booking.Trip.Route.Origin → @booking.Trip.Route.Destination</span>
+                                    }
+                                    else
+                                    {
+                                        <span>-</span>
+                                    }
+                                </td>
+                                <td>
+                                    <span class="status-badge status-@booking.Status.ToLower()">@booking.Status</span>
+                                </td>
+                                <td>RM @booking.TotalPrice.ToString("N2")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="empty-state">
+                    <p>No bookings found for this member.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- ======================================================= -->
+<!-- DELETE CONFIRMATION MODAL (GitHub Style) -->
+<!-- ======================================================= -->
+<div id="deleteModal" class="modal-overlay" style="display: none;">
+    <div class="modal-box">
+        <div class="modal-header">
+            <span>Delete member account</span>
+            <span class="close-btn" onclick="closeDeleteModal()">×</span>
+        </div>
+        <div class="modal-body">
+            <div class="warning-box">
+                <span class="warning-icon">⚠️</span>
+                <span>Unexpected bad things will happen if you don't read this!</span>
+            </div>
+
+            <p>This action <strong>cannot</strong> be undone. This will delete the <strong>@Model.Name</strong> account.</p>
+
+            <label class="modal-label">To confirm, type "<strong id="confirmString">@Model.Name</strong>" in the box below</label>
+
+            <input type="text" id="deleteInput" class="modal-input" autocomplete="off">
+
+            <form method="post" action="/Admin/DeleteMember/@Model.Id">
+                <button type="submit" id="confirmDeleteBtn" class="btn-modal-delete" disabled>Delete this member</button>
+            </form>
+        </div>
+    </div>
+</div>
