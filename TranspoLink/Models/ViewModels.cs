@@ -82,6 +82,8 @@ public class UpdateProfileVM
 
     public string? PhotoURL { get; set; }
 
+    public string? Role { get; set; }
+
     public IFormFile? Photo { get; set; }
 }
 

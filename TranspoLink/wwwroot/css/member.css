@@ -434,3 +434,257 @@ th[data-dir="desc"] .sort-arrow {
     th[data-dir="desc"] .sort-arrow::after {
         content: '▼';
     }
+
+/* =========================================================
+   PROFILE SETTINGS LAYOUT
+   ========================================================= */
+
+.profile-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 0 20px;
+    font-family: 'Roboto', sans-serif;
+}
+
+/* --- 1. USER HEADER BANNER --- */
+.user-header-banner {
+    background: #202225; /* Dark background like reference */
+    padding: 20px;
+    border-radius: 8px 8px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    position: relative;
+    color: white;
+}
+
+.user-avatar-large {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 4px solid #202225;
+    background: #fff;
+    object-fit: cover;
+    position: relative;
+    cursor: pointer;
+}
+
+.user-info-text h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.role-badge {
+    background: #5865F2; /* Blurple color */
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    vertical-align: middle;
+}
+
+.user-id-text {
+    color: #b9bbbe;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+/* --- 2. SETTINGS SECTIONS --- */
+.settings-section {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-top: none;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+    .settings-section:last-child {
+        border-radius: 0 0 8px 8px;
+    }
+
+.section-title {
+    color: #4f545c;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 15px;
+}
+
+/* --- 3. FIELD ROWS (Reference Style) --- */
+.field-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+    .field-row:last-of-type {
+        border-bottom: none;
+    }
+
+.field-info label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: #72767d;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+}
+
+/* Custom Input Styling to look like text until focused */
+.field-input {
+    width: 100%;
+    min-width: 300px;
+    padding: 8px 10px;
+    font-size: 16px;
+    color: #2e3338;
+    border: 1px solid #dcddde;
+    border-radius: 4px;
+    background: #f6f6f7;
+    transition: all 0.2s;
+}
+
+    .field-input:focus {
+        background: white;
+        border-color: #5865F2;
+        outline: none;
+    }
+
+    .field-input:disabled {
+        background: transparent;
+        border-color: transparent;
+        padding-left: 0;
+        font-weight: 500;
+    }
+
+/* --- 4. BUTTONS --- */
+.btn-edit-photo {
+    background: #5865F2;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+}
+
+    .btn-edit-photo:hover {
+        background: #4752c4;
+    }
+
+.btn-change-pass {
+    background: #5865F2;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 500;
+    display: inline-block;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-danger-outline {
+    background: transparent;
+    border: 1px solid #ed4245;
+    color: #ed4245;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: 0.2s;
+}
+
+    .btn-danger-outline:hover {
+        background: #ed4245;
+        color: white;
+    }
+
+.btn-danger-solid {
+    background: #ed4245;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.btn-save-float {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #202225;
+    color: white;
+    padding: 15px 30px;
+    border-radius: 8px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    z-index: 100;
+    animation: slideUp 0.3s ease-out;
+}
+
+.btn-save-confirm {
+    background: #23a559;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 4px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Image Upload Hidden Input */
+.upload-trigger {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* =========================================================
+   READ-ONLY DISPLAY MODE
+   ========================================================= */
+
+/* When input is readonly, make it look like plain text */
+.field-input[readonly] {
+    background-color: transparent;
+    border-color: transparent;
+    padding-left: 0;
+    cursor: default;
+    color: #2e3338;
+    font-weight: 500;
+}
+
+    /* Hide the focus outline if clicked while readonly */
+    .field-input[readonly]:focus {
+        outline: none;
+        border-color: transparent;
+        background-color: transparent;
+    }
+
+/* Disable the photo cursor initially */
+.disabled-upload {
+    cursor: default !important;
+}
