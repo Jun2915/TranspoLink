@@ -1,11 +1,11 @@
 ﻿/* =========================================================
-   1. SEARCH BAR FIX
+   1. SEARCH BAR
    ========================================================= */
 .search-container {
-    max-width: 100% !important; /* Force it to stretch full width */
-    display: flex; /* Arrange items in a row */
-    gap: 15px; /* Space between input and button */
-    align-items: center; /* Vertically align them */
+    max-width: 100% !important;
+    display: flex;
+    gap: 15px;
+    align-items: center;
     margin-bottom: 25px;
     background: #fff;
     padding: 20px 30px;
@@ -13,9 +13,8 @@
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
 }
 
-    /* Make the text box grow to fill space */
     .search-container input[type="text"] {
-        flex: 1; /* Takes up all available space */
+        flex: 1;
         padding: 12px 15px;
         border: 2px solid #e0e0e0;
         border-radius: 8px;
@@ -28,7 +27,6 @@
             border-color: #667eea;
         }
 
-    /* Style the Search button */
     .search-container button {
         padding: 12px 25px;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -54,57 +52,50 @@
    2. MEMBER TABLE & PHOTO FIX
    ========================================================= */
 .member-photo {
-    width: 35px; /* Smaller width */
-    height: 35px; /* Smaller height */
+    width: 35px;
+    height: 35px;
     border-radius: 50%;
     object-fit: cover;
-    border: 1px solid #e0e0e0; /* Thinner border for smaller icon */
+    border: 1px solid #e0e0e0;
     vertical-align: middle;
 }
 
-/* Align text vertically in the middle */
 .booking-table td {
     vertical-align: middle !important;
-    padding: 10px 15px; /* Slightly less padding to make rows more compact */
+    padding: 10px 15px;
 }
 
 /* =========================================================
-   3. ACTION BUTTONS ALIGNMENT FIX
+   3. ACTION BUTTONS ALIGNMENT
    ========================================================= */
-
 .action-links {
-    display: flex; /* aligns items in a row */
-    align-items: center; /* vertically centers them */
-    gap: 10px; /* space between buttons */
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-    /* CRITICAL FIX: The form tag adds invisible margins. This removes them. */
     .action-links form {
         margin: 0;
         padding: 0;
-        display: flex; /* Shrinks the form to fit the button exactly */
+        display: flex;
     }
 
-/* Make both buttons TWINS (Identical Size & Alignment) */
 .btn-view, .btn-delete {
-    display: inline-flex; /* Critical for perfect centering */
-    align-items: center; /* Centers text vertically */
-    justify-content: center; /* Centers text horizontally */
-
-    height: 30px; /* Fixed height for BOTH (Small size) */
-    padding: 0 15px; /* Fixed width padding */
-
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 30px;
+    padding: 0 15px;
     border: none;
     border-radius: 4px;
     font-size: 13px;
     font-weight: 500;
     text-decoration: none;
     cursor: pointer;
-    line-height: 1; /* Stops text from pushing buttons up/down */
+    line-height: 1;
     transition: all 0.2s ease;
 }
 
-/* Details Button (Blue) */
 .btn-view {
     background: #667eea;
     color: white;
@@ -115,7 +106,6 @@
         transform: translateY(-1px);
     }
 
-/* Delete Button (Red) */
 .btn-delete {
     background: #ff4757;
     color: white;
@@ -127,9 +117,8 @@
     }
 
 /* =========================================================
-   4. MEMBER DETAILS PAGE STYLES
+   4. MEMBER DETAILS PAGE
    ========================================================= */
-
 .btn-back {
     display: inline-block;
     color: #666;
@@ -144,12 +133,11 @@
 
 .details-grid {
     display: grid;
-    grid-template-columns: 350px 1fr; /* Fixed sidebar, flexible content */
+    grid-template-columns: 350px 1fr;
     gap: 30px;
     align-items: start;
 }
 
-/* Profile Card (Left) */
 .profile-card {
     background: white;
     padding: 30px;
@@ -223,7 +211,6 @@
         background: #ff2e43;
     }
 
-/* Activity Section (Right) */
 .activity-section {
     background: white;
     padding: 30px;
@@ -246,24 +233,22 @@
     font-style: italic;
 }
 
-/* Responsive */
 @media (max-width: 900px) {
     .details-grid {
-        grid-template-columns: 1fr; /* Stack vertically on tablets */
+        grid-template-columns: 1fr;
     }
 }
 
 /* =========================================================
-   5. GITHUB STYLE DELETE MODAL
+   5. DELETE MODAL
    ========================================================= */
-
 .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5); /* Dim background */
+    background: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -306,7 +291,7 @@
     padding: 20px;
     color: #24292e;
     font-size: 14px;
-    text-align: left; /* Ensure left alignment */
+    text-align: left;
 }
 
 .warning-box {
@@ -343,7 +328,7 @@
     outline: none;
     box-shadow: inset 0 1px 0 rgba(225,228,232,0.2);
     margin-bottom: 15px;
-    box-sizing: border-box; /* IMPORTANT to keep input inside box */
+    box-sizing: border-box;
 }
 
     .modal-input:focus {
@@ -355,8 +340,8 @@
     display: block;
     width: 100%;
     text-align: center;
-    background-color: #f9f9f9; /* Disabled color */
-    color: #d73a49; /* Red text */
+    background-color: #f9f9f9;
+    color: #d73a49;
     border: 1px solid rgba(27,31,35,0.15);
     padding: 10px 16px;
     font-size: 14px;
@@ -370,7 +355,6 @@
     transition: 0.2s;
 }
 
-    /* When the input matches (Active State) */
     .btn-modal-delete.active {
         background-color: #d73a49;
         color: #fff;
@@ -398,7 +382,6 @@
 /* =========================================================
    SORTING STYLES
    ========================================================= */
-
 th.sortable {
     cursor: pointer;
     user-select: none;
@@ -407,26 +390,23 @@ th.sortable {
 }
 
     th.sortable:hover {
-        background-color: #f0f0f0; /* Subtle hover effect */
+        background-color: #f0f0f0;
     }
 
-/* Arrow Container */
 .sort-arrow {
     margin-left: 5px;
     font-size: 12px;
-    opacity: 0; /* HIDDEN BY DEFAULT */
+    opacity: 0;
     transition: opacity 0.2s;
     display: inline-block;
 }
 
-/* Active State - Show Arrow Only When Sorted */
 th[data-dir="asc"] .sort-arrow,
 th[data-dir="desc"] .sort-arrow {
     opacity: 1;
-    color: #667eea; /* Your primary color */
+    color: #667eea;
 }
 
-    /* Arrow Content */
     th[data-dir="asc"] .sort-arrow::after {
         content: '▲';
     }
@@ -436,25 +416,25 @@ th[data-dir="desc"] .sort-arrow {
     }
 
 /* =========================================================
-   PROFILE SETTINGS LAYOUT (NEWLY UPDATED)
+   PROFILE SETTINGS LAYOUT (UPDATED)
    ========================================================= */
 
 .profile-container {
-    max-width: 800px;
+    max-width: 1400px; /* EXPANDED WIDTH */
     margin: 40px auto;
-    padding: 0 20px;
+    padding: 0 40px; /* More spacing */
     font-family: 'Roboto', sans-serif;
 }
 
-/* --- NEW 2-COLUMN LAYOUT WRAPPERS --- */
+/* --- 2-COLUMN LAYOUT WRAPPERS --- */
 .profile-layout-wrapper {
     display: flex;
-    gap: 25px;
-    align-items: flex-start; /* Align items to the top */
+    gap: 40px;
+    align-items: flex-start;
 }
 
 .profile-left-col {
-    flex: 3; /* Takes up 60% of space roughly */
+    flex: 3;
     min-width: 300px;
     display: flex;
     flex-direction: column;
@@ -462,21 +442,19 @@ th[data-dir="desc"] .sort-arrow {
 }
 
 .profile-right-col {
-    flex: 2; /* Takes up 40% of space roughly */
+    flex: 2;
     min-width: 250px;
     display: flex;
     flex-direction: column;
-    gap: 20px; /* Space between the two right sections */
+    gap: 20px;
 }
 
-    /* Adjust settings section margin for the right column to fit nicely */
     .profile-right-col .settings-section {
         margin-bottom: 0;
-        border-radius: 8px; /* Rounded corners for standalone boxes */
-        border: 1px solid #e0e0e0; /* Explicit border for right col boxes */
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
     }
 
-/* Responsive: Stack them on mobile */
 @media (max-width: 900px) {
     .profile-layout-wrapper {
         flex-direction: column;
@@ -489,71 +467,68 @@ th[data-dir="desc"] .sort-arrow {
 
 /* --- 1. USER HEADER BANNER --- */
 .user-header-banner {
-    background: #202225; /* Dark background like reference */
-    padding: 20px;
+    background: #202225;
+    padding: 30px;
     border-radius: 8px 8px 0 0;
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 25px;
     position: relative;
     color: white;
 }
 
 .user-avatar-large {
-    width: 80px;
-    height: 80px;
+    width: 90px;
+    height: 90px;
     border-radius: 50%;
     border: 4px solid #202225;
     background: #fff;
     object-fit: cover;
     position: relative;
     cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.upload:not(.disabled-upload) .user-avatar-large:hover {
+    transform: scale(1.05);
+    border-color: #667eea;
 }
 
 .user-info-text h2 {
     margin: 0;
-    font-size: 24px;
+    font-size: 26px;
     font-weight: 700;
     display: flex;
     align-items: center;
-    gap: 10px;
-}
-
-.role-badge {
-    background: #5865F2; /* Blurple color */
-    font-size: 12px;
-    padding: 2px 8px;
-    border-radius: 4px;
-    text-transform: uppercase;
-    vertical-align: middle;
+    gap: 12px;
 }
 
 .user-id-text {
     color: #b9bbbe;
-    font-size: 14px;
-    margin-top: 5px;
+    font-size: 15px;
+    margin-top: 6px;
 }
 
 /* --- 2. SETTINGS SECTIONS --- */
 .settings-section {
     background: #fff;
     border: 1px solid #e0e0e0;
-    border-top: none; /* Usually attached to header, but standalone ones have border */
-    padding: 20px;
+    border-top: none;
+    padding: 30px;
     margin-bottom: 20px;
-    border-radius: 0 0 8px 8px; /* Rounded bottom if attached to header */
+    border-radius: 0 0 8px 8px;
 }
 
 .section-title {
     color: #4f545c;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 700;
     text-transform: uppercase;
     margin-bottom: 15px;
     margin-top: 0;
 }
 
-/* --- 3. FIELD ROWS (Reference Style) --- */
+/* --- 3. FIELD ROWS --- */
 .field-row {
     display: flex;
     justify-content: space-between;
@@ -571,71 +546,117 @@ th[data-dir="desc"] .sort-arrow {
     font-size: 12px;
     font-weight: 700;
     color: #72767d;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
     text-transform: uppercase;
 }
 
-/* Custom Input Styling to look like text until focused */
+/* --- 4. INPUT STYLING (READ ONLY VS EDIT) --- */
+
 .field-input {
     width: 100%;
-    /* min-width removed to fit container */
-    padding: 8px 10px;
+    padding: 10px 12px;
     font-size: 16px;
     color: #2e3338;
-    border: 1px solid #dcddde;
     border-radius: 4px;
-    background: #f6f6f7;
     transition: all 0.2s;
     box-sizing: border-box;
 }
 
-    .field-input:focus {
-        background: white;
-        border-color: #5865F2;
-        outline: none;
+    /* When Editing (Normal Input) */
+    .field-input:not([readonly]) {
+        background: #fff;
+        border: 1px solid #dcddde;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
 
-    .field-input:disabled {
-        background: transparent;
-        border-color: transparent;
+        .field-input:not([readonly]):focus {
+            border-color: #5865F2;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(88, 101, 242, 0.15);
+        }
+
+    /* When Displaying (Read Only - Looks like text) */
+    .field-input[readonly] {
+        background-color: transparent;
+        border: 1px solid transparent;
         padding-left: 0;
+        cursor: default;
+        color: #2e3338;
         font-weight: 500;
     }
 
-/* --- 4. BUTTONS --- */
+        .field-input[readonly]:focus {
+            outline: none;
+            border-color: transparent;
+            box-shadow: none;
+        }
+
+/* --- 5. BUTTONS --- */
 .btn-edit-photo {
     background: #5865F2;
     color: white;
     border: none;
-    padding: 8px 16px;
+    padding: 8px 20px;
     border-radius: 4px;
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
     text-decoration: none;
     display: inline-block;
+    transition: 0.2s;
 }
 
     .btn-edit-photo:hover {
         background: #4752c4;
     }
 
+/* New Inline Save/Cancel Buttons */
+.btn-save-changes {
+    background: #23a559;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+    .btn-save-changes:hover {
+        background: #1e8e4c;
+    }
+
+.btn-cancel-edit {
+    background: transparent;
+    color: #ccc;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+    .btn-cancel-edit:hover {
+        color: white;
+        text-decoration: underline;
+    }
+
 .btn-change-pass {
     background: #5865F2;
     color: white;
-    padding: 10px 20px;
+    padding: 12px 20px;
     border-radius: 4px;
     text-decoration: none;
     font-weight: 500;
-    display: block; /* Full width block */
+    display: block;
     border: none;
     cursor: pointer;
     text-align: center;
+    transition: 0.2s;
 }
 
     .btn-change-pass:hover {
         background: #4752c4;
-        color: white;
     }
 
 .btn-danger-outline {
@@ -662,79 +683,19 @@ th[data-dir="desc"] .sort-arrow {
     border-radius: 4px;
     cursor: pointer;
     font-weight: 500;
+    transition: 0.2s;
 }
 
     .btn-danger-solid:hover {
         background: #c03537;
     }
 
-.btn-save-float {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: #202225;
-    color: white;
-    padding: 15px 30px;
-    border-radius: 8px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    z-index: 100;
-    animation: slideUp 0.3s ease-out;
-}
-
-.btn-save-confirm {
-    background: #23a559;
-    color: white;
-    border: none;
-    padding: 8px 20px;
-    border-radius: 4px;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-@keyframes slideUp {
-    from {
-        transform: translateY(100px);
-        opacity: 0;
-    }
-
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-
-/* Image Upload Hidden Input */
 .upload-trigger {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 15px;
 }
 
-/* =========================================================
-   READ-ONLY DISPLAY MODE
-   ========================================================= */
-
-/* When input is readonly, make it look like plain text */
-.field-input[readonly] {
-    background-color: transparent;
-    border-color: transparent;
-    padding-left: 0;
-    cursor: default;
-    color: #2e3338;
-    font-weight: 500;
-}
-
-    /* Hide the focus outline if clicked while readonly */
-    .field-input[readonly]:focus {
-        outline: none;
-        border-color: transparent;
-        background-color: transparent;
-    }
-
-/* Disable the photo cursor initially */
 .disabled-upload {
     cursor: default !important;
 }

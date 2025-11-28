@@ -229,14 +229,14 @@ public class AccountController(DB db,
             db.SaveChanges();
 
             TempData["Info"] = "Password updated.";
-            return RedirectToAction();
+            return RedirectToAction("ProfileManage");
         }
 
         return View();
     }
 
     [Authorize]
-    public IActionResult UpdateProfile()
+    public IActionResult ProfileManage()
     {
         var identifier = User.Identity!.Name;
         var u = db.Users.FirstOrDefault(u => u.Email == identifier || u.Phone == identifier);
@@ -258,13 +258,25 @@ public class AccountController(DB db,
 
     [Authorize]
     [HttpPost]
-    public IActionResult UpdateProfile(UpdateProfileVM vm)
+    public IActionResult ProfileManage(UpdateProfileVM vm)
     {
         var identifier = User.Identity!.Name;
         var u = db.Users.FirstOrDefault(u => u.Email == identifier || u.Phone == identifier);
 
         if (u == null) return RedirectToAction("Index", "Home");
 
+        // 1. Check if the New Email/Phone is already taken by SOMEONE ELSE
+        if (!string.IsNullOrEmpty(vm.Email) && db.Users.Any(x => x.Id != u.Id && x.Email == vm.Email))
+        {
+            ModelState.AddModelError("Email", "This Email is already in use by another account.");
+        }
+
+        if (!string.IsNullOrEmpty(vm.Phone) && db.Users.Any(x => x.Id != u.Id && x.Phone == vm.Phone))
+        {
+            ModelState.AddModelError("Phone", "This Phone Number is already in use by another account.");
+        }
+
+        // 2. Validate Photo
         if (vm.Photo != null)
         {
             var err = hp.ValidatePhoto(vm.Photo);
@@ -273,17 +285,21 @@ public class AccountController(DB db,
 
         if (ModelState.IsValid)
         {
+            // 3. UPDATE THE DATA (This part was missing for Phone/Email!)
             u.Name = vm.Name;
+            u.Email = vm.Email;
+            u.Phone = vm.Phone;
 
+            // Handle Photo
             if (vm.Photo != null)
             {
-                string newPhoto = hp.SavePhoto(vm.Photo, "photos");
+                string newPhoto = hp.SavePhoto(vm.Photo, "images");
 
                 if (u is Member m)
                 {
                     if (!string.IsNullOrEmpty(m.PhotoURL) && m.PhotoURL != "default_photo.png")
                     {
-                        hp.DeletePhoto(m.PhotoURL, "photos");
+                        hp.DeletePhoto(m.PhotoURL, "images");
                     }
                     m.PhotoURL = newPhoto;
                 }
@@ -291,20 +307,22 @@ public class AccountController(DB db,
                 {
                     if (!string.IsNullOrEmpty(a.PhotoURL) && !a.PhotoURL.StartsWith("/images/"))
                     {
-                        hp.DeletePhoto(a.PhotoURL, "photos");
+                        hp.DeletePhoto(a.PhotoURL, "images");
                     }
                     a.PhotoURL = newPhoto;
                 }
             }
 
             db.SaveChanges();
+
+            string newIdentifier = u.Email ?? u.Phone ?? u.Id;
+            hp.SignIn(newIdentifier, u.Role, true); // Keep them logged in
+
             TempData["Info"] = "Profile updated successfully.";
             return RedirectToAction();
         }
 
-        vm.Email = u.Email;
-        vm.Phone = u.Phone;
-
+        // If validation failed, reload current data to show image
         if (u is Member m2) vm.PhotoURL = m2.PhotoURL;
         else if (u is Admin a2) vm.PhotoURL = a2.PhotoURL;
 

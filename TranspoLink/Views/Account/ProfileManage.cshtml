@@ -5,9 +5,8 @@
 }
 
 @section head {
-    <!-- Using your existing CSS files -->
-    <link rel="stylesheet" href="/css/member.css" asp-append-version="true"/>
-    <link rel="stylesheet" href="/css/photo-tools.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="/css/member.css" asp-append-version="true" />
+    <link rel="stylesheet" href="/css/photo-tools.css" asp-append-version="true" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <script src="/js/photo-tools.js" defer></script>
     <script src="/js/user.js" defer></script>
@@ -15,22 +14,17 @@
 
 <div class="profile-container">
 
-    <!-- Wrapper for the 2-Column Layout -->
     <div class="profile-layout-wrapper">
 
-        <!-- === LEFT COLUMN (Header + Profile Form) === -->
         <div class="profile-left-col">
             <form method="post" enctype="multipart/form-data" id="profileForm">
                 <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
 
-                <!-- 1. HEADER SECTION -->
                 <div class="user-header-banner">
                     <div class="upload-trigger">
-                        <!-- Photo upload is disabled initially until Edit Mode is active -->
                         <label class="upload disabled-upload" id="photoLabel" title="Edit Profile to change photo">
                             <input asp-for="Photo" accept="image/jpeg,image/png" hidden disabled>
-                            <!-- Display Profile Picture -->
-                            <img src="@(string.IsNullOrEmpty(Model.PhotoURL) || Model.PhotoURL == "default_photo.png" ? "/images/default_photo.png" : (Model.PhotoURL.StartsWith("/images/") ? Model.PhotoURL : "/photos/" + Model.PhotoURL))"
+                            <img src="@(string.IsNullOrEmpty(Model.PhotoURL) || Model.PhotoURL == "default_photo.png" ? "/images/default_photo.png" : (Model.PhotoURL.StartsWith("/images/") ? Model.PhotoURL : "/images/" + Model.PhotoURL))"
                                  class="user-avatar-large"
                                  onerror="this.src='/images/default_photo.png'">
                         </label>
@@ -38,7 +32,6 @@
                         <div class="user-info-text">
                             <h2>
                                 @Model.Name
-                                <span class="role-badge">@Model.Role</span>
                             </h2>
                             <div class="user-id-text">
                                 @(Model.Email ?? Model.Phone)
@@ -46,18 +39,21 @@
                         </div>
                     </div>
 
-                    <div style="margin-left: auto;">
+                    <div style="margin-left: auto;" class="header-actions">
                         <button type="button" class="btn-edit-photo" id="btnEditProfile">Edit User Profile</button>
+
+                        <div id="editActions" style="display:none; gap: 10px; align-items:center;">
+                            <button type="button" class="btn-cancel-edit" onclick="location.reload()">Cancel</button>
+                            <button type="submit" class="btn-save-changes">Save Changes</button>
+                        </div>
                     </div>
                 </div>
 
-                <!-- 2. PROFILE INFORMATION -->
                 <div class="settings-section">
 
                     <div class="field-row">
                         <div class="field-info" style="flex: 1;">
                             <label asp-for="Name">Display Name</label>
-                            <!-- Added readonly attribute -->
                             <input asp-for="Name" class="field-input" placeholder="Your Name" readonly>
                             <span asp-validation-for="Name" style="color:red; font-size:12px;"></span>
                         </div>
@@ -66,7 +62,6 @@
                     <div class="field-row">
                         <div class="field-info" style="flex: 1;">
                             <label asp-for="Email">Email</label>
-                            <!-- Added readonly attribute -->
                             <input asp-for="Email" class="field-input" placeholder="Your Email" readonly>
                             <span asp-validation-for="Email" style="color:red; font-size:12px;"></span>
                         </div>
@@ -75,7 +70,6 @@
                     <div class="field-row">
                         <div class="field-info" style="flex: 1;">
                             <label asp-for="Phone">Phone Number</label>
-                            <!-- Added readonly attribute -->
                             <input asp-for="Phone" class="field-input" placeholder="Your Phone Number" readonly>
                             <span asp-validation-for="Phone" style="color:red; font-size:12px;"></span>
                         </div>
@@ -85,10 +79,8 @@
             </form>
         </div>
 
-        <!-- === RIGHT COLUMN (Password + Removal) === -->
         <div class="profile-right-col">
 
-            <!-- 3. PASSWORD & AUTHENTICATION -->
             <div class="settings-section">
                 <h3 class="section-title">Password and Authentication</h3>
 
@@ -97,7 +89,6 @@
                 </div>
             </div>
 
-            <!-- 4. ACCOUNT REMOVAL -->
             <div class="settings-section" style="border-color: #faa6a8;">
                 <h3 class="section-title" style="color:#ed4245;">Account Removal</h3>
                 <p style="font-size:13px; color:#666; margin-bottom:15px;">
@@ -113,14 +104,4 @@
         </div>
 
     </div>
-
-    <!-- FLOATING SAVE BUTTON -->
-    <div class="btn-save-float" id="saveBar" style="display:none;">
-        <span>Careful - you have unsaved changes!</span>
-        <div style="margin-left:auto; display:flex; gap:10px;">
-            <button type="button" class="btn-danger-outline" style="border:none; color:#ccc;" onclick="location.reload()">Reset</button>
-            <button type="button" class="btn-save-confirm" onclick="$('#profileForm').submit()">Save Changes</button>
-        </div>
-    </div>
-
 </div>
