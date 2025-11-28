@@ -254,7 +254,7 @@
 }
 
 /* =========================================================
-   5. GITHUB STYLE DELETE MODAL (THE PART YOU WERE MISSING)
+   5. GITHUB STYLE DELETE MODAL
    ========================================================= */
 
 .modal-overlay {
@@ -436,7 +436,7 @@ th[data-dir="desc"] .sort-arrow {
     }
 
 /* =========================================================
-   PROFILE SETTINGS LAYOUT
+   PROFILE SETTINGS LAYOUT (NEWLY UPDATED)
    ========================================================= */
 
 .profile-container {
@@ -444,6 +444,47 @@ th[data-dir="desc"] .sort-arrow {
     margin: 40px auto;
     padding: 0 20px;
     font-family: 'Roboto', sans-serif;
+}
+
+/* --- NEW 2-COLUMN LAYOUT WRAPPERS --- */
+.profile-layout-wrapper {
+    display: flex;
+    gap: 25px;
+    align-items: flex-start; /* Align items to the top */
+}
+
+.profile-left-col {
+    flex: 3; /* Takes up 60% of space roughly */
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.profile-right-col {
+    flex: 2; /* Takes up 40% of space roughly */
+    min-width: 250px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Space between the two right sections */
+}
+
+    /* Adjust settings section margin for the right column to fit nicely */
+    .profile-right-col .settings-section {
+        margin-bottom: 0;
+        border-radius: 8px; /* Rounded corners for standalone boxes */
+        border: 1px solid #e0e0e0; /* Explicit border for right col boxes */
+    }
+
+/* Responsive: Stack them on mobile */
+@media (max-width: 900px) {
+    .profile-layout-wrapper {
+        flex-direction: column;
+    }
+
+    .profile-left-col, .profile-right-col {
+        width: 100%;
+    }
 }
 
 /* --- 1. USER HEADER BANNER --- */
@@ -497,14 +538,11 @@ th[data-dir="desc"] .sort-arrow {
 .settings-section {
     background: #fff;
     border: 1px solid #e0e0e0;
-    border-top: none;
+    border-top: none; /* Usually attached to header, but standalone ones have border */
     padding: 20px;
     margin-bottom: 20px;
+    border-radius: 0 0 8px 8px; /* Rounded bottom if attached to header */
 }
-
-    .settings-section:last-child {
-        border-radius: 0 0 8px 8px;
-    }
 
 .section-title {
     color: #4f545c;
@@ -512,6 +550,7 @@ th[data-dir="desc"] .sort-arrow {
     font-weight: 700;
     text-transform: uppercase;
     margin-bottom: 15px;
+    margin-top: 0;
 }
 
 /* --- 3. FIELD ROWS (Reference Style) --- */
@@ -539,7 +578,7 @@ th[data-dir="desc"] .sort-arrow {
 /* Custom Input Styling to look like text until focused */
 .field-input {
     width: 100%;
-    min-width: 300px;
+    /* min-width removed to fit container */
     padding: 8px 10px;
     font-size: 16px;
     color: #2e3338;
@@ -547,6 +586,7 @@ th[data-dir="desc"] .sort-arrow {
     border-radius: 4px;
     background: #f6f6f7;
     transition: all 0.2s;
+    box-sizing: border-box;
 }
 
     .field-input:focus {
@@ -587,10 +627,16 @@ th[data-dir="desc"] .sort-arrow {
     border-radius: 4px;
     text-decoration: none;
     font-weight: 500;
-    display: inline-block;
+    display: block; /* Full width block */
     border: none;
     cursor: pointer;
+    text-align: center;
 }
+
+    .btn-change-pass:hover {
+        background: #4752c4;
+        color: white;
+    }
 
 .btn-danger-outline {
     background: transparent;
@@ -617,6 +663,10 @@ th[data-dir="desc"] .sort-arrow {
     cursor: pointer;
     font-weight: 500;
 }
+
+    .btn-danger-solid:hover {
+        background: #c03537;
+    }
 
 .btn-save-float {
     position: fixed;

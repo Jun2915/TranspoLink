@@ -135,6 +135,10 @@ $(document).ready(function () {
     updateSortIcons();
 });
 
+// ============================================================================
+// PROFILE PAGE LOGIC
+// ============================================================================
+
 $(document).ready(function () {
     // 1. Handle Edit Button Click
     $('#btnEditProfile').on('click', function () {
@@ -148,22 +152,25 @@ $(document).ready(function () {
         // Visual feedback
         $(this).hide(); // Hide the edit button
         $('.field-input').first().focus(); // Focus first field
-
-        // Optional: Show a "Editing..." badge or similar if desired
     });
 
     // 2. Detect Changes for Save Bar
-    const initialData = $('#profileForm').serialize();
+    // We only attach this if the form exists to avoid errors on other pages
+    const $profileForm = $('#profileForm');
 
-    $('#profileForm').on('input change', 'input', function () {
-        // Don't show save bar if we are still in readonly mode (shouldn't happen, but safety check)
-        if ($('.field-input').first().prop('readonly')) return;
+    if ($profileForm.length) {
+        const initialData = $profileForm.serialize();
 
-        const currentData = $('#profileForm').serialize();
-        if (currentData !== initialData) {
-            $('#saveBar').fadeIn();
-        } else {
-            $('#saveBar').fadeOut();
-        }
-    });
+        $profileForm.on('input change', 'input', function () {
+            // Don't show save bar if we are still in readonly mode (shouldn't happen, but safety check)
+            if ($('.field-input').first().prop('readonly')) return;
+
+            const currentData = $profileForm.serialize();
+            if (currentData !== initialData) {
+                $('#saveBar').fadeIn();
+            } else {
+                $('#saveBar').fadeOut();
+            }
+        });
+    }
 });
