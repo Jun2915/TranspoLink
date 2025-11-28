@@ -264,4 +264,13 @@ public class Helper(IWebHostEnvironment en,
             return doc.RootElement.GetProperty("success").GetBoolean();
         }
     }
+
+    // ------------------------------------------------------------------------
+    // OTP Helper
+    // ------------------------------------------------------------------------
+    public string GenerateOTP()
+    {
+        Random r = new();
+        return r.Next(100000, 999999).ToString();
+    }
 }

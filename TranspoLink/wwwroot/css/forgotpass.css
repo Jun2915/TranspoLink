@@ -1,0 +1,153 @@
+﻿/* =========================================================
+   FORGOT PASSWORD & OTP STYLES
+   ========================================================= */
+
+/* Center everything nicely */
+.auth-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* The Card Box */
+.auth-card {
+    background: white;
+    padding: 40px;
+    width: 100%;
+    max-width: 450px;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Headers & Text */
+.auth-card h2 {
+    color: #0f1b3d;
+    margin-bottom: 10px;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.auth-card p {
+    color: #666;
+    margin-bottom: 30px;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+/* Input Fields */
+.auth-input-group {
+    position: relative;
+    margin-bottom: 15px;
+    text-align: left; /* Align input text left */
+}
+
+    .auth-input-group input {
+        width: 100%;
+        padding: 12px 12px 12px 45px;
+        font-size: 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background: #f9f9f9;
+        box-sizing: border-box; /* Fixes padding overflow issues */
+        transition: all 0.3s ease;
+    }
+
+        .auth-input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(102, 126, 238, 0.2);
+        }
+
+/* Icons inside inputs */
+.auth-input-icon {
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    transform: translateY(-50%);
+    font-size: 18px; /* Emoji size */
+    pointer-events: none;
+}
+
+/* Special OTP Input Style */
+.otp-input {
+    letter-spacing: 8px;
+    font-weight: bold;
+    text-align: center !important;
+    padding-left: 12px !important; /* Remove icon padding for center text */
+    font-size: 20px !important;
+}
+
+/* Submit Buttons */
+.auth-submit-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 15px rgba(102, 126, 238, 0.3);
+}
+
+    .auth-submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 238, 0.4);
+    }
+
+/* Links (Back to Login) */
+.auth-link {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    transition: color 0.2s;
+}
+
+    .auth-link:hover {
+        color: #764ba2;
+        text-decoration: underline;
+    }
+
+/* Error Messages */
+.field-validation-error {
+    color: #dc3545;
+    font-size: 13px;
+    display: block;
+    text-align: left;
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+/* Account Display Box (Step 3) */
+.account-display {
+    background: #f0f4ff;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+    margin-bottom: 25px;
+    color: #667eea;
+    font-weight: 600;
+    border: 1px dashed #667eea;
+}

@@ -1,0 +1,31 @@
+﻿@model VerifyOtpVM
+@{
+    ViewBag.Title = "Account | Verify OTP";
+}
+
+@section head {
+    <link rel="stylesheet" href="/css/forgotpass.css" />
+}
+
+<div class="auth-container">
+    <div class="auth-card">
+        <h2>Verify Code</h2>
+        <p>We have sent a 6-digit code to your registered contact. Please enter it below.</p>
+
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
+
+            <div class="auth-input-group">
+                <!-- No icon needed for centered OTP -->
+                <input asp-for="Otp" class="otp-input" placeholder="000000" maxlength="6" autofocus>
+            </div>
+            <span asp-validation-for="Otp" class="field-validation-error"></span>
+
+            <button type="submit" class="auth-submit-btn">Verify Code</button>
+
+            <div style="margin-top: 20px;">
+                <a href="/Account/ForgotPassword" class="auth-link">Resend Code</a>
+            </div>
+        </form>
+    </div>
+</div>

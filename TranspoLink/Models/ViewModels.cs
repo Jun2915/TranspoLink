@@ -34,7 +34,7 @@ public class RegisterVM
 
     [StringLength(20)]
     [DisplayName("Phone Number")]
-    [Remote("CheckPhone", "Account", ErrorMessage = "Duplicated {0}.")] 
+    [Remote("CheckPhone", "Account", ErrorMessage = "Duplicated {0}.")]
     public string? PhoneNumber { get; set; }
 
     [StringLength(100, MinimumLength = 5)]
@@ -128,4 +128,30 @@ public class BookTripVM
     public int NumberOfSeats { get; set; } = 1;
 
     public string? SpecialRequests { get; set; }
+}
+
+public class ForgotPasswordVM
+{
+    [StringLength(100)]
+    public string EmailOrPhone { get; set; }
+}
+
+public class VerifyOtpVM
+{
+    [StringLength(6, MinimumLength = 6, ErrorMessage = "OTP must be 6 digits")]
+    public string Otp { get; set; }
+}
+
+public class ResetPasswordFinalVM
+{
+    [StringLength(100, MinimumLength = 5)]
+    [DataType(DataType.Password)]
+    [DisplayName("New Password")]
+    public string NewPassword { get; set; }
+
+    [StringLength(100, MinimumLength = 5)]
+    [Compare("NewPassword")]
+    [DataType(DataType.Password)]
+    [DisplayName("Confirm Password")]
+    public string ConfirmPassword { get; set; }
 }

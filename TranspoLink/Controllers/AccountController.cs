@@ -37,7 +37,7 @@ public class AccountController(DB db,
             u = db.Users.FirstOrDefault(x => x.Phone == vm.Phone);
         }
 
-        // 3. CHECK IF BLOCKED (Before checking password!)
+        // 3. CHECK IF BLOCKED
         if (u != null && u.LockoutEnd > DateTime.Now)
         {
             var timeLeft = u.LockoutEnd.Value - DateTime.Now;
@@ -52,24 +52,20 @@ public class AccountController(DB db,
         // 4. Verify Password
         if (u == null || !hp.VerifyPassword(u.Hash, vm.Password))
         {
-            // --- FAILED LOGIN LOGIC ---
             if (u != null)
             {
-                u.LoginRetryCount++; // Increment failure count
+                u.LoginRetryCount++;
 
-                // Rule: 10 Fails = 1 Hour Block
                 if (u.LoginRetryCount >= 10)
                 {
                     u.LockoutEnd = DateTime.Now.AddHours(1);
                     ModelState.AddModelError("", "Too many failed attempts! Account locked for 1 hour.");
                 }
-                // Rule: 5 Fails = 10 Minute Block
                 else if (u.LoginRetryCount >= 5)
                 {
                     u.LockoutEnd = DateTime.Now.AddMinutes(10);
                     ModelState.AddModelError("", "Too many failed attempts! Account locked for 10 minutes.");
                 }
-                // Rule: 3 Fails = 5 Minute Block
                 else if (u.LoginRetryCount >= 3)
                 {
                     u.LockoutEnd = DateTime.Now.AddMinutes(5);
@@ -77,18 +73,13 @@ public class AccountController(DB db,
                 }
                 else
                 {
-                    // Just a warning
                     int left = 3 - u.LoginRetryCount;
                     if (left > 0)
-                    {
                         ModelState.AddModelError("", $"Login failed. You have {left} attempt(s) before lockout.");
-                    }
                     else
-                    {
                         ModelState.AddModelError("", "Login failed.");
-                    }
                 }
-                db.SaveChanges(); // Save the counter/lockout
+                db.SaveChanges();
             }
             else
             {
@@ -96,10 +87,9 @@ public class AccountController(DB db,
             }
         }
 
-        // 5. SUCCESS LOGIN LOGIC
+        // 5. SUCCESS LOGIN
         if (ModelState.IsValid)
         {
-            // Reset counters on success!
             if (u != null)
             {
                 u.LoginRetryCount = 0;
@@ -183,7 +173,6 @@ public class AccountController(DB db,
 
         if (ModelState.IsValid)
         {
-            // Generate ID C001, C002, etc.
             string nextId = hp.GetNextId(db, "Member");
 
             var newMember = new Member()
@@ -193,8 +182,7 @@ public class AccountController(DB db,
                 Phone = vm.PhoneNumber,
                 Hash = hp.HashPassword(vm.Password),
                 Name = vm.Name,
-                // Saved to "photos" to match view logic
-                PhotoURL = vm.Photo != null ? hp.SavePhoto(vm.Photo, "photos") : "default_photo.png",
+                PhotoURL = vm.Photo != null ? hp.SavePhoto(vm.Photo, "images") : "default_photo.png",
             };
 
             db.Members.Add(newMember);
@@ -241,10 +229,6 @@ public class AccountController(DB db,
 
         return View();
     }
-
-    // ============================================================================
-    // PROFILE MANAGEMENT (Supports Admin & Member)
-    // ============================================================================
 
     [Authorize]
     public IActionResult UpdateProfile()
@@ -322,75 +306,146 @@ public class AccountController(DB db,
         return View(vm);
     }
 
-    public IActionResult ResetPassword()
+    // ============================================================================
+    // FORGOT PASSWORD / OTP FLOW (REPLACES OLD RESET PASSWORD)
+    // ============================================================================
+
+    // STEP 1: Request OTP
+    public IActionResult ForgotPassword()
     {
         return View();
     }
 
     [HttpPost]
-    public IActionResult ResetPassword(ResetPasswordVM vm)
+    public IActionResult ForgotPassword(ForgotPasswordVM vm)
     {
-        var u = db.Users.FirstOrDefault(x => x.Email == vm.Email);
-
-        if (u == null)
+        if (ModelState.IsValid)
         {
-            ModelState.AddModelError("Email", "Email not found.");
+            var u = db.Users.FirstOrDefault(x => x.Email == vm.EmailOrPhone || x.Phone == vm.EmailOrPhone);
+
+            if (u == null)
+            {
+                ModelState.AddModelError("EmailOrPhone", "User not found.");
+                return View(vm);
+            }
+
+            string otp = hp.GenerateOTP();
+
+            // Store in Session
+            HttpContext.Session.SetString("Reset_OTP", otp);
+            HttpContext.Session.SetString("Reset_UserId", u.Id);
+            HttpContext.Session.SetString("Reset_Target", vm.EmailOrPhone);
+
+            if (vm.EmailOrPhone.Contains("@"))
+            {
+                SendOtpEmail(u, otp);
+                TempData["Info"] = "OTP sent to your email.";
+            }
+            else
+            {
+                // Simulated SMS
+                Console.WriteLine($"[SMS SIMULATION] OTP for {u.Phone}: {otp}");
+                TempData["Info"] = $"OTP sent to phone: {otp}";
+            }
+
+            return RedirectToAction("VerifyOtp");
+        }
+        return View(vm);
+    }
+
+    // STEP 2: Verify OTP
+    public IActionResult VerifyOtp()
+    {
+        if (HttpContext.Session.GetString("Reset_OTP") == null)
+        {
+            return RedirectToAction("ForgotPassword");
+        }
+        return View();
+    }
+
+    [HttpPost]
+    public IActionResult VerifyOtp(VerifyOtpVM vm)
+    {
+        string? sessionOtp = HttpContext.Session.GetString("Reset_OTP");
+
+        if (ModelState.IsValid)
+        {
+            if (vm.Otp == sessionOtp)
+            {
+                HttpContext.Session.SetString("Reset_Verified", "true");
+                TempData["Info"] = "OTP Verified!";
+                return RedirectToAction("ResetPassword");
+            }
+            else
+            {
+                ModelState.AddModelError("Otp", "Invalid OTP.");
+            }
+        }
+        return View(vm);
+    }
+
+    // STEP 3: Reset Password
+    public IActionResult ResetPassword()
+    {
+        if (HttpContext.Session.GetString("Reset_Verified") != "true")
+        {
+            return RedirectToAction("ForgotPassword");
+        }
+
+        ViewBag.Target = HttpContext.Session.GetString("Reset_Target");
+        return View();
+    }
+
+    [HttpPost]
+    public IActionResult ResetPassword(ResetPasswordFinalVM vm)
+    {
+        if (HttpContext.Session.GetString("Reset_Verified") != "true")
+        {
+            return RedirectToAction("ForgotPassword");
         }
 
         if (ModelState.IsValid)
         {
-            string password = hp.RandomPassword();
-            u!.Hash = hp.HashPassword(password);
-            db.SaveChanges();
+            string? userId = HttpContext.Session.GetString("Reset_UserId");
+            var u = db.Users.Find(userId);
 
-            if (!string.IsNullOrEmpty(u.Email))
+            if (u != null)
             {
-                SendResetPasswordEmail(u, password);
-                TempData["Info"] = $"Password reset. Check your email.";
-            }
+                u.Hash = hp.HashPassword(vm.NewPassword);
 
-            return RedirectToAction();
+                // UNLOCK ACCOUNT if it was blocked
+                u.LoginRetryCount = 0;
+                u.LockoutEnd = null;
+
+                db.SaveChanges();
+                HttpContext.Session.Clear();
+
+                TempData["Info"] = "Password reset successfully. Please login.";
+                return RedirectToAction("Login");
+            }
         }
 
-        return View();
+        ViewBag.Target = HttpContext.Session.GetString("Reset_Target");
+        return View(vm);
     }
 
-    private void SendResetPasswordEmail(User u, string password)
+    private void SendOtpEmail(User u, string otp)
     {
         if (string.IsNullOrEmpty(u.Email)) return;
 
         var mail = new MailMessage();
         mail.To.Add(new MailAddress(u.Email, u.Name));
-        mail.Subject = "Reset Password";
+        mail.Subject = "Your Reset OTP Code";
         mail.IsBodyHtml = true;
 
-        var url = Url.Action("Login", "Account", null, "https");
-
-        var path = "";
-        if (u is Member m)
-        {
-            path = Path.Combine(en.WebRootPath, "photos", m.PhotoURL ?? "default_photo.png");
-        }
-        else if (u is Admin a)
-        {
-            if (a.PhotoURL != null && a.PhotoURL.StartsWith("/images/"))
-                path = Path.Combine(en.WebRootPath, a.PhotoURL.TrimStart('/'));
-            else
-                path = Path.Combine(en.WebRootPath, "photos", a.PhotoURL ?? "");
-        }
-
-        if (System.IO.File.Exists(path))
-        {
-            var att = new Attachment(path);
-            mail.Attachments.Add(att);
-            att.ContentId = "photo";
-        }
-
         mail.Body = $@"
-            <p>Dear {u.Name},<p>
-            <p>Your password has been reset to:</p>
-            <h1 style='color: red'>{password}</h1>
-            <p>From, 🐱 Super Admin</p>
+            <div style='font-family: Arial; padding: 20px; border: 1px solid #ddd; border-radius: 10px;'>
+                <h2>Reset Password Request</h2>
+                <p>Hello {u.Name},</p>
+                <p>Your OTP code is:</p>
+                <h1 style='color: #667eea; letter-spacing: 5px; font-size: 32px;'>{otp}</h1>
+                <p>If you did not request this, please ignore this email.</p>
+            </div>
         ";
 
         hp.SendEmail(mail);
