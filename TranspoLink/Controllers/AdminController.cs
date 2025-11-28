@@ -41,11 +41,11 @@ public class AdminController(DB db, Helper hp) : Controller
     // ============================================================================
 
     // GET: Admin/Members
-    public IActionResult Members(string search = "", int page = 1)
+    public IActionResult Members(string search = "", int page = 1, string sort = "Id", string dir = "asc")
     {
         var query = db.Members.AsQueryable();
 
-        // Search filter
+        // 1. Search Logic
         if (!string.IsNullOrEmpty(search))
         {
             query = query.Where(m =>
@@ -54,18 +54,32 @@ public class AdminController(DB db, Helper hp) : Controller
                 m.Name.Contains(search));
         }
 
-        ViewBag.Search = search;
+        // 2. Sort Logic
+        query = sort switch
+        {
+            "Name" => dir == "asc" ? query.OrderBy(m => m.Name) : query.OrderByDescending(m => m.Name),
+            "Email" => dir == "asc" ? query.OrderBy(m => m.Email) : query.OrderByDescending(m => m.Email),
+            "Phone" => dir == "asc" ? query.OrderBy(m => m.Phone) : query.OrderByDescending(m => m.Phone),
+            _ => dir == "asc" ? query.OrderBy(m => m.Id) : query.OrderByDescending(m => m.Id)
+        };
 
-        // Pagination
+        ViewBag.Search = search;
+        ViewBag.Sort = sort;
+        ViewBag.Dir = dir;
+
+        // 3. Pagination
         int pageSize = 20;
-        var members = query
-            .OrderBy(m => m.Email)
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToList();
+        var members = query.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
         ViewBag.TotalPages = (int)Math.Ceiling(query.Count() / (double)pageSize);
         ViewBag.CurrentPage = page;
+
+        // 4. AJAX CHECK (Prevents duplication)
+        if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+        {
+            // Return ONLY the table HTML, not the whole layout
+            return PartialView("_MemberTable", members);
+        }
 
         return View(members);
     }

@@ -103,6 +103,11 @@ public class AccountController(DB db,
 
                 if (string.IsNullOrEmpty(returnURL))
                 {
+                    if (u.Role == "Admin")
+                    {
+                        return RedirectToAction("Index", "Admin");
+                    }
+
                     return RedirectToAction("Index", "Home");
                 }
                 return Redirect(returnURL);

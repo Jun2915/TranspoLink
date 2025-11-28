@@ -15,66 +15,29 @@
         <p>View and manage registered members.</p>
     </div>
 
-    <form method="get" class="search-container">
-        <input type="text" name="search" value="@ViewBag.Search" placeholder="Search by name, email, or phone..." autocomplete="off">
+    <!-- Search Form -->
+    <form method="get" class="search-container" id="searchForm">
+        <input type="text" id="searchInput" name="search" value="@ViewBag.Search" placeholder="Search by name, email, or phone..." autocomplete="off">
         <button type="submit">Search</button>
         @if (!string.IsNullOrEmpty(ViewBag.Search))
         {
-            <a href="/Admin/Members" style="padding: 10px; color: #666; text-decoration: none; align-self: center;">Clear</a>
+            <a href="/Admin/Members">Clear</a>
         }
     </form>
 
-    <div class="recent-section">
-        <table class="booking-table">
-            <thead>
-                <tr>
-                    <th>Photo</th>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (Model.Any())
-                {
-                    foreach (var m in Model)
-                    {
-                        <tr>
-                            <td>
-                                <img src="/images/@m.PhotoURL" class="member-photo" onerror="this.src='/images/default_photo.png'">
-                            </td>
-                            <td>@m.Id</td>
-                            <td>@m.Name</td>
-                            <td>@m.Email</td>
-                            <td>@m.Phone</td>
-                            <td class="action-links">
-                                <a href="/Admin/MemberDetails/@m.Id" class="btn-view">Details</a>
-
-                                <form method="post" action="/Admin/DeleteMember/@m.Id" onsubmit="return confirm('Are you sure you want to delete @m.Name?');">
-                                    <button class="btn-delete">Delete</button>
-                                </form>
-                            </td>
-                        </tr>
-                    }
-                }
-                else
-                {
-                    <tr>
-                        <td colspan="6" style="text-align:center; padding: 20px;">No members found.</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+    <!-- AJAX Container: This div's content will be replaced on sort/search -->
+    <div id="tableContainer" class="recent-section">
+        <partial name="_MemberTable" model="Model" />
     </div>
 
+    <!-- Pagination -->
     <div class="pagination-container" style="margin-top: 20px; text-align: center;">
         <ul class="pagination">
             @for (int i = 1; i <= ViewBag.TotalPages; i++)
             {
                 <li class="@(i == ViewBag.CurrentPage ? "active" : "")">
-                    <a href="/Admin/Members?search=@ViewBag.Search&page=@i">@i</a>
+                    <!-- Use onclick to trigger AJAX load -->
+                    <a href="javascript:void(0)" onclick="loadTable(@i)">@i</a>
                 </li>
             }
         </ul>

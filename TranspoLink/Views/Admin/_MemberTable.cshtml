@@ -1,0 +1,48 @@
+﻿@model IEnumerable<Member>
+
+<table class="booking-table">
+    <thead>
+        <tr>
+            <th>Photo</th>
+            <!-- Sortable Headers -->
+            <th class="sortable" data-col="Id">ID <span class="sort-arrow"></span></th>
+            <th class="sortable" data-col="Name">Name <span class="sort-arrow"></span></th>
+            <th class="sortable" data-col="Email">Email <span class="sort-arrow"></span></th>
+            <th class="sortable" data-col="Phone">Phone <span class="sort-arrow"></span></th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Any())
+        {
+            foreach (var m in Model)
+            {
+                <tr>
+                    <td>
+                        <img src="/images/@m.PhotoURL" class="member-photo" onerror="this.src='/images/default_photo.png'">
+                    </td>
+                    <td>@m.Id</td>
+                    <td>@m.Name</td>
+                    <td>@m.Email</td>
+                    <td>@m.Phone</td>
+                    <td class="action-links">
+                        <a href="/Admin/MemberDetails/@m.Id" class="btn-view">Details</a>
+                        <form method="post" action="/Admin/DeleteMember/@m.Id" onsubmit="return confirm('Delete @m.Name?');">
+                            <button class="btn-delete">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="6" style="text-align:center; padding: 20px;">No members found.</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Hidden inputs to track current sort state inside the partial -->
+<input type="hidden" id="partialSort" value="@ViewBag.Sort" />
+<input type="hidden" id="partialDir" value="@ViewBag.Dir" />

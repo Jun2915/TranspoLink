@@ -394,3 +394,43 @@
         transform: scale(1);
     }
 }
+
+/* =========================================================
+   SORTING STYLES
+   ========================================================= */
+
+th.sortable {
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    transition: background-color 0.2s;
+}
+
+    th.sortable:hover {
+        background-color: #f0f0f0; /* Subtle hover effect */
+    }
+
+/* Arrow Container */
+.sort-arrow {
+    margin-left: 5px;
+    font-size: 12px;
+    opacity: 0; /* HIDDEN BY DEFAULT */
+    transition: opacity 0.2s;
+    display: inline-block;
+}
+
+/* Active State - Show Arrow Only When Sorted */
+th[data-dir="asc"] .sort-arrow,
+th[data-dir="desc"] .sort-arrow {
+    opacity: 1;
+    color: #667eea; /* Your primary color */
+}
+
+    /* Arrow Content */
+    th[data-dir="asc"] .sort-arrow::after {
+        content: '▲';
+    }
+
+    th[data-dir="desc"] .sort-arrow::after {
+        content: '▼';
+    }
