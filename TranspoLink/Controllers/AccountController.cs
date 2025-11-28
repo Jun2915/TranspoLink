@@ -18,17 +18,16 @@ public class AccountController(DB db,
     [HttpPost]
     public IActionResult Login(LoginVM vm, string? returnURL)
     {
-        // --- CAPTCHA CHECK START ---
+        // 1. CAPTCHA Check
         string captchaResponse = HttpContext.Request.Form["g-recaptcha-response"];
         if (!hp.VerifyCaptcha(captchaResponse))
         {
             ModelState.AddModelError("", "Please verify that you are not a robot.");
             return View(vm);
         }
-        // --- CAPTCHA CHECK END ---
 
+        // 2. Find User
         User? u = null;
-
         if (!string.IsNullOrEmpty(vm.Email))
         {
             u = db.Users.FirstOrDefault(x => x.Email == vm.Email);
@@ -38,24 +37,86 @@ public class AccountController(DB db,
             u = db.Users.FirstOrDefault(x => x.Phone == vm.Phone);
         }
 
-        if (u == null || !hp.VerifyPassword(u.Hash, vm.Password))
+        // 3. CHECK IF BLOCKED (Before checking password!)
+        if (u != null && u.LockoutEnd > DateTime.Now)
         {
-            ModelState.AddModelError("", "Login credentials not matched.");
+            var timeLeft = u.LockoutEnd.Value - DateTime.Now;
+            var msg = timeLeft.TotalMinutes >= 60
+                ? $"Account locked. Try again in {Math.Ceiling(timeLeft.TotalHours)} hour(s)."
+                : $"Account locked. Try again in {Math.Ceiling(timeLeft.TotalMinutes)} minute(s).";
+
+            ModelState.AddModelError("", msg);
+            return View(vm);
         }
 
+        // 4. Verify Password
+        if (u == null || !hp.VerifyPassword(u.Hash, vm.Password))
+        {
+            // --- FAILED LOGIN LOGIC ---
+            if (u != null)
+            {
+                u.LoginRetryCount++; // Increment failure count
+
+                // Rule: 10 Fails = 1 Hour Block
+                if (u.LoginRetryCount >= 10)
+                {
+                    u.LockoutEnd = DateTime.Now.AddHours(1);
+                    ModelState.AddModelError("", "Too many failed attempts! Account locked for 1 hour.");
+                }
+                // Rule: 5 Fails = 10 Minute Block
+                else if (u.LoginRetryCount >= 5)
+                {
+                    u.LockoutEnd = DateTime.Now.AddMinutes(10);
+                    ModelState.AddModelError("", "Too many failed attempts! Account locked for 10 minutes.");
+                }
+                // Rule: 3 Fails = 5 Minute Block
+                else if (u.LoginRetryCount >= 3)
+                {
+                    u.LockoutEnd = DateTime.Now.AddMinutes(5);
+                    ModelState.AddModelError("", "Too many failed attempts! Account locked for 5 minutes.");
+                }
+                else
+                {
+                    // Just a warning
+                    int left = 3 - u.LoginRetryCount;
+                    if (left > 0)
+                    {
+                        ModelState.AddModelError("", $"Login failed. You have {left} attempt(s) before lockout.");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("", "Login failed.");
+                    }
+                }
+                db.SaveChanges(); // Save the counter/lockout
+            }
+            else
+            {
+                ModelState.AddModelError("", "Login credentials not matched.");
+            }
+        }
+
+        // 5. SUCCESS LOGIN LOGIC
         if (ModelState.IsValid)
         {
-            TempData["Info"] = $"Welcome, {u!.Name}!";
-
-            // u.Id is now a string (e.g., C001), so no need for ToString()
-            string identifier = u!.Email ?? u.Phone ?? u.Id;
-            hp.SignIn(identifier, u.Role, vm.RememberMe);
-
-            if (string.IsNullOrEmpty(returnURL))
+            // Reset counters on success!
+            if (u != null)
             {
-                return RedirectToAction("Index", "Home");
+                u.LoginRetryCount = 0;
+                u.LockoutEnd = null;
+                db.SaveChanges();
+
+                TempData["Info"] = $"Welcome, {u.Name}!";
+
+                string identifier = u.Email ?? u.Phone ?? u.Id;
+                hp.SignIn(identifier, u.Role, vm.RememberMe);
+
+                if (string.IsNullOrEmpty(returnURL))
+                {
+                    return RedirectToAction("Index", "Home");
+                }
+                return Redirect(returnURL);
             }
-            return Redirect(returnURL);
         }
 
         return View(vm);
@@ -91,14 +152,14 @@ public class AccountController(DB db,
     [HttpPost]
     public IActionResult Register(RegisterVM vm)
     {
-        // --- CAPTCHA CHECK START ---
+        // CAPTCHA Check
         string captchaResponse = HttpContext.Request.Form["g-recaptcha-response"];
         if (!hp.VerifyCaptcha(captchaResponse))
         {
             ModelState.AddModelError("", "Please verify that you are not a robot.");
             return View(vm);
         }
-        // --- CAPTCHA CHECK END ---
+
         if (string.IsNullOrEmpty(vm.Email) && string.IsNullOrEmpty(vm.PhoneNumber))
         {
             ModelState.AddModelError("", "Please provide either an Email or a Phone number.");
@@ -132,7 +193,7 @@ public class AccountController(DB db,
                 Phone = vm.PhoneNumber,
                 Hash = hp.HashPassword(vm.Password),
                 Name = vm.Name,
-                // FIX: Changed "images" to "photos"
+                // Saved to "photos" to match view logic
                 PhotoURL = vm.Photo != null ? hp.SavePhoto(vm.Photo, "photos") : "default_photo.png",
             };
 
@@ -182,7 +243,7 @@ public class AccountController(DB db,
     }
 
     // ============================================================================
-    // UPDATE PROFILE (NOW SUPPORTS ADMIN AND MEMBER)
+    // PROFILE MANAGEMENT (Supports Admin & Member)
     // ============================================================================
 
     [Authorize]
@@ -200,7 +261,6 @@ public class AccountController(DB db,
             Name = u.Name,
         };
 
-        // Determine photo URL based on role
         if (u is Member m) vm.PhotoURL = m.PhotoURL;
         else if (u is Admin a) vm.PhotoURL = a.PhotoURL;
 
@@ -226,15 +286,12 @@ public class AccountController(DB db,
         {
             u.Name = vm.Name;
 
-            // Handle Photo Upload
             if (vm.Photo != null)
             {
-                // Save new photo to 'photos' folder
                 string newPhoto = hp.SavePhoto(vm.Photo, "photos");
 
                 if (u is Member m)
                 {
-                    // Delete old photo if it's not the default
                     if (!string.IsNullOrEmpty(m.PhotoURL) && m.PhotoURL != "default_photo.png")
                     {
                         hp.DeletePhoto(m.PhotoURL, "photos");
@@ -243,7 +300,6 @@ public class AccountController(DB db,
                 }
                 else if (u is Admin a)
                 {
-                    // For Admin, only delete if it's NOT the static /images/ path
                     if (!string.IsNullOrEmpty(a.PhotoURL) && !a.PhotoURL.StartsWith("/images/"))
                     {
                         hp.DeletePhoto(a.PhotoURL, "photos");
@@ -257,17 +313,14 @@ public class AccountController(DB db,
             return RedirectToAction();
         }
 
-        // Restore data if validation fails
         vm.Email = u.Email;
         vm.Phone = u.Phone;
-        
+
         if (u is Member m2) vm.PhotoURL = m2.PhotoURL;
         else if (u is Admin a2) vm.PhotoURL = a2.PhotoURL;
 
         return View(vm);
     }
-
-    // ============================================================================
 
     public IActionResult ResetPassword()
     {
@@ -314,23 +367,16 @@ public class AccountController(DB db,
         var url = Url.Action("Login", "Account", null, "https");
 
         var path = "";
-        
-        // Handle different photo paths for email attachment
         if (u is Member m)
         {
-             path = Path.Combine(en.WebRootPath, "photos", m.PhotoURL ?? "default_photo.png");
+            path = Path.Combine(en.WebRootPath, "photos", m.PhotoURL ?? "default_photo.png");
         }
         else if (u is Admin a)
         {
-             if (a.PhotoURL != null && a.PhotoURL.StartsWith("/images/"))
-             {
-                 // Remove leading slash for Path.Combine
-                 path = Path.Combine(en.WebRootPath, a.PhotoURL.TrimStart('/'));
-             }
-             else
-             {
-                 path = Path.Combine(en.WebRootPath, "photos", a.PhotoURL ?? "");
-             }
+            if (a.PhotoURL != null && a.PhotoURL.StartsWith("/images/"))
+                path = Path.Combine(en.WebRootPath, a.PhotoURL.TrimStart('/'));
+            else
+                path = Path.Combine(en.WebRootPath, "photos", a.PhotoURL ?? "");
         }
 
         if (System.IO.File.Exists(path))

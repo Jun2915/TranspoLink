@@ -62,7 +62,6 @@ public class DB(DbContextOptions options) : DbContext(options)
 
 public class User
 {
-    // CHANGED: Id is now String and Manual Entry
     [Key, MaxLength(5)]
     [DatabaseGenerated(DatabaseGeneratedOption.None)]
     public string Id { get; set; }
@@ -80,6 +79,9 @@ public class User
 
     [MaxLength(100)]
     public string Name { get; set; }
+
+    public int LoginRetryCount { get; set; } = 0;
+    public DateTime? LockoutEnd { get; set; }
 
     public string Role => GetType().Name;
 }
