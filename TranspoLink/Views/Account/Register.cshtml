@@ -4,7 +4,7 @@
 }
 
 @section head {
-    <link rel="stylesheet" href="/css/login.css" />
+    <link rel="stylesheet" href="/css/login.css" asp-append-version="true"/>
     <script src="/js/regNlog.js" defer></script>
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 }
@@ -16,7 +16,6 @@
             <div class="success-icon">✓</div>
             <h2>Congratulations!</h2>
             <p>Account created for <b>@ViewBag.RegisteredName</b></p>
-            <p>Details sent to: <b>@ViewBag.RegisteredContact</b></p>
             <br>
             <p style="font-size:14px; color:#999;">Redirecting in <span id="countdown" class="countdown-text">5</span> seconds...</p>
             <a href="/Account/Login" class="auth-submit-btn" style="display:inline-block; text-decoration:none; width:auto; padding:10px 30px;">Login Now</a>
@@ -47,12 +46,17 @@
             <div class="register-layout">
 
                 <div class="register-left">
-                    <div class="auth-photo-upload" style="text-align:center; width: 100%;">
+                    <div class="auth-photo-upload" style="text-align:center; width: 70%;">
                         <label class="upload auth-upload">
                             <input asp-for="Photo" accept="image/jpeg,image/png" hidden>
                             <img src="/images/add_photo.png" alt="Upload Photo" style="width:150px; height:150px; object-fit:cover; border-radius:50%; border:2px dashed #ccc;">
                             <span class="auth-upload-text" style="display:block; margin-top:10px; color:#666;">Tap to upload photo</span>
                         </label>
+
+                        <button type="button" class="btn-open-camera" onclick="startWebcam()">
+                            📸 Use Camera
+                        </button>
+
                         <span asp-validation-for="Photo" class="field-validation-error"></span>
                     </div>
                 </div>

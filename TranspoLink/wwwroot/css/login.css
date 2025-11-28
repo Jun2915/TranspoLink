@@ -7,14 +7,14 @@
     align-items: center;
     justify-content: center;
     padding: 20px;
-    /* CHANGED: Added a gradient background so the transparency looks good */
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    /* Update this section to use your image */
+    background: url('/images/background_rl.png') no-repeat center center fixed;
+    background-size: cover; /* Ensures image covers the whole screen */
 }
 
 .auth-card {
     /* CHANGED: Semi-transparent White */
-    background: rgba(255, 255, 255, 0.85);
-    /* Glass Blur Effect */
+    background: rgba(255, 255, 255, 0.6);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     /* Subtle border for glass look */

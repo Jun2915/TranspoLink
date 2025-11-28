@@ -1,0 +1,122 @@
+﻿/* =========================================================
+   PHOTO TOOLS MODAL (Webcam & Cropper)
+   ========================================================= */
+.photo-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 10000;
+    display: none; /* Hidden by default */
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.photo-modal-content {
+    background: #222;
+    padding: 20px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 600px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+/* Webcam Video Container */
+.video-container {
+    width: 100%;
+    height: 350px;
+    background: #000;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+video#webcamVideo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Cropper Container */
+.cropper-container-box {
+    height: 400px; /* Fixed height for cropper */
+    background: #333;
+    margin-bottom: 15px;
+}
+
+img#imageToCrop {
+    max-width: 100%;
+    display: block; /* Important for Cropper.js */
+}
+
+/* Action Buttons */
+.photo-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 15px;
+}
+
+.btn-tool {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    color: white;
+    transition: 0.2s;
+}
+
+.btn-capture {
+    background: #ff4757;
+}
+
+    .btn-capture:hover {
+        background: #ff6b81;
+    }
+
+.btn-confirm {
+    background: #2ed573;
+}
+
+    .btn-confirm:hover {
+        background: #7bed9f;
+    }
+
+.btn-cancel {
+    background: #57606f;
+}
+
+    .btn-cancel:hover {
+        background: #747d8c;
+    }
+
+.btn-rotate {
+    background: #3742fa;
+}
+
+    .btn-rotate:hover {
+        background: #535c68;
+    }
+
+/* Custom "Take Photo" button on the main form */
+.btn-open-camera {
+    margin-top: 10px;
+    background: #3742fa;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
