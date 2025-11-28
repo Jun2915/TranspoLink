@@ -5,8 +5,8 @@
 }
 
 @section head {
-    <link rel="stylesheet" href="/css/admin.css" />
-    <link rel="stylesheet" href="/css/member.css" />
+    <link rel="stylesheet" href="/css/admin.css" asp-append-version="true" />
+    <link rel="stylesheet" href="/css/member.css" asp-append-version="true" />
 }
 
 <div class="admin-container">
@@ -43,7 +43,7 @@
                     {
                         <tr>
                             <td>
-                                <img src="/photos/@m.PhotoURL" class="member-photo" onerror="this.src='/images/default_photo.png'">
+                                <img src="/images/@m.PhotoURL" class="member-photo" onerror="this.src='/images/default_photo.png'">
                             </td>
                             <td>@m.Id</td>
                             <td>@m.Name</td>

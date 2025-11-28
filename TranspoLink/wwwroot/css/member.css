@@ -1,1 +1,126 @@
-﻿
+﻿/* =========================================================
+   1. SEARCH BAR FIX
+   ========================================================= */
+.search-container {
+    max-width: 100% !important; /* Force it to stretch full width */
+    display: flex; /* Arrange items in a row */
+    gap: 15px; /* Space between input and button */
+    align-items: center; /* Vertically align them */
+    margin-bottom: 25px;
+    background: #fff;
+    padding: 20px 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+    /* Make the text box grow to fill space */
+    .search-container input[type="text"] {
+        flex: 1; /* Takes up all available space */
+        padding: 12px 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 15px;
+        outline: none;
+        transition: border-color 0.3s;
+    }
+
+        .search-container input[type="text"]:focus {
+            border-color: #667eea;
+        }
+
+    /* Style the Search button */
+    .search-container button {
+        padding: 12px 25px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+
+        .search-container button:hover {
+            transform: translateY(-2px);
+        }
+
+    .search-container a {
+        color: #666;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+/* =========================================================
+   2. MEMBER TABLE & PHOTO FIX
+   ========================================================= */
+.member-photo {
+    width: 35px; /* Smaller width */
+    height: 35px; /* Smaller height */
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #e0e0e0; /* Thinner border for smaller icon */
+    vertical-align: middle;
+}
+
+/* Align text vertically in the middle */
+.booking-table td {
+    vertical-align: middle !important;
+    padding: 10px 15px; /* Slightly less padding to make rows more compact */
+}
+
+/* =========================================================
+   3. ACTION BUTTONS BALANCING (THE FIX)
+   ========================================================= */
+.action-links {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+    /* Remove default margin from the form */
+    .action-links form {
+        margin: 0;
+        padding: 0;
+        display: flex;
+    }
+
+/* Make both buttons TWINS (Identical Size & Alignment) */
+.btn-view, .btn-delete {
+    display: inline-flex; /* Critical for perfect centering */
+    align-items: center; /* Centers text vertically */
+    justify-content: center; /* Centers text horizontally */
+
+    height: 38px; /* Fixed height for BOTH */
+    padding: 0 20px; /* Fixed width padding */
+
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    line-height: 1; /* Stops text from pushing buttons up/down */
+    transition: all 0.2s ease;
+}
+
+/* Details Button (Blue) */
+.btn-view {
+    background: #667eea;
+    color: white;
+}
+
+    .btn-view:hover {
+        background: #5a6fd1;
+        transform: translateY(-2px);
+    }
+
+/* Delete Button (Red) */
+.btn-delete {
+    background: #ff4757;
+    color: white;
+}
+
+    .btn-delete:hover {
+        background: #ff2e43;
+        transform: translateY(-2px);
+    }

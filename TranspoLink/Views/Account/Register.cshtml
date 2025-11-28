@@ -6,6 +6,7 @@
 @section head {
     <link rel="stylesheet" href="/css/login.css" />
     <script src="/js/regNlog.js" defer></script>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 }
 
 @if (ViewBag.Success == true)
@@ -119,6 +120,11 @@
                             </div>
                             <span asp-validation-for="Confirm" class="field-validation-error"></span>
                         </div>
+                    </div>
+
+                    <div class="g-recaptcha"
+                         data-sitekey="6Ld3iBosAAAAAHOjrhAT_ufqDtdaUHcKIYH94G4-"
+                         style="margin-top: 20px; display: flex; justify-content: center;">
                     </div>
 
                     <button type="submit" class="auth-submit-btn">Sign Up</button>

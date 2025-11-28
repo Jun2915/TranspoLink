@@ -26,13 +26,14 @@
     }
 
 .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    display: flex; /* Use Flexbox instead of Grid */
+    flex-wrap: wrap; /* Allow items to wrap to next line */
     gap: 25px;
     margin-bottom: 40px;
 }
 
 .stat-card {
+    flex: 1 1 250px; /* Grow: 1 (Fill space), Shrink: 1, Min-width: 250px */
     background: white;
     padding: 25px;
     border-radius: 12px;
@@ -67,14 +68,16 @@
     font-weight: 700;
 }
 
-.admin-nav {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+.admin-nav 
+{
+    display: flex; /* Use Flexbox instead of Grid */
+    flex-wrap: wrap; /* Allow items to wrap to next line */
     gap: 20px;
     margin-bottom: 40px;
 }
 
 .nav-card {
+    flex: 1 1 200px; /* Grow: 1 (Fill space), Shrink: 1, Min-width: 200px */
     background: white;
     padding: 25px;
     border-radius: 12px;

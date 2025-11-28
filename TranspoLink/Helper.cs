@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
-using System.Net.Mail;
 using System.Net;
+using System.Net.Mail;
 using System.Security.Claims;
+using System.Text.Json;
 using System.Text.RegularExpressions;
-using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace TranspoLink;
 
@@ -246,6 +247,21 @@ public class Helper(IWebHostEnvironment en,
         else
         {
             ct.HttpContext!.Session.Set("Cart", dict);
+        }
+    }
+
+    public bool VerifyCaptcha(string responseToken)
+    {
+        if (string.IsNullOrEmpty(responseToken)) return false;
+
+        string secretKey = "6Ld3iBosAAAAAK2pXnJdiSD7YCX-wnUjBnZ2C28o"; // <--- PASTE HERE
+        string apiUrl = $"https://www.google.com/recaptcha/api/siteverify?secret={secretKey}&response={responseToken}";
+
+        using (var client = new HttpClient())
+        {
+            var result = client.GetStringAsync(apiUrl).Result;
+            using var doc = JsonDocument.Parse(result);
+            return doc.RootElement.GetProperty("success").GetBoolean();
         }
     }
 }

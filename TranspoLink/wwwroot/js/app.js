@@ -75,10 +75,31 @@ $('.upload input').on('change', e => {
 });
 
 // ============================================================================
-// HOME PAGE FUNCTIONALITY
+// MAIN FUNCTIONALITY
 // ============================================================================
 
 $(document).ready(function () {
+
+    // ============================================================================
+    // PROFILE DROPDOWN LOGIC
+    // ============================================================================
+
+    // Toggle dropdown when clicking the name/photo
+    $('#profileTrigger').on('click', function (e) {
+        e.stopPropagation(); // Prevents the click from reaching the document
+        $('#profileDropdown').toggle(); // Shows or Hides
+    });
+
+    // Close dropdown when clicking ANYWHERE else on the page
+    $(document).on('click', function (e) {
+        if (!$(e.target).closest('.profile-dropdown').length && !$(e.target).closest('#profileTrigger').length) {
+            $('#profileDropdown').hide();
+        }
+    });
+
+    // ============================================================================
+    // HOME PAGE FUNCTIONALITY
+    // ============================================================================
 
     // Tab switching functionality for transport types
     $('.tab').on('click', function () {

@@ -23,6 +23,8 @@
         <div class="top-bar-item">
             📋 Check My Booking
         </div>
+
+        @* --- USER DROPDOWN LOGIC START --- *@
         @if (User.Identity.IsAuthenticated)
         {
             // Fetch User Details from DB
@@ -41,20 +43,45 @@
                 }
                 else
                 {
+                    // Pointing to 'photos' folder
                     photoUrl = "/photos/" + m.PhotoURL;
                 }
             }
+            // Logic for Admin Photo
             else if (currentUser is Admin a && !string.IsNullOrEmpty(a.PhotoURL))
             {
-                photoUrl = a.PhotoURL;
+                // If it's the default static image or a custom uploaded one
+                if (a.PhotoURL.StartsWith("/images/"))
+                {
+                    photoUrl = a.PhotoURL;
+                }
+                else
+                {
+                    photoUrl = "/photos/" + a.PhotoURL;
+                }
             }
 
-            <div class="top-bar-item user-profile-display">
-                <img src="@photoUrl" class="nav-user-photo" alt="Profile" onerror="this.src='/images/add_photo.png'">
-                <span>👋 Welcome, <b>@(currentUser?.Name ?? User.Identity.Name)</b></span>
-            </div>
-            <div class="top-bar-item">
-                <a href="/Account/Logout">🚪 Logout</a>
+            <div class="user-dropdown-container">
+
+                <div class="top-bar-item user-profile-display" id="profileTrigger">
+                    <img src="@photoUrl" class="nav-user-photo" alt="Profile" onerror="this.src='/images/default_photo.png'">
+                    <span>👋 Welcome, <b>@(currentUser?.Name ?? User.Identity.Name)</b></span>
+                    <span style="font-size: 10px; margin-left: 5px;">▼</span>
+                </div>
+
+                <div class="profile-dropdown" id="profileDropdown">
+                    <div class="dropdown-header">
+                        <img src="@photoUrl" class="dropdown-big-photo" onerror="this.src='/images/default_photo.png'">
+                        <p class="dropdown-name">@(currentUser?.Name ?? User.Identity.Name)</p>
+                        <p class="dropdown-email">@(currentUser?.Email ?? currentUser?.Phone)</p>
+                    </div>
+
+                    <div class="dropdown-actions">
+                        <a href="/Account/UpdateProfile" class="dropdown-btn btn-manage">Manage Account</a>
+
+                        <a href="/Account/Logout" class="dropdown-btn btn-logout">Sign Out</a>
+                    </div>
+                </div>
             </div>
         }
         else
@@ -63,6 +90,7 @@
                 <a href="/Account/Login">🔐 Login</a> / <a href="/Account/Register">Sign Up</a>
             </div>
         }
+        @* --- USER DROPDOWN LOGIC END --- *@
     </div>
 
     <nav>

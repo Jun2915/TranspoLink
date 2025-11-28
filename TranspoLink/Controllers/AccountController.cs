@@ -18,6 +18,15 @@ public class AccountController(DB db,
     [HttpPost]
     public IActionResult Login(LoginVM vm, string? returnURL)
     {
+        // --- CAPTCHA CHECK START ---
+        string captchaResponse = HttpContext.Request.Form["g-recaptcha-response"];
+        if (!hp.VerifyCaptcha(captchaResponse))
+        {
+            ModelState.AddModelError("", "Please verify that you are not a robot.");
+            return View(vm);
+        }
+        // --- CAPTCHA CHECK END ---
+
         User? u = null;
 
         if (!string.IsNullOrEmpty(vm.Email))
@@ -82,6 +91,14 @@ public class AccountController(DB db,
     [HttpPost]
     public IActionResult Register(RegisterVM vm)
     {
+        // --- CAPTCHA CHECK START ---
+        string captchaResponse = HttpContext.Request.Form["g-recaptcha-response"];
+        if (!hp.VerifyCaptcha(captchaResponse))
+        {
+            ModelState.AddModelError("", "Please verify that you are not a robot.");
+            return View(vm);
+        }
+        // --- CAPTCHA CHECK END ---
         if (string.IsNullOrEmpty(vm.Email) && string.IsNullOrEmpty(vm.PhoneNumber))
         {
             ModelState.AddModelError("", "Please provide either an Email or a Phone number.");
@@ -115,7 +132,8 @@ public class AccountController(DB db,
                 Phone = vm.PhoneNumber,
                 Hash = hp.HashPassword(vm.Password),
                 Name = vm.Name,
-                PhotoURL = vm.Photo != null ? hp.SavePhoto(vm.Photo, "images") : "add_photo.png",
+                // FIX: Changed "images" to "photos"
+                PhotoURL = vm.Photo != null ? hp.SavePhoto(vm.Photo, "photos") : "default_photo.png",
             };
 
             db.Members.Add(newMember);
@@ -163,33 +181,40 @@ public class AccountController(DB db,
         return View();
     }
 
-    [Authorize(Roles = "Member")]
+    // ============================================================================
+    // UPDATE PROFILE (NOW SUPPORTS ADMIN AND MEMBER)
+    // ============================================================================
+
+    [Authorize]
     public IActionResult UpdateProfile()
     {
         var identifier = User.Identity!.Name;
-        var m = db.Members.FirstOrDefault(u => u.Email == identifier || u.Phone == identifier);
+        var u = db.Users.FirstOrDefault(u => u.Email == identifier || u.Phone == identifier);
 
-        if (m == null) return RedirectToAction("Index", "Home");
+        if (u == null) return RedirectToAction("Index", "Home");
 
         var vm = new UpdateProfileVM
         {
-            Email = m.Email,
-            Phone = m.Phone,
-            Name = m.Name,
-            PhotoURL = m.PhotoURL,
+            Email = u.Email,
+            Phone = u.Phone,
+            Name = u.Name,
         };
+
+        // Determine photo URL based on role
+        if (u is Member m) vm.PhotoURL = m.PhotoURL;
+        else if (u is Admin a) vm.PhotoURL = a.PhotoURL;
 
         return View(vm);
     }
 
-    [Authorize(Roles = "Member")]
+    [Authorize]
     [HttpPost]
     public IActionResult UpdateProfile(UpdateProfileVM vm)
     {
         var identifier = User.Identity!.Name;
-        var m = db.Members.FirstOrDefault(u => u.Email == identifier || u.Phone == identifier);
+        var u = db.Users.FirstOrDefault(u => u.Email == identifier || u.Phone == identifier);
 
-        if (m == null) return RedirectToAction("Index", "Home");
+        if (u == null) return RedirectToAction("Index", "Home");
 
         if (vm.Photo != null)
         {
@@ -199,27 +224,50 @@ public class AccountController(DB db,
 
         if (ModelState.IsValid)
         {
-            m.Name = vm.Name;
+            u.Name = vm.Name;
 
+            // Handle Photo Upload
             if (vm.Photo != null)
             {
-                if (m.PhotoURL != null && m.PhotoURL != "add_photo.png")
+                // Save new photo to 'photos' folder
+                string newPhoto = hp.SavePhoto(vm.Photo, "photos");
+
+                if (u is Member m)
                 {
-                    hp.DeletePhoto(m.PhotoURL, "photos");
+                    // Delete old photo if it's not the default
+                    if (!string.IsNullOrEmpty(m.PhotoURL) && m.PhotoURL != "default_photo.png")
+                    {
+                        hp.DeletePhoto(m.PhotoURL, "photos");
+                    }
+                    m.PhotoURL = newPhoto;
                 }
-                m.PhotoURL = hp.SavePhoto(vm.Photo, "photos");
+                else if (u is Admin a)
+                {
+                    // For Admin, only delete if it's NOT the static /images/ path
+                    if (!string.IsNullOrEmpty(a.PhotoURL) && !a.PhotoURL.StartsWith("/images/"))
+                    {
+                        hp.DeletePhoto(a.PhotoURL, "photos");
+                    }
+                    a.PhotoURL = newPhoto;
+                }
             }
 
             db.SaveChanges();
-            TempData["Info"] = "Profile updated.";
+            TempData["Info"] = "Profile updated successfully.";
             return RedirectToAction();
         }
 
-        vm.Email = m.Email;
-        vm.Phone = m.Phone;
-        vm.PhotoURL = m.PhotoURL;
+        // Restore data if validation fails
+        vm.Email = u.Email;
+        vm.Phone = u.Phone;
+        
+        if (u is Member m2) vm.PhotoURL = m2.PhotoURL;
+        else if (u is Admin a2) vm.PhotoURL = a2.PhotoURL;
+
         return View(vm);
     }
+
+    // ============================================================================
 
     public IActionResult ResetPassword()
     {
@@ -265,12 +313,25 @@ public class AccountController(DB db,
 
         var url = Url.Action("Login", "Account", null, "https");
 
-        var path = u switch
+        var path = "";
+        
+        // Handle different photo paths for email attachment
+        if (u is Member m)
         {
-            Admin => Path.Combine(en.WebRootPath, "photos", "admin.jpg"),
-            Member m => Path.Combine(en.WebRootPath, "photos", m.PhotoURL ?? "add_photo.png"),
-            _ => "",
-        };
+             path = Path.Combine(en.WebRootPath, "photos", m.PhotoURL ?? "default_photo.png");
+        }
+        else if (u is Admin a)
+        {
+             if (a.PhotoURL != null && a.PhotoURL.StartsWith("/images/"))
+             {
+                 // Remove leading slash for Path.Combine
+                 path = Path.Combine(en.WebRootPath, a.PhotoURL.TrimStart('/'));
+             }
+             else
+             {
+                 path = Path.Combine(en.WebRootPath, "photos", a.PhotoURL ?? "");
+             }
+        }
 
         if (System.IO.File.Exists(path))
         {
