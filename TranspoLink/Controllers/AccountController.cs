@@ -397,7 +397,7 @@ public class AccountController(DB db,
     }
 
     [HttpPost]
-    public IActionResult ResetPassword(ResetPasswordFinalVM vm)
+    public IActionResult ResetPassword(ResetPasswordVM vm)
     {
         if (HttpContext.Session.GetString("Reset_Verified") != "true")
         {
