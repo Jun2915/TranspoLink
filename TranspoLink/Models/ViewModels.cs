@@ -85,13 +85,6 @@ public class UpdateProfileVM
     public IFormFile? Photo { get; set; }
 }
 
-public class ResetPasswordVM
-{
-    [StringLength(100)]
-    [EmailAddress]
-    public string Email { get; set; }
-}
-
 public class SearchTripVM
 {
     [Required]
@@ -142,7 +135,7 @@ public class VerifyOtpVM
     public string Otp { get; set; }
 }
 
-public class ResetPasswordFinalVM
+public class ResetPasswordVM
 {
     [StringLength(100, MinimumLength = 5)]
     [DataType(DataType.Password)]

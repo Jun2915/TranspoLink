@@ -20,9 +20,6 @@
         <div class="top-bar-item">
             🌐 Language
         </div>
-        <div class="top-bar-item">
-            📋 Check My Booking
-        </div>
 
         @* --- USER DROPDOWN LOGIC START --- *@
         @if (User.Identity.IsAuthenticated)
@@ -34,12 +31,12 @@
             if (currentUser is Member m && !string.IsNullOrEmpty(m.PhotoURL))
             {
                 if (m.PhotoURL == "default_photo.png") { photoUrl = "/images/default_photo.png"; }
-                else { photoUrl = "/photos/" + m.PhotoURL; }
+                else { photoUrl = "/images/" + m.PhotoURL; }
             }
             else if (currentUser is Admin a && !string.IsNullOrEmpty(a.PhotoURL))
             {
                 if (a.PhotoURL.StartsWith("/images/")) { photoUrl = a.PhotoURL; }
-                else { photoUrl = "/photos/" + a.PhotoURL; }
+                else { photoUrl = "/images/" + a.PhotoURL; }
             }
 
             <div class="user-dropdown-container">
@@ -77,7 +74,6 @@
             <span>TranspoLink</span>
         </div>
         <ul class="nav-links">
-            <li><a href="/">Home</a></li>
             @if (User.IsInRole("Admin"))
             {
                 <li><a href="/Admin">Dashboard</a></li>
@@ -87,14 +83,15 @@
                 <li><a href="/Admin/Trips">Trips</a></li>
                 <li><a href="/Admin/Bookings">Bookings</a></li>
             }
-            else if (User.Identity.IsAuthenticated)
+            else if (User.IsInRole("Member"))
             {
+                <li><a href="/">Home</a></li>
                 <li><a href="#features">Features</a></li>
                 <li><a href="#trending">News & Offers</a></li>
-                <li><a href="/Account/UpdateProfile">Profile</a></li>
             }
             else
             {
+                <li><a href="/">Home</a></li>
                 <li><a href="#features">Features</a></li>
                 <li><a href="#trending">News & Offers</a></li>
                 <li><a href="#contact">Contact</a></li>
