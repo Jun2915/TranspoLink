@@ -150,3 +150,38 @@ public class ResetPasswordVM
     [DisplayName("Confirm Password")]
     public string ConfirmPassword { get; set; }
 }
+
+// [Existing code...]
+
+public class AdminVM
+{
+    public string? Id { get; set; }
+
+    [Required]
+    [StringLength(100)]
+    public string Name { get; set; }
+
+    [Required]
+    [EmailAddress]
+    [StringLength(100)]
+    public string Email { get; set; }
+
+    [Required]
+    [StringLength(20)]
+    public string Phone { get; set; }
+
+    // Password is required only for Create, optional for Edit
+    [StringLength(100, MinimumLength = 8)]
+    [DataType(DataType.Password)]
+    public string? Password { get; set; }
+
+    [Compare("Password")]
+    [DataType(DataType.Password)]
+    [DisplayName("Confirm Password")]
+    public string? ConfirmPassword { get; set; }
+
+    public IFormFile? Photo { get; set; }
+
+    public string? ExistingPhotoURL { get; set; }
+    public bool IsBlocked { get; set; }
+}

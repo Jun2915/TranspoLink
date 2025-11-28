@@ -36,6 +36,199 @@ public class AdminController(DB db, Helper hp) : Controller
         return View(recentBookings);
     }
 
+    // GET: Admin/Admins
+    public IActionResult Admins(string search = "", int page = 1, string sort = "Id", string dir = "asc")
+    {
+        var query = db.Admins.AsQueryable();
+
+        // 1. Search Logic
+        if (!string.IsNullOrEmpty(search))
+        {
+            query = query.Where(a =>
+                a.Email.Contains(search) ||
+                a.Phone.Contains(search) ||
+                a.Name.Contains(search));
+        }
+
+        // 2. Sort Logic
+        query = sort switch
+        {
+            "Name" => dir == "asc" ? query.OrderBy(a => a.Name) : query.OrderByDescending(a => a.Name),
+            "Email" => dir == "asc" ? query.OrderBy(a => a.Email) : query.OrderByDescending(a => a.Email),
+            "Phone" => dir == "asc" ? query.OrderBy(a => a.Phone) : query.OrderByDescending(a => a.Phone),
+            _ => dir == "asc" ? query.OrderBy(a => a.Id) : query.OrderByDescending(a => a.Id)
+        };
+
+        ViewBag.Search = search;
+        ViewBag.Sort = sort;
+        ViewBag.Dir = dir;
+
+        // 3. Pagination
+        int pageSize = 10;
+        var admins = query.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+        ViewBag.TotalPages = (int)Math.Ceiling(query.Count() / (double)pageSize);
+        ViewBag.CurrentPage = page;
+
+        if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+        {
+            return PartialView("_AdminTable", admins);
+        }
+
+        return View(admins);
+    }
+
+    // GET: Admin/CreateAdmin
+    public IActionResult CreateAdmin()
+    {
+        return View();
+    }
+
+    // POST: Admin/CreateAdmin
+    [HttpPost]
+    public IActionResult CreateAdmin(AdminVM vm)
+    {
+        // Manual validation for Password on Create
+        if (string.IsNullOrEmpty(vm.Password))
+        {
+            ModelState.AddModelError("Password", "Password is required.");
+        }
+
+        if (db.Users.Any(u => u.Email == vm.Email))
+            ModelState.AddModelError("Email", "Email already in use.");
+
+        if (db.Users.Any(u => u.Phone == vm.Phone))
+            ModelState.AddModelError("Phone", "Phone number already in use.");
+
+        if (vm.Photo != null)
+        {
+            var err = hp.ValidatePhoto(vm.Photo);
+            if (err != "") ModelState.AddModelError("Photo", err);
+        }
+
+        if (ModelState.IsValid)
+        {
+            var newAdmin = new Admin
+            {
+                Id = hp.GetNextId(db, "Admin"),
+                Name = vm.Name,
+                Email = vm.Email,
+                Phone = vm.Phone,
+                Hash = hp.HashPassword(vm.Password),
+                PhotoURL = vm.Photo != null ? hp.SavePhoto(vm.Photo, "images") : "beauty_admin.png",
+                IsBlocked = false
+            };
+
+            db.Admins.Add(newAdmin);
+            db.SaveChanges();
+
+            TempData["Info"] = "New Admin account created successfully.";
+            return RedirectToAction("Admins");
+        }
+
+        return View(vm);
+    }
+
+    // GET: Admin/EditAdmin/A001
+    public IActionResult EditAdmin(string id)
+    {
+        var admin = db.Admins.Find(id);
+        if (admin == null) return RedirectToAction("Admins");
+
+        var vm = new AdminVM
+        {
+            Id = admin.Id,
+            Name = admin.Name,
+            Email = admin.Email,
+            Phone = admin.Phone,
+            ExistingPhotoURL = admin.PhotoURL,
+            IsBlocked = admin.IsBlocked
+        };
+
+        return View(vm);
+    }
+
+    // POST: Admin/EditAdmin
+    [HttpPost]
+    public IActionResult EditAdmin(AdminVM vm)
+    {
+        var admin = db.Admins.Find(vm.Id);
+        if (admin == null) return RedirectToAction("Admins");
+
+        // Unique checks (excluding self)
+        if (db.Users.Any(u => u.Email == vm.Email && u.Id != vm.Id))
+            ModelState.AddModelError("Email", "Email already in use.");
+
+        if (db.Users.Any(u => u.Phone == vm.Phone && u.Id != vm.Id))
+            ModelState.AddModelError("Phone", "Phone number already in use.");
+
+        if (vm.Photo != null)
+        {
+            var err = hp.ValidatePhoto(vm.Photo);
+            if (err != "") ModelState.AddModelError("Photo", err);
+        }
+
+        if (ModelState.IsValid)
+        {
+            admin.Name = vm.Name;
+            admin.Email = vm.Email;
+            admin.Phone = vm.Phone;
+            admin.IsBlocked = vm.IsBlocked;
+
+            // Update password only if provided
+            if (!string.IsNullOrEmpty(vm.Password))
+            {
+                admin.Hash = hp.HashPassword(vm.Password);
+            }
+
+            // Update Photo
+            if (vm.Photo != null)
+            {
+                if (!string.IsNullOrEmpty(admin.PhotoURL) && !admin.PhotoURL.StartsWith("/images/") && admin.PhotoURL != "beauty_admin.png")
+                {
+                    hp.DeletePhoto(admin.PhotoURL, "images");
+                }
+                admin.PhotoURL = hp.SavePhoto(vm.Photo, "images");
+            }
+
+            db.SaveChanges();
+            TempData["Info"] = "Admin details updated.";
+            return RedirectToAction("Admins");
+        }
+
+        // Maintain photo preview on error
+        vm.ExistingPhotoURL = admin.PhotoURL;
+        return View(vm);
+    }
+
+    // POST: Admin/DeleteAdmin/A001
+    [HttpPost]
+    public IActionResult DeleteAdmin(string id)
+    {
+        var admin = db.Admins.Find(id);
+
+        // Prevent deleting self
+        var currentUserId = db.Users.FirstOrDefault(u => u.Email == User.Identity.Name || u.Phone == User.Identity.Name)?.Id;
+        if (currentUserId == id)
+        {
+            TempData["Info"] = "You cannot delete your own account while logged in.";
+            return RedirectToAction("Admins");
+        }
+
+        if (admin != null)
+        {
+            if (admin.PhotoURL != null && admin.PhotoURL != "beauty_admin.png" && !admin.PhotoURL.StartsWith("/images/"))
+            {
+                hp.DeletePhoto(admin.PhotoURL, "images");
+            }
+
+            db.Admins.Remove(admin);
+            db.SaveChanges();
+            TempData["Info"] = "Admin account deleted.";
+        }
+        return RedirectToAction("Admins");
+    }
+
     // ============================================================================
     // MEMBER MANAGEMENT
     // ============================================================================
@@ -54,12 +247,13 @@ public class AdminController(DB db, Helper hp) : Controller
                 m.Name.Contains(search));
         }
 
-        // 2. Sort Logic
+        // 2. Sort Logic (Added "Status" case)
         query = sort switch
         {
             "Name" => dir == "asc" ? query.OrderBy(m => m.Name) : query.OrderByDescending(m => m.Name),
             "Email" => dir == "asc" ? query.OrderBy(m => m.Email) : query.OrderByDescending(m => m.Email),
             "Phone" => dir == "asc" ? query.OrderBy(m => m.Phone) : query.OrderByDescending(m => m.Phone),
+            "Status" => dir == "asc" ? query.OrderBy(m => m.IsBlocked) : query.OrderByDescending(m => m.IsBlocked), // 新增排序
             _ => dir == "asc" ? query.OrderBy(m => m.Id) : query.OrderByDescending(m => m.Id)
         };
 
@@ -68,7 +262,7 @@ public class AdminController(DB db, Helper hp) : Controller
         ViewBag.Dir = dir;
 
         // 3. Pagination
-        int pageSize = 20;
+        int pageSize = 10; // 这里我稍微改成了10，你可以改回20
         var members = query.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
         ViewBag.TotalPages = (int)Math.Ceiling(query.Count() / (double)pageSize);
@@ -83,7 +277,6 @@ public class AdminController(DB db, Helper hp) : Controller
 
         return View(members);
     }
-
     // GET: Admin/MemberDetails/C001
     public IActionResult MemberDetails(string id) // CHANGED: int -> string
     {

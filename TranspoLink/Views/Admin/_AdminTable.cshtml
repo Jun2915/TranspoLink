@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Member>
+﻿@model IEnumerable<Admin>
 
 <table class="booking-table">
     <thead>
@@ -8,27 +8,27 @@
             <th class="sortable" data-col="Name">Name <span class="sort-arrow"></span></th>
             <th class="sortable" data-col="Email">Email <span class="sort-arrow"></span></th>
             <th class="sortable" data-col="Phone">Phone <span class="sort-arrow"></span></th>
-            <th class="sortable" data-col="Status">Status <span class="sort-arrow"></span></th>
+            <th>Status</th>
             <th>Actions</th>
         </tr>
     </thead>
     <tbody>
         @if (Model.Any())
         {
-            foreach (var m in Model)
+            foreach (var a in Model)
             {
                 <tr>
                     <td>
-                        <img src="@(m.PhotoURL != null && m.PhotoURL.StartsWith("/images/") ? m.PhotoURL : "/images/" + m.PhotoURL)"
+                        <img src="@(a.PhotoURL != null && a.PhotoURL.StartsWith("/images/") ? a.PhotoURL : "/images/" + a.PhotoURL)"
                              class="member-photo"
-                             onerror="this.src='/images/default_photo.png'">
+                             onerror="this.src='/images/beauty_admin.png'">
                     </td>
-                    <td>@m.Id</td>
-                    <td>@m.Name</td>
-                    <td>@m.Email</td>
-                    <td>@m.Phone</td>
+                    <td>@a.Id</td>
+                    <td>@a.Name</td>
+                    <td>@a.Email</td>
+                    <td>@a.Phone</td>
                     <td>
-                        @if (m.IsBlocked)
+                        @if (a.IsBlocked)
                         {
                             <span class="status-badge status-cancelled">Blocked</span>
                         }
@@ -38,10 +38,19 @@
                         }
                     </td>
                     <td class="action-links">
-                        <a href="/Admin/MemberDetails/@m.Id" class="btn-view">Details</a>
-                        <form method="post" action="/Admin/DeleteMember/@m.Id" onsubmit="return confirm('Delete @m.Name?');">
-                            <button class="btn-delete">Delete</button>
-                        </form>
+                        @if (a.Id == "A001")
+                        {
+                            <span style="font-size:12px; color:#999; font-weight:bold; background:#eee; padding:10px 20px; border-radius:4px;">
+                                🛡️ Protected
+                            </span>
+                        }
+                        else
+                        {
+                            <a href="/Admin/EditAdmin/@a.Id" class="btn-view" style="background-color: #f59e0b;">Edit</a>
+                            <form method="post" action="/Admin/DeleteAdmin/@a.Id" onsubmit="return confirm('Delete Admin @a.Name?');">
+                                <button class="btn-delete">Delete</button>
+                            </form>
+                        }
                     </td>
                 </tr>
             }
@@ -49,7 +58,7 @@
         else
         {
             <tr>
-                <td colspan="7" style="text-align:center; padding: 20px;">No members found.</td>
+                <td colspan="7" style="text-align:center; padding: 20px;">No admins found.</td>
             </tr>
         }
     </tbody>
