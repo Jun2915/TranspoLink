@@ -20,19 +20,19 @@
             <form method="post" enctype="multipart/form-data" id="profileForm">
                 <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
 
+                <input asp-for="Photo" type="file" accept="image/jpeg,image/png" hidden disabled>
+
                 <div class="user-header-banner">
                     <div class="upload-trigger">
-                        <label class="upload disabled-upload" id="photoLabel" title="Edit Profile to change photo">
-                            <input asp-for="Photo" accept="image/jpeg,image/png" hidden disabled>
+                        <div class="upload disabled-upload" id="photoContainer" title="Edit Profile to change photo">
                             <img src="@(string.IsNullOrEmpty(Model.PhotoURL) || Model.PhotoURL == "default_photo.png" ? "/images/default_photo.png" : (Model.PhotoURL.StartsWith("/images/") ? Model.PhotoURL : "/images/" + Model.PhotoURL))"
                                  class="user-avatar-large"
+                                 id="profileImagePreview"
                                  onerror="this.src='/images/default_photo.png'">
-                        </label>
+                        </div>
 
                         <div class="user-info-text">
-                            <h2>
-                                @Model.Name
-                            </h2>
+                            <h2>@Model.Name</h2>
                             <div class="user-id-text">
                                 @(Model.Email ?? Model.Phone)
                             </div>

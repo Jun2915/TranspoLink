@@ -13,16 +13,31 @@
     align-items: center;
     justify-content: center;
     flex-direction: column;
+    backdrop-filter: blur(5px);
+    animation: fadeInModal 0.2s ease-out;
+}
+
+@keyframes fadeInModal {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 .photo-modal-content {
     background: #222;
-    padding: 20px;
-    border-radius: 12px;
+    padding: 30px;
+    border-radius: 16px;
     width: 90%;
     max-width: 600px;
     text-align: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    border: 1px solid #444;
 }
 
 /* Webcam Video Container */
@@ -30,30 +45,34 @@
     width: 100%;
     height: 350px;
     background: #000;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    border-radius: 8px;
+    border-radius: 12px;
+    border: 2px solid #333;
 }
 
 video#webcamVideo {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transform: scaleX(-1); /* Mirror effect for user experience */
 }
 
 /* Cropper Container */
 .cropper-container-box {
-    height: 400px; /* Fixed height for cropper */
+    height: 400px;
     background: #333;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    overflow: hidden;
 }
 
 img#imageToCrop {
     max-width: 100%;
-    display: block; /* Important for Cropper.js */
+    display: block;
 }
 
 /* Action Buttons */
@@ -61,52 +80,55 @@ img#imageToCrop {
     display: flex;
     gap: 10px;
     justify-content: center;
-    margin-top: 15px;
+    flex-wrap: wrap;
 }
 
 .btn-tool {
-    padding: 10px 20px;
+    padding: 12px 24px;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
     font-weight: 600;
+    font-size: 14px;
     color: white;
-    transition: 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
+
+    .btn-tool:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
 
 .btn-capture {
-    background: #ff4757;
+    background: #ff4757; /* Red */
+    width: 100%; /* Full width for mobile friendliness */
+    max-width: 200px;
 }
-
-    .btn-capture:hover {
-        background: #ff6b81;
-    }
 
 .btn-confirm {
-    background: #2ed573;
+    background: #2ed573; /* Green */
 }
-
-    .btn-confirm:hover {
-        background: #7bed9f;
-    }
 
 .btn-cancel {
-    background: #57606f;
+    background: #57606f; /* Grey */
 }
-
-    .btn-cancel:hover {
-        background: #747d8c;
-    }
 
 .btn-rotate {
-    background: #3742fa;
+    background: #3742fa; /* Blue */
 }
 
-    .btn-rotate:hover {
-        background: #535c68;
-    }
+.btn-primary-action {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    width: 100%;
+    padding: 15px;
+    font-size: 16px;
+}
 
-/* Custom "Take Photo" button on the main form */
+/* Register Page - Camera Button Style */
 .btn-open-camera {
     margin-top: 10px;
     background: #3742fa;

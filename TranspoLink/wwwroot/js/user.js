@@ -111,23 +111,31 @@ $(document).ready(function () {
     // Only run this logic if we are on the profile page
     if ($profileForm.length) {
         const $btnEdit = $('#btnEditProfile');
-        const $editActions = $('#editActions'); // The container for Save/Cancel
+        const $editActions = $('#editActions');
         const $inputs = $('.field-input');
-        const $photoLabel = $('#photoLabel');
-        const $photoInput = $('#photoLabel input');
+
+        // Updated Selectors for the new structure
+        const $photoContainer = $('#photoContainer');
+        const $photoInput = $('input[name="Photo"]');
+        const $editOverlay = $('.edit-overlay');
 
         // 1. Handle "Edit User Profile" Click
         $btnEdit.on('click', function () {
             // Enable Inputs
             $inputs.prop('readonly', false);
 
-            // Enable Photo Upload
+            // Enable Photo Upload (Logic handled in photo-tools.js via click on container)
             $photoInput.prop('disabled', false);
-            $photoLabel.css('cursor', 'pointer').attr('title', 'Change Avatar').removeClass('disabled-upload');
+
+            // Visual feedback
+            $photoContainer.removeClass('disabled-upload');
+            $photoContainer.css('cursor', 'pointer');
+            $photoContainer.css('border-color', '#667eea');
+            $editOverlay.show(); // Show the little pen icon
 
             // UI Changes: Hide Edit button, Show Save/Cancel Buttons
             $(this).hide();
-            $editActions.css('display', 'flex'); // Show as flex container
+            $editActions.css('display', 'flex');
 
             // Focus on the first input
             $inputs.first().focus();
