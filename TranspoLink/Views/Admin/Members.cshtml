@@ -15,28 +15,23 @@
         <p>View and manage registered members.</p>
     </div>
 
-    <!-- Search Form -->
     <form method="get" class="search-container" id="searchForm">
         <input type="text" id="searchInput" name="search" value="@ViewBag.Search" placeholder="Search by name, email, or phone..." autocomplete="off">
+
+        <a href="/Admin/Members" id="clearSearchBtn" class="btn-clear" style="display: none;">✕ Clear</a>
+
         <button type="submit">Search</button>
-        @if (!string.IsNullOrEmpty(ViewBag.Search))
-        {
-            <a href="/Admin/Members">Clear</a>
-        }
     </form>
 
-    <!-- AJAX Container: This div's content will be replaced on sort/search -->
     <div id="tableContainer" class="recent-section">
         <partial name="_MemberTable" model="Model" />
     </div>
 
-    <!-- Pagination -->
     <div class="pagination-container" style="margin-top: 20px; text-align: center;">
         <ul class="pagination">
             @for (int i = 1; i <= ViewBag.TotalPages; i++)
             {
                 <li class="@(i == ViewBag.CurrentPage ? "active" : "")">
-                    <!-- Use onclick to trigger AJAX load -->
                     <a href="javascript:void(0)" onclick="loadTable(@i)">@i</a>
                 </li>
             }

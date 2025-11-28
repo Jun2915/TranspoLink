@@ -43,6 +43,30 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 // ============================================================================
+// SEARCH CLEAR BUTTON LOGIC (✅ Add this section)
+// ============================================================================
+function toggleClearButton() {
+    const inputVal = $('#searchInput').val();
+    const $btn = $('#clearSearchBtn');
+
+    if (inputVal && inputVal.trim() !== '') {
+        $btn.css('display', 'inline-flex'); // Show if text exists
+    } else {
+        $btn.hide(); // Hide if empty
+    }
+}
+
+$(document).ready(function () {
+    // Check on page load (in case there is already a search term)
+    toggleClearButton();
+
+    // Check whenever the user types
+    $('#searchInput').on('input', function () {
+        toggleClearButton();
+    });
+});
+
+// ============================================================================
 // AJAX TABLE SORTING LOGIC
 // ============================================================================
 window.loadTable = function (page) {

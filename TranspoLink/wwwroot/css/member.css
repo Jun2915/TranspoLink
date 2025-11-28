@@ -38,11 +38,16 @@
         border-radius: 8px;
         font-weight: 600;
         cursor: pointer;
-        transition: transform 0.2s;
+        transition: transform 0.2s, box-shadow 0.2s;
+        height: 45px; /* Fixed height to match Clear button */
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
     }
 
         .search-container button:hover {
             transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 238, 0.3);
         }
 
     .search-container a {
@@ -50,6 +55,35 @@
         text-decoration: none;
         font-size: 14px;
     }
+
+.btn-clear {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 45px; /* Match search button height */
+    padding: 0 20px;
+    background-color: var(--bg-body); /* Uses theme background */
+    color: var(--text-light);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+    .btn-clear:hover {
+        background-color: #ffe5e5; /* Light red background on hover */
+        color: #d63031; /* Red text on hover */
+        border-color: #d63031;
+        transform: translateY(-2px);
+    }
+
+/* Dark mode specific override for clear button hover if needed */
+[data-theme="dark"] .btn-clear:hover {
+    background-color: #3b1717;
+}
 
 /* =========================================================
    2. MEMBER TABLE & PHOTO FIX
