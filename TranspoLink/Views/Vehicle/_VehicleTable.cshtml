@@ -1,0 +1,82 @@
+﻿@model IEnumerable<Vehicle>
+
+<table class="booking-table">
+    <thead>
+        <tr>
+            <th class="sortable" data-col="Id">ID <span class="sort-arrow"></span></th>
+            <th class="sortable" data-col="VehicleNumber">Vehicle No. <span class="sort-arrow"></span></th>
+            <th class="sortable" data-col="Type">Type <span class="sort-arrow"></span></th>
+            <th class="sortable" data-col="Operator">Operator <span class="sort-arrow"></span></th>
+            <th class="sortable" data-col="Seats">Seats <span class="sort-arrow"></span></th>
+            <th class="sortable" data-col="Status">Status <span class="sort-arrow"></span></th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Any())
+        {
+            foreach (var v in Model)
+            {
+                <tr>
+                    <td style="font-weight:bold; color:#667eea;">
+                        V@(v.Id.ToString("D3"))
+                    </td>
+                    <td style="font-weight:bold;">@v.VehicleNumber</td>
+                    <td>
+                        @if (v.Type == "Bus")
+                        {
+                            <span>🚌 Bus</span>
+                        }
+                        else if (v.Type == "Train")
+                        {
+
+                            <span>🚄 Train</span>
+                        }
+                        else
+                        {
+
+                            <span>🚢 Ferry</span>
+                        }
+                    </td>
+                    <td>@v.Operator</td>
+                    <td>@v.TotalSeats</td>
+                    <td>
+                        @if (v.IsActive)
+                        {
+                            <span class="status-badge status-confirmed">Active</span>
+                        }
+                        else
+                        {
+                            <span class="status-badge status-cancelled">Inactive</span>
+                        }
+                    </td>
+                    <td class="action-links">
+                        <a href="/Vehicle/VehicleDetails/@v.Id" class="btn-view" style="background-color: #667eea;">Details</a>
+                        <a href="/Vehicle/EditVehicle/@v.Id" class="btn-view" style="background-color: #f59e0b;">Edit</a>
+
+                        <form method="post" action="/Vehicle/ToggleVehicleStatus/@v.Id" style="display:inline;">
+                            <button class="btn-delete" style="background-color: @(v.IsActive ? "#57606f" : "#2ed573");">
+                                @(v.IsActive ? "Deactivate" : "Activate")
+                            </button>
+                        </form>
+
+                        <form method="post" action="/Vehicle/DeleteVehicle/@v.Id" onsubmit="return confirm('Delete @v.VehicleNumber?');" style="display:inline;">
+                            <button class="btn-delete">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="7" style="text-align:center; padding: 30px; color: #999;">
+                    No vehicles found.
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<input type="hidden" id="partialSort" value="@ViewBag.Sort" />
+<input type="hidden" id="partialDir" value="@ViewBag.Dir" />

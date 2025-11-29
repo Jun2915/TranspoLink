@@ -1,0 +1,66 @@
+﻿@model Vehicle
+
+@{
+    ViewBag.Title += " | Add Vehicle";
+}
+
+@section head {
+    <link rel="stylesheet" href="/css/admin.css" />
+    <link rel="stylesheet" href="/css/vehicle.css" />
+    <script src="/js/vehicle.js" defer></script>
+}
+
+<div class="admin-container">
+    <div style="margin-bottom: 20px;">
+        <a href="/Vehicle/Vehicles" class="btn-back">← Back to Fleet</a>
+    </div>
+
+    <div class="vehicle-form-card">
+        <div class="form-header">
+            <h2>Add New Vehicle</h2>
+            <p>Register a new bus, train, or ferry to the fleet.</p>
+        </div>
+
+        <form method="post" asp-action="CreateVehicle">
+            <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
+
+            <div class="form-group-row">
+                <div class="vehicle-input-group">
+                    <label asp-for="Type">Vehicle Type</label>
+                    <div class="input-with-icon">
+                        <span class="input-icon" id="typeIcon">🚌</span>
+                        <select asp-for="Type" asp-items="ViewBag.VehicleTypes" class="vehicle-select" id="vehicleTypeSelect">
+                            <option value="" disabled selected>Select Type</option>
+                        </select>
+                    </div>
+                    <span asp-validation-for="Type" class="field-validation-error"></span>
+                </div>
+
+                <div class="vehicle-input-group">
+                    <label asp-for="VehicleNumber">Vehicle Number</label>
+                    <input asp-for="VehicleNumber" class="vehicle-input" readonly
+                           style="background-color: #f0f0f0; cursor: not-allowed; font-weight: bold; color: #667eea;">
+                    <span asp-validation-for="VehicleNumber" class="field-validation-error"></span>
+                </div>
+            </div>
+
+            <div class="form-group-row">
+                <div class="vehicle-input-group">
+                    <label asp-for="Operator">Operator / Company</label>
+                    <input asp-for="Operator" class="vehicle-input" placeholder="e.g. TransNasional">
+                    <span asp-validation-for="Operator" class="field-validation-error"></span>
+                </div>
+
+                <div class="vehicle-input-group">
+                    <label asp-for="TotalSeats">Total Seats</label>
+                    <input asp-for="TotalSeats" type="number" class="vehicle-input" min="1" max="500" value="40">
+                    <span asp-validation-for="TotalSeats" class="field-validation-error"></span>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-save-vehicle">
+                💾 Save Vehicle
+            </button>
+        </form>
+    </div>
+</div>

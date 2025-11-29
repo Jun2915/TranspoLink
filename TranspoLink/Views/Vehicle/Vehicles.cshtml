@@ -6,7 +6,8 @@
 
 @section head {
     <link rel="stylesheet" href="/css/admin.css" asp-append-version="true" />
-    <link rel="stylesheet" href="/css/member.css" asp-append-version="true" />
+    <link rel="stylesheet" href="/css/vehicle.css" asp-append-version="true" />
+    <script src="/js/vehicle.js" defer></script>
 }
 
 <div class="admin-container">
@@ -18,92 +19,21 @@
         <a href="/Vehicle/CreateVehicle" class="btn-view btn-add">+ Add New Vehicle</a>
     </div>
 
-    <div class="tabs" style="justify-content: flex-start; margin-bottom: 20px;">
-        <a href="/Vehicle/Vehicles" class="tab @(string.IsNullOrEmpty(ViewBag.SelectedType) ? "active" : "")" style="color: var(--text-body);">All</a>
-        <a href="/Vehicle/Vehicles?type=Bus" class="tab @(ViewBag.SelectedType == "Bus" ? "active" : "")" style="color: var(--text-body);">🚌 Buses</a>
-        <a href="/Vehicle/Vehicles?type=Train" class="tab @(ViewBag.SelectedType == "Train" ? "active" : "")" style="color: var(--text-body);">🚄 Trains</a>
-        <a href="/Vehicle/Vehicles?type=Ferry" class="tab @(ViewBag.SelectedType == "Ferry" ? "active" : "")" style="color: var(--text-body);">🚢 Ferries</a>
+    <div class="search-section">
+        <form id="vehicleSearchForm" class="search-container">
+            <input type="text" id="searchInput" placeholder="Search by Vehicle No. or Operator..." autocomplete="off">
+            <button type="submit" style="display:none;">Search</button>
+        </form>
     </div>
 
-    <div class="recent-section">
-        <table class="booking-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Vehicle No.</th>
-                    <th>Type</th>
-                    <th>Operator</th>
-                    <th>Seats</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (Model.Any())
-                {
-                    foreach (var v in Model)
-                    {
-                        <tr>
-                            <td>#@v.Id</td>
-                            <td style="font-weight:bold;">@v.VehicleNumber</td>
-                            <td>
-                                @if (v.Type == "Bus")
-                                {
-                                    <span>🚌 Bus</span>
-                                }
-                                else if (v.Type == "Train")
-                                {
+    <div class="tabs" style="justify-content: flex-start; margin-bottom: 20px;">
+        <a href="javascript:void(0)" onclick="filterType('')" class="tab active" data-type="">All</a>
+        <a href="javascript:void(0)" onclick="filterType('Bus')" class="tab" data-type="Bus">🚌 Buses</a>
+        <a href="javascript:void(0)" onclick="filterType('Train')" class="tab" data-type="Train">🚄 Trains</a>
+        <a href="javascript:void(0)" onclick="filterType('Ferry')" class="tab" data-type="Ferry">🚢 Ferries</a>
+    </div>
 
-                                    <span>🚄 Train</span>
-                                }
-                                else
-                                {
-
-                                    <span>🚢 Ferry</span>
-                                }
-                            </td>
-                            <td>@v.Operator</td>
-                            <td>@v.TotalSeats</td>
-                            <td>
-                                @if (v.IsActive)
-                                {
-                                    <span class="status-badge status-confirmed">Active</span>
-                                }
-                                else
-                                {
-                                    <span class="status-badge status-cancelled">Inactive</span>
-                                }
-                            </td>
-                            <td class="action-links">
-                                <a href="/Vehicle/EditVehicle/@v.Id" class="btn-view" style="background-color: #f59e0b;">Edit</a>
-
-                                <form method="post" action="/Vehicle/ToggleVehicleStatus/@v.Id" style="display:inline;">
-                                    @if (v.IsActive)
-                                    {
-                                        <button class="btn-delete" style="background-color: #57606f;">Deactivate</button>
-                                    }
-                                    else
-                                    {
-                                        <button class="btn-view" style="background-color: #2ed573;">Activate</button>
-                                    }
-                                </form>
-
-                                <form method="post" action="/Vehicle/DeleteVehicle/@v.Id" onsubmit="return confirm('Delete @v.VehicleNumber?');" style="display:inline;">
-                                    <button class="btn-delete">Delete</button>
-                                </form>
-                            </td>
-                        </tr>
-                    }
-                }
-                else
-                {
-                    <tr>
-                        <td colspan="7" style="text-align:center; padding: 30px; color: #999;">
-                            No vehicles found. Click "Add New Vehicle" to start.
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+    <div id="tableContainer" class="recent-section">
+        <partial name="_VehicleTable" model="Model" />
     </div>
 </div>

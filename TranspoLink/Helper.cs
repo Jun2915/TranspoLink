@@ -303,4 +303,29 @@ public class Helper(IWebHostEnvironment en,
         db.AuditLogs.Add(log);
         db.SaveChanges();
     }
+
+    // Add this method inside your Helper class
+    public string GetNextVehicleNumber(DB db)
+    {
+        // Find all VehicleNumbers that start with 'V'
+        var existingIds = db.Vehicles
+            .Where(v => v.VehicleNumber.StartsWith("V"))
+            .Select(v => v.VehicleNumber)
+            .ToList()
+            // Extract the number part (e.g., "V005" -> 5)
+            .Select(id => int.TryParse(id.Substring(1), out int n) ? n : 0)
+            .OrderBy(n => n)
+            .ToList();
+
+        // Find the first missing number (Gap)
+        int nextNum = 1;
+        foreach (var num in existingIds)
+        {
+            if (num == nextNum) nextNum++;
+            else if (num > nextNum) break;
+        }
+
+        // Return format V001, V002, etc.
+        return "V" + nextNum.ToString("D3");
+    }
 }

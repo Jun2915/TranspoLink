@@ -1,0 +1,79 @@
+﻿@model Vehicle
+@{
+    ViewBag.Title += " | Vehicle Details";
+    var activeDates = System.Text.Json.JsonSerializer.Serialize(ViewBag.TripDates);
+}
+
+@section head {
+    <link rel="stylesheet" href="/css/admin.css" />
+    <link rel="stylesheet" href="/css/vehicle.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+}
+
+<div class="admin-container">
+    <div style="margin-bottom: 20px;">
+        <a href="/Vehicle/Vehicles" class="btn-back">← Back to Fleet</a>
+    </div>
+
+    <div class="details-grid">
+        <div class="profile-card">
+            <div class="vehicle-icon-large">
+                @if (Model.Type == "Bus")
+                {
+                    <span>🚌</span>
+                }
+                else if (Model.Type == "Train")
+                {
+
+                    <span>🚄</span>
+                }
+                else
+                {
+
+                    <span>🚢</span>
+                }
+            </div>
+
+            <h2 class="profile-name">@Model.VehicleNumber</h2>
+            <p class="profile-id">ID: <b>V@(Model.Id.ToString("D3"))</b></p>
+
+            <div class="profile-info-list">
+                <div class="info-row">
+                    <span class="info-label">🏗️ Operator</span>
+                    <span class="info-value">@Model.Operator</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">💺 Total Seats</span>
+                    <span class="info-value">@Model.TotalSeats</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">📶 Status</span>
+                    <span class="info-value">
+                        @if (Model.IsActive)
+                        {
+                            <span class="status-active">Active</span>
+                        }
+                        else
+                        {
+                            <span class="status-blocked">Inactive</span>
+                        }
+                    </span>
+                </div>
+            </div>
+
+            <div class="profile-btn-group">
+                <a href="/Vehicle/EditVehicle/@Model.Id" class="btn-view" style="background:#f59e0b; text-align:center;">Edit Details</a>
+            </div>
+        </div>
+
+        <div class="activity-section">
+            <h3>📅 Vehicle Schedule</h3>
+            <p style="color:#666; font-size:14px; margin-bottom:15px;">
+                Highlighted dates indicate scheduled trips for this vehicle.
+            </p>
+
+            <div id="vehicleCalendar" style="display:flex; justify-content:center;"></div>
+        </div>
+    </div>
+</div>

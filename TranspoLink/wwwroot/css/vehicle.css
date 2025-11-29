@@ -1,0 +1,190 @@
+﻿/* =========================================================
+   VEHICLE MANAGEMENT STYLES
+   ========================================================= */
+
+.vehicle-form-card {
+    background: var(--bg-card);
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--border-color);
+}
+
+.form-group-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+    .form-group-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+.vehicle-input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-light);
+    font-size: 14px;
+}
+
+.vehicle-input, .vehicle-select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-input);
+    color: var(--text-body);
+    font-size: 15px;
+    transition: all 0.3s;
+    box-sizing: border-box;
+}
+
+    .vehicle-input:focus, .vehicle-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        outline: none;
+    }
+
+/* Icon inside Select */
+.input-with-icon {
+    position: relative;
+}
+
+    .input-with-icon .input-icon {
+        position: absolute;
+        top: 50%;
+        left: 12px;
+        transform: translateY(-50%);
+        font-size: 18px;
+        pointer-events: none;
+    }
+
+    .input-with-icon select {
+        padding-left: 40px;
+    }
+
+/* Submit Button */
+.btn-save-vehicle {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+    .btn-save-vehicle:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+/* Toggle Switch */
+.vehicle-status-group {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: var(--bg-body);
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+.status-label {
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+}
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+}
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: .4s;
+    }
+
+input:checked + .slider {
+    background-color: #2ed573;
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px #2ed573;
+}
+
+input:checked + .slider:before {
+    transform: translateX(24px);
+}
+
+.slider.round {
+    border-radius: 34px;
+}
+
+    .slider.round:before {
+        border-radius: 50%;
+    }
+
+
+.vehicle-icon-large {
+    font-size: 80px;
+    margin-bottom: 10px;
+}
+/* Calendar Customization */
+.flatpickr-calendar {
+    box-shadow: none !important;
+    background: transparent !important;
+}
+
+.calendar-dot {
+    width: 6px;
+    height: 6px;
+    background: #2ed573;
+    border-radius: 50%;
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+/* Highlight enabled dates (trip days) */
+.flatpickr-day.enabled {
+    background: #eafff3;
+    border-color: #2ed573;
+    color: #000;
+    font-weight: bold;
+}

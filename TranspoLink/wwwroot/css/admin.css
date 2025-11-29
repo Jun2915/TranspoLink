@@ -881,3 +881,11 @@
 .btn-unblock {
     background-color: #2ed573;
 }
+
+.tab {
+    text-decoration: none !important;
+}
+
+    .tab:hover {
+        text-decoration: none;
+    }
