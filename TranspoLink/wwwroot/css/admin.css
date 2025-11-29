@@ -827,40 +827,57 @@
 }
 
 /* Buttons in Profile */
+/* =========================================================
+   UPDATED BUTTON GROUP (Side-by-Side)
+   ========================================================= */
+
 .profile-btn-group {
     display: flex;
-    gap: 10px;
+    gap: 15px; /* Creates the space between buttons */
     margin-top: 25px;
+    width: 100%;
 }
 
+/* Common style for both buttons to ensure equal height/shape */
+.btn-block,
+.btn-unblock,
+.btn-delete-action {
+    flex: 1; /* Makes them equal width */
+    width: 100%; /* Ensures they fill the form container */
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 700; /* Bold text like the image */
+    color: white;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Subtle shadow */
+    text-align: center;
+    line-height: 1.2;
+}
+
+    /* Hover Effect for all */
+    .btn-block:hover,
+    .btn-unblock:hover,
+    .btn-delete-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+
+/* Specific Colors */
+
+/* Orange "Block Account" */
 .btn-block {
-    flex: 1;
-    background: #ffa502;
-    color: white;
-    border: none;
-    padding: 12px;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.2s;
+    background-color: #f59e0b;
 }
 
-    .btn-block:hover {
-        background: #e19202;
-    }
+/* Red "Delete Account" */
+.btn-delete-action {
+    background-color: #ff4757;
+}
 
+/* Green "Unblock Account" (Just in case) */
 .btn-unblock {
-    flex: 1;
-    background: #2ed573;
-    color: white;
-    border: none;
-    padding: 12px;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.2s;
+    background-color: #2ed573;
 }
-
-    .btn-unblock:hover {
-        background: #26b05e;
-    }

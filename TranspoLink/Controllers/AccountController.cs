@@ -113,6 +113,7 @@ public class AccountController(DB db,
                 {
                     if (u.Role == "Admin")
                     {
+                        hp.LogActivity(db, u.Id, "Logged In", "System Access", "🔑", "marker-login");
                         return RedirectToAction("Index", "Admin");
                     }
 

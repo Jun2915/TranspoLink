@@ -288,4 +288,19 @@ public class Helper(IWebHostEnvironment en,
         Random r = new();
         return r.Next(100000, 999999).ToString();
     }
+
+    public void LogActivity(DB db, string adminId, string action, string details, string icon, string cssClass)
+    {
+        var log = new AuditLog
+        {
+            AdminId = adminId,
+            Action = action,
+            Details = details,
+            Icon = icon,
+            CssClass = cssClass,
+            Timestamp = DateTime.Now
+        };
+        db.AuditLogs.Add(log);
+        db.SaveChanges();
+    }
 }

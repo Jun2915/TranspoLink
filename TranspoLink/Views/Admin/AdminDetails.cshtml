@@ -63,19 +63,23 @@
 
             <!-- ACTION BUTTONS -->
             <div class="profile-btn-group">
-                <!-- Block/Unblock Button -->
                 @if (Model.Id != "A001")
                 {
-                    <form method="post" action="/Admin/ToggleBlockAdmin/@Model.Id" style="flex:1;">
+                    <form method="post" action="/Admin/ToggleBlockAdmin/@Model.Id" style="flex:1; display:flex;">
                         @if (Model.IsBlocked)
                         {
                             <button type="submit" class="btn-unblock">🔓 Unblock Account</button>
                         }
                         else
                         {
-                            <button type="submit" class="btn-block">🔒 Block Account</button>
+                            <button type="submit" class="btn-block">Block Account</button>
                         }
                     </form>
+
+                    <button type="button" class="btn-delete-action"
+                            onclick="openConfirmModal('/Admin/DeleteAdmin/@Model.Id', '@Model.Name')">
+                        Delete Account
+                    </button>
                 }
                 else
                 {
@@ -83,19 +87,9 @@
                 }
             </div>
 
-            @if (Model.Id != "A001")
-            {
-                <button type="button" class="btn-delete-large"
-                        onclick="openConfirmModal('/Admin/DeleteAdmin/@Model.Id', '@Model.Name')">
-                    Delete Account
-                </button>
-            }
-        </div>
-
-        <!-- RIGHT: ACTION TRAJECTORY (TIMELINE) -->
-        <div class="timeline-section">
+        </div> <div class="timeline-section">
             <div class="timeline-header">
-                <h3>🧭 Action Trajectory <span style="font-size:12px; color:#999; margin-left:10px;">(Recent Activity for @Model.Name)</span></h3>
+                <h3>🧭 Action Trajectory <span style="font-size:12px; color:#999; margin-left:10px;">(Recent Activity)</span></h3>
             </div>
 
             <ul class="timeline-list">
@@ -120,8 +114,7 @@
         </div>
 
     </div>
-</div>
-
+</div> 
 <!-- Reusing the Modal from Admins page (Ensure admin.js includes openConfirmModal logic) -->
 <div id="confirmModal" class="confirm-overlay">
     <div class="confirm-box">

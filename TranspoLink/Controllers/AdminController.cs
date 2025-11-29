@@ -150,7 +150,7 @@ public class AdminController(DB db, Helper hp) : Controller
         return View(vm);
     }
 
-    // GET: Admin/AdminDetails/A002 (UPDATED WITH TIMELINE)
+    // GET: Admin/AdminDetails/A002
     public IActionResult AdminDetails(string id)
     {
         var admin = db.Admins.Find(id);
@@ -160,87 +160,33 @@ public class AdminController(DB db, Helper hp) : Controller
             return RedirectToAction("Admins");
         }
 
-        // =================================================================================
-        // 🟢 MOCK ACTION GENERATOR (Dynamic Timeline)
-        // =================================================================================
-        var timeline = new List<TimelineItemVM>();
-
-        // 1. Always add a Login event for today
-        timeline.Add(new TimelineItemVM
+        var timeline = db.AuditLogs
+        .Where(l => l.AdminId == id) // 只找这个 Admin 做的通过
+        .OrderByDescending(l => l.Timestamp) // 最新的在上面
+        .Take(10) // 只显示最近 10 条
+        .Select(l => new TimelineItemVM
         {
-            Title = "Logged In",
-            Time = "Today, " + DateTime.Now.ToString("hh:mm tt"),
-            Type = "login",
-            Icon = "🔑",
-            CssClass = "marker-login"
-        });
+            Title = l.Action,
+            Time = l.Timestamp.ToString("dd MMM yyyy, hh:mm tt") + " - " + l.Details,
+            Icon = l.Icon,
+            CssClass = l.CssClass
+        })
+        .ToList();
 
-        // 2. Customize actions based on who it is
-        if (admin.Id == "A001") // System Admin does big things
+        // 如果是空的新账号，显示一条默认的“账户创建”
+        if (!timeline.Any())
         {
             timeline.Add(new TimelineItemVM
             {
-                Title = "Performed System Backup",
-                Time = "Today, 09:00 AM",
-                Type = "add",
-                Icon = "💾",
-                CssClass = "marker-add"
-            });
-            timeline.Add(new TimelineItemVM
-            {
-                Title = "Updated Security Settings",
-                Time = "Yesterday, 08:30 PM",
-                Type = "block",
-                Icon = "🛡️",
-                CssClass = "marker-block"
-            });
-        }
-        else // Normal Admins do booking/member stuff
-        {
-            timeline.Add(new TimelineItemVM
-            {
-                Title = $"Managed Member Details (C{(new Random().Next(100, 999))})",
-                Time = "Today, 10:15 AM",
-                Type = "delete",
-                Icon = "✏️",
-                CssClass = "marker-delete"
-            });
-
-            // Randomly decide if they blocked someone recently
-            if (new Random().Next(0, 2) == 1)
-            {
-                timeline.Add(new TimelineItemVM
-                {
-                    Title = "Blocked Suspicious User (C005)",
-                    Time = "Yesterday, 04:45 PM",
-                    Type = "block",
-                    Icon = "🔒",
-                    CssClass = "marker-block"
-                });
-            }
-
-            timeline.Add(new TimelineItemVM
-            {
-                Title = "Processed Booking #1024",
-                Time = "Yesterday, 02:30 PM",
-                Type = "add",
-                Icon = "✅",
+                Title = "Account Created",
+                Time = "No recent activity recorded.",
+                Icon = "✨",
                 CssClass = "marker-add"
             });
         }
-
-        // 3. Add Account Creation (Historical)
-        timeline.Add(new TimelineItemVM
-        {
-            Title = "Account Created",
-            Time = "01 Jan 2025, 09:00 AM",
-            Type = "add",
-            Icon = "✨",
-            CssClass = "marker-add"
-        });
 
         ViewBag.Timeline = timeline;
-        // =================================================================================
+        // =========================================================
 
         return View(admin);
     }
@@ -273,6 +219,17 @@ public class AdminController(DB db, Helper hp) : Controller
 
         admin.IsBlocked = !admin.IsBlocked;
         db.SaveChanges();
+
+        var currentAdmin = db.Users.FirstOrDefault(u => u.Email == User.Identity.Name || u.Phone == User.Identity.Name);
+
+        if (currentAdmin != null)
+        {
+            string actionName = admin.IsBlocked ? "Blocked Admin" : "Unblocked Admin";
+            string icon = admin.IsBlocked ? "🔒" : "🔓";
+            string css = admin.IsBlocked ? "marker-block" : "marker-login";
+
+            hp.LogActivity(db, currentAdmin.Id, actionName, $"Target: {admin.Name} ({admin.Id})", icon, css);
+        }
 
         string status = admin.IsBlocked ? "blocked" : "unblocked";
         TempData["Info"] = $"Admin {admin.Name} has been {status}.";

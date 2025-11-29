@@ -17,6 +17,7 @@ public class DB(DbContextOptions options) : DbContext(options)
     public DbSet<Trip> Trips { get; set; }
     public DbSet<Vehicle> Vehicles { get; set; }
     public DbSet<Booking> Bookings { get; set; }
+    public DbSet<AuditLog> AuditLogs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -198,4 +199,26 @@ public class Booking
 
     public virtual Member Member { get; set; }
     public virtual Trip Trip { get; set; }
+}
+
+public class AuditLog
+{
+    public int Id { get; set; }
+
+    [MaxLength(5)]
+    public string AdminId { get; set; } // 谁做的 (A001, A002...)
+
+    [MaxLength(50)]
+    public string Action { get; set; }  // 做了什么 (Login, Block User...)
+
+    [MaxLength(100)]
+    public string Details { get; set; } // 详情 (Member Name, ID...)
+
+    public DateTime Timestamp { get; set; } = DateTime.Now; // 时间
+
+    // 视觉效果
+    [MaxLength(10)]
+    public string Icon { get; set; }    // Emoji (🔒, ✏️)
+    [MaxLength(20)]
+    public string CssClass { get; set; } // 颜色样式 (marker-block...)
 }
