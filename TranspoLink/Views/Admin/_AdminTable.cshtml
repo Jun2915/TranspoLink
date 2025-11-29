@@ -43,10 +43,10 @@
                         }
                     </td>
                     <td class="action-links">
-                        @* 1. HIDE BUTTONS FOR CURRENT PROFILE *@
+                        @* 1. BEAUTIFUL BADGE FOR CURRENT PROFILE *@
                         @if (a.Id == currentUserId)
                         {
-                            <span style="font-size:12px; color:#999; font-style:italic;">(You)</span>
+                            <span class="badge-you">It's You ✨</span>
                         }
                         else
                         {
@@ -56,7 +56,6 @@
                             @* 3. EDIT & DELETE: Only for System Admin (A001) *@
                             if (isSystemAdmin)
                             {
-                                @* Protect A001 from being edited/deleted by others (though logic above handles it) *@
                                 if (a.Id != "A001")
                                 {
                                     <a href="/Admin/EditAdmin/@a.Id" class="btn-view" style="background-color: #f59e0b;">Edit</a>

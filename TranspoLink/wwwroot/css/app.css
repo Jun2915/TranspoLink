@@ -200,6 +200,7 @@ input, select, textarea {
 /* Fix Nav Links in Footer */
 footer {
     color: #fff;
+    text-align:center;
 }
 
 /* ============================================================================
@@ -254,6 +255,8 @@ header {
     gap: 30px;
     margin: 0;
     padding: 0;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 .hero {

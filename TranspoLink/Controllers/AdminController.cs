@@ -41,17 +41,18 @@ public class AdminController(DB db, Helper hp) : Controller
         // 1. Identify Current User & System Admin Status
         var currentUser = db.Users.FirstOrDefault(u => u.Email == User.Identity.Name || u.Phone == User.Identity.Name);
         ViewBag.CurrentUserId = currentUser?.Id;
-        ViewBag.IsSystemAdmin = currentUser?.Id == "A001"; // Only A001 is the Boss
+        ViewBag.IsSystemAdmin = currentUser?.Id == "A001";
 
         var query = db.Admins.AsQueryable();
 
-        // 2. Search Logic
+        // 2. Search Logic (UPDATED TO INCLUDE ID)
         if (!string.IsNullOrEmpty(search))
         {
             query = query.Where(a =>
+                a.Id.Contains(search) ||    // <--- Added ID Search
+                a.Name.Contains(search) ||
                 a.Email.Contains(search) ||
-                a.Phone.Contains(search) ||
-                a.Name.Contains(search));
+                a.Phone.Contains(search));
         }
 
         // 3. Sort Logic
@@ -287,22 +288,23 @@ public class AdminController(DB db, Helper hp) : Controller
     {
         var query = db.Members.AsQueryable();
 
-        // 1. Search Logic
+        // 1. Search Logic (UPDATED TO INCLUDE ID)
         if (!string.IsNullOrEmpty(search))
         {
             query = query.Where(m =>
+                m.Id.Contains(search) ||    // <--- Added ID Search
+                m.Name.Contains(search) ||
                 m.Email.Contains(search) ||
-                m.Phone.Contains(search) ||
-                m.Name.Contains(search));
+                m.Phone.Contains(search));
         }
 
-        // 2. Sort Logic (Added "Status" case)
+        // 2. Sort Logic
         query = sort switch
         {
             "Name" => dir == "asc" ? query.OrderBy(m => m.Name) : query.OrderByDescending(m => m.Name),
             "Email" => dir == "asc" ? query.OrderBy(m => m.Email) : query.OrderByDescending(m => m.Email),
             "Phone" => dir == "asc" ? query.OrderBy(m => m.Phone) : query.OrderByDescending(m => m.Phone),
-            "Status" => dir == "asc" ? query.OrderBy(m => m.IsBlocked) : query.OrderByDescending(m => m.IsBlocked), // 新增排序
+            "Status" => dir == "asc" ? query.OrderBy(m => m.IsBlocked) : query.OrderByDescending(m => m.IsBlocked),
             _ => dir == "asc" ? query.OrderBy(m => m.Id) : query.OrderByDescending(m => m.Id)
         };
 
@@ -311,16 +313,14 @@ public class AdminController(DB db, Helper hp) : Controller
         ViewBag.Dir = dir;
 
         // 3. Pagination
-        int pageSize = 10; // 这里我稍微改成了10，你可以改回20
+        int pageSize = 10;
         var members = query.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
         ViewBag.TotalPages = (int)Math.Ceiling(query.Count() / (double)pageSize);
         ViewBag.CurrentPage = page;
 
-        // 4. AJAX CHECK (Prevents duplication)
         if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
         {
-            // Return ONLY the table HTML, not the whole layout
             return PartialView("_MemberTable", members);
         }
 
