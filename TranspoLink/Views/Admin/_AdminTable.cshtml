@@ -1,5 +1,10 @@
 ﻿@model IEnumerable<Admin>
 
+@{
+    string currentUserId = ViewBag.CurrentUserId as string;
+    bool isSystemAdmin = ViewBag.IsSystemAdmin != null && (bool)ViewBag.IsSystemAdmin;
+}
+
 <table class="booking-table">
     <thead>
         <tr>
@@ -38,18 +43,32 @@
                         }
                     </td>
                     <td class="action-links">
-                        @if (a.Id == "A001")
+                        @* 1. HIDE BUTTONS FOR CURRENT PROFILE *@
+                        @if (a.Id == currentUserId)
                         {
-                            <span style="font-size:12px; color:#999; font-weight:bold; background:#eee; padding:10px 20px; border-radius:4px;">
-                                🛡️ Protected
-                            </span>
+                            <span style="font-size:12px; color:#999; font-style:italic;">(You)</span>
                         }
                         else
                         {
-                            <a href="/Admin/EditAdmin/@a.Id" class="btn-view" style="background-color: #f59e0b;">Edit</a>
-                            <form method="post" action="/Admin/DeleteAdmin/@a.Id" onsubmit="return confirm('Delete Admin @a.Name?');">
-                                <button class="btn-delete">Delete</button>
-                            </form>
+                            @* 2. DETAILS: Visible to everyone *@
+                            <a href="/Admin/AdminDetails/@a.Id" class="btn-view">Details</a>
+
+                            @* 3. EDIT & DELETE: Only for System Admin (A001) *@
+                            if (isSystemAdmin)
+                            {
+                                @* Protect A001 from being edited/deleted by others (though logic above handles it) *@
+                                if (a.Id != "A001")
+                                {
+                                    <a href="/Admin/EditAdmin/@a.Id" class="btn-view" style="background-color: #f59e0b;">Edit</a>
+                                    <form method="post" action="/Admin/DeleteAdmin/@a.Id" onsubmit="return confirm('Delete Admin @a.Name?');">
+                                        <button class="btn-delete">Delete</button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span style="font-size:12px; color:#667eea; font-weight:bold; margin-left: 5px;">🛡️ Super Admin</span>
+                                }
+                            }
                         }
                     </td>
                 </tr>

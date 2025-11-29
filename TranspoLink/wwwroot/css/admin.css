@@ -4,7 +4,7 @@
 
 .admin-container {
     padding: 30px 50px;
-    background: var(--bg-body); /* 跟随主题背景 */
+    background: var(--bg-body);
     min-height: 100vh;
     transition: background 0.3s ease;
 }
@@ -23,14 +23,14 @@
         margin: 0;
         font-size: 36px;
         font-weight: 700;
-        color: white; /* 强制白色 */
+        color: white;
     }
 
     .admin-header p {
         margin: 10px 0 0 0;
         opacity: 0.9;
         font-size: 16px;
-        color: white; /* 强制白色 */
+        color: white;
     }
 
 /* --- STATS GRID --- */
@@ -43,14 +43,14 @@
 
 .stat-card {
     flex: 1 1 250px;
-    background: var(--bg-card); /* 自动切换卡片背景 */
+    background: var(--bg-card);
     padding: 25px;
     border-radius: 12px;
     box-shadow: var(--shadow-soft);
     transition: all 0.3s ease;
     border-left: 4px solid #667eea;
-    border: 1px solid var(--border-color); /* 加个边框让暗黑模式更清晰 */
-    border-left-width: 4px; /* 保持左边粗边框 */
+    border: 1px solid var(--border-color);
+    border-left-width: 4px;
 }
 
     .stat-card:hover {
@@ -67,14 +67,14 @@
     }
 
 .stat-label {
-    color: var(--text-light); /* 灰色字 -> 自动变浅灰 */
+    color: var(--text-light);
     font-size: 14px;
     font-weight: 500;
     margin-bottom: 10px;
 }
 
 .stat-value {
-    color: var(--text-main); /* 深蓝字 -> 自动变白 */
+    color: var(--text-main);
     font-size: 36px;
     font-weight: 700;
 }
@@ -89,12 +89,12 @@
 
 .nav-card {
     flex: 1 1 200px;
-    background: var(--bg-card); /* 自动切换 */
+    background: var(--bg-card);
     padding: 25px;
     border-radius: 12px;
     text-align: center;
     text-decoration: none;
-    color: var(--text-main); /* 自动变色 */
+    color: var(--text-main);
     box-shadow: var(--shadow-soft);
     transition: all 0.3s ease;
     border: 1px solid var(--border-color);
@@ -103,7 +103,7 @@
     .nav-card:hover {
         transform: translateY(-5px);
         box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-        color: #667eea; /* Hover 还是保持紫色 */
+        color: #667eea;
         border-color: #667eea;
     }
 
@@ -146,7 +146,7 @@
 }
 
     .booking-table th {
-        background: var(--bg-body); /*稍微深一点的背景 */
+        background: var(--bg-body);
         padding: 15px;
         text-align: left;
         font-weight: 600;
@@ -161,10 +161,10 @@
     }
 
     .booking-table tr:hover {
-        background: var(--bg-body); /* Hover 效果 */
+        background: var(--bg-body);
     }
 
-/* --- STATUS BADGES (Keep colors mostly same, text white if needed) --- */
+/* --- STATUS BADGES --- */
 .status-badge {
     display: inline-block;
     padding: 5px 12px;
@@ -208,3 +208,171 @@
         background: #764ba2;
         color: white;
     }
+
+/* =========================================================
+   EXTRACTED STYLES (For Admins.cshtml)
+   ========================================================= */
+
+/* Header Layout: Aligns title left and button right */
+.admin-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Green "Add New" Button Override */
+.btn-add {
+    background-color: #2ed573;
+    font-size: 16px;
+    display: inline-flex;
+    align-items: center;
+}
+
+    .btn-add:hover {
+        background-color: #26b05e; /* Slightly darker green on hover */
+        transform: translateY(-2px);
+    }
+
+/* Search Bar Wrapper */
+.search-section {
+    margin-bottom: 20px;
+}
+
+    /* Remove default margin when inside the wrapper */
+    .search-section .search-container {
+        margin-bottom: 0;
+    }
+
+/* Pagination Container */
+.pagination-container {
+    margin-top: 20px;
+    text-align: center;
+}
+
+
+/* =========================================================
+   ADMIN FORM STYLES (Register-like Layout)
+   ========================================================= */
+
+.admin-form-card {
+    max-width: 800px !important;
+    margin: 0 auto;
+    padding: 40px !important;
+}
+
+.admin-form-layout {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: 40px;
+    align-items: start;
+    text-align: left; /* Ensure inputs align left */
+}
+
+/* Photo Section */
+.admin-form-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-right: 1px solid var(--border-color);
+    padding-right: 30px;
+}
+
+.upload-label {
+    cursor: pointer;
+    display: block;
+    text-align: center;
+    transition: transform 0.2s;
+}
+
+    .upload-label:hover {
+        transform: scale(1.02);
+    }
+
+    .upload-label img {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 2px dashed #ccc;
+        background: var(--bg-input);
+    }
+
+.upload-hint {
+    display: block;
+    margin-top: 10px;
+    color: var(--text-light);
+    font-size: 13px;
+}
+
+/* Input Section */
+.admin-form-right {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.admin-input-group {
+    position: relative;
+    width: 100%;
+}
+
+    .admin-input-group input {
+        width: 100%;
+        padding: 12px 12px 12px 45px; /* Space for icon */
+        font-size: 15px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        background: var(--bg-input);
+        color: var(--text-body);
+        box-sizing: border-box;
+        transition: all 0.3s ease;
+    }
+
+        .admin-input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 238, 0.2);
+        }
+
+.input-icon {
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    transform: translateY(-50%);
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+}
+
+/* SVG Fill Color adjustment for Dark Mode */
+[data-theme="dark"] .input-icon svg {
+    fill: #999;
+}
+
+.toggle-password-btn {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .admin-form-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-form-left {
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+        padding-right: 0;
+        padding-bottom: 30px;
+        margin-bottom: 20px;
+    }
+}

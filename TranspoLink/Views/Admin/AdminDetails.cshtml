@@ -1,0 +1,59 @@
+﻿@model Admin
+
+@{
+    ViewBag.Title += " | Admin Details";
+}
+
+@section head {
+    <link rel="stylesheet" href="/css/admin.css" asp-append-version="true" />
+    <link rel="stylesheet" href="/css/member.css" asp-append-version="true" />
+}
+
+<div class="admin-container">
+
+    <div style="margin-bottom: 20px;">
+        <a href="/Admin/Admins" class="btn-back">← Back to Admins</a>
+    </div>
+
+    <div class="profile-card" style="max-width: 500px; margin: 0 auto;">
+        <div class="profile-header-img" style="text-align: center;">
+            <img src="@(Model.PhotoURL != null && Model.PhotoURL.StartsWith("/images/") ? Model.PhotoURL : "/images/" + Model.PhotoURL)"
+                 onerror="this.src='/images/beauty_admin.png'"
+                 style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid var(--bg-body);"
+                 alt="Admin Photo">
+        </div>
+
+        <h2 class="profile-name" style="text-align: center;">@Model.Name</h2>
+        <p class="profile-id" style="text-align: center;">ID: <b>@Model.Id</b></p>
+
+        <div class="profile-info-list">
+            <div class="info-item">
+                <span class="label">📧 Email</span>
+                <span class="value">@(Model.Email ?? "-")</span>
+            </div>
+            <div class="info-item">
+                <span class="label">📞 Phone</span>
+                <span class="value">@(Model.Phone ?? "-")</span>
+            </div>
+            <div class="info-item">
+                <span class="label">🔒 Role</span>
+                <span class="value">
+                    @(Model.Id == "A001" ? "System Administrator" : "Administrator")
+                </span>
+            </div>
+            <div class="info-item">
+                <span class="label">📶 Status</span>
+                <span class="value">
+                    @if (Model.IsBlocked)
+                    {
+                        <span style="color:red;">Blocked</span>
+                    }
+                    else
+                    {
+                        <span style="color:green;">Active</span>
+                    }
+                </span>
+            </div>
+        </div>
+    </div>
+</div>

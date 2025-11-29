@@ -12,7 +12,6 @@ public class AdminController(DB db, Helper hp) : Controller
     // ============================================================================
     // DASHBOARD
     // ============================================================================
-
     // GET: Admin/Index
     public IActionResult Index()
     {
@@ -39,9 +38,14 @@ public class AdminController(DB db, Helper hp) : Controller
     // GET: Admin/Admins
     public IActionResult Admins(string search = "", int page = 1, string sort = "Id", string dir = "asc")
     {
+        // 1. Identify Current User & System Admin Status
+        var currentUser = db.Users.FirstOrDefault(u => u.Email == User.Identity.Name || u.Phone == User.Identity.Name);
+        ViewBag.CurrentUserId = currentUser?.Id;
+        ViewBag.IsSystemAdmin = currentUser?.Id == "A001"; // Only A001 is the Boss
+
         var query = db.Admins.AsQueryable();
 
-        // 1. Search Logic
+        // 2. Search Logic
         if (!string.IsNullOrEmpty(search))
         {
             query = query.Where(a =>
@@ -50,7 +54,7 @@ public class AdminController(DB db, Helper hp) : Controller
                 a.Name.Contains(search));
         }
 
-        // 2. Sort Logic
+        // 3. Sort Logic
         query = sort switch
         {
             "Name" => dir == "asc" ? query.OrderBy(a => a.Name) : query.OrderByDescending(a => a.Name),
@@ -63,7 +67,7 @@ public class AdminController(DB db, Helper hp) : Controller
         ViewBag.Sort = sort;
         ViewBag.Dir = dir;
 
-        // 3. Pagination
+        // 4. Pagination
         int pageSize = 10;
         var admins = query.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
@@ -81,6 +85,14 @@ public class AdminController(DB db, Helper hp) : Controller
     // GET: Admin/CreateAdmin
     public IActionResult CreateAdmin()
     {
+        // SECURITY: Only A001 can create admins
+        var currentUser = db.Users.FirstOrDefault(u => u.Email == User.Identity.Name || u.Phone == User.Identity.Name);
+        if (currentUser?.Id != "A001")
+        {
+            TempData["Info"] = "Access Denied: Only System Administrator can create new admins.";
+            return RedirectToAction("Admins");
+        }
+
         return View();
     }
 
@@ -88,7 +100,13 @@ public class AdminController(DB db, Helper hp) : Controller
     [HttpPost]
     public IActionResult CreateAdmin(AdminVM vm)
     {
-        // Manual validation for Password on Create
+        // SECURITY: Only A001 can create admins
+        var currentUser = db.Users.FirstOrDefault(u => u.Email == User.Identity.Name || u.Phone == User.Identity.Name);
+        if (currentUser?.Id != "A001")
+        {
+            return RedirectToAction("Admins");
+        }
+
         if (string.IsNullOrEmpty(vm.Password))
         {
             ModelState.AddModelError("Password", "Password is required.");
@@ -129,9 +147,33 @@ public class AdminController(DB db, Helper hp) : Controller
         return View(vm);
     }
 
+    // GET: Admin/AdminDetails/A002 (NEW)
+    public IActionResult AdminDetails(string id)
+    {
+        var admin = db.Admins.Find(id);
+        if (admin == null)
+        {
+            TempData["Info"] = "Admin not found.";
+            return RedirectToAction("Admins");
+        }
+        return View(admin);
+    }
+
     // GET: Admin/EditAdmin/A001
     public IActionResult EditAdmin(string id)
     {
+        // SECURITY: Only A001 can edit other admins
+        var currentUser = db.Users.FirstOrDefault(u => u.Email == User.Identity.Name || u.Phone == User.Identity.Name);
+        if (currentUser?.Id != "A001" && currentUser?.Id != id) // Can edit self? No, use ProfileManage.
+        {
+            // Actually, usually only System Admin edits others. Self goes to Profile.
+            if (currentUser?.Id != "A001")
+            {
+                TempData["Info"] = "Access Denied.";
+                return RedirectToAction("Admins");
+            }
+        }
+
         var admin = db.Admins.Find(id);
         if (admin == null) return RedirectToAction("Admins");
 
@@ -152,10 +194,13 @@ public class AdminController(DB db, Helper hp) : Controller
     [HttpPost]
     public IActionResult EditAdmin(AdminVM vm)
     {
+        // SECURITY CHECK
+        var currentUser = db.Users.FirstOrDefault(u => u.Email == User.Identity.Name || u.Phone == User.Identity.Name);
+        if (currentUser?.Id != "A001") return RedirectToAction("Admins");
+
         var admin = db.Admins.Find(vm.Id);
         if (admin == null) return RedirectToAction("Admins");
 
-        // Unique checks (excluding self)
         if (db.Users.Any(u => u.Email == vm.Email && u.Id != vm.Id))
             ModelState.AddModelError("Email", "Email already in use.");
 
@@ -175,13 +220,11 @@ public class AdminController(DB db, Helper hp) : Controller
             admin.Phone = vm.Phone;
             admin.IsBlocked = vm.IsBlocked;
 
-            // Update password only if provided
             if (!string.IsNullOrEmpty(vm.Password))
             {
                 admin.Hash = hp.HashPassword(vm.Password);
             }
 
-            // Update Photo
             if (vm.Photo != null)
             {
                 if (!string.IsNullOrEmpty(admin.PhotoURL) && !admin.PhotoURL.StartsWith("/images/") && admin.PhotoURL != "beauty_admin.png")
@@ -196,7 +239,6 @@ public class AdminController(DB db, Helper hp) : Controller
             return RedirectToAction("Admins");
         }
 
-        // Maintain photo preview on error
         vm.ExistingPhotoURL = admin.PhotoURL;
         return View(vm);
     }
@@ -205,16 +247,23 @@ public class AdminController(DB db, Helper hp) : Controller
     [HttpPost]
     public IActionResult DeleteAdmin(string id)
     {
-        var admin = db.Admins.Find(id);
+        // SECURITY: Only A001 can delete
+        var currentUser = db.Users.FirstOrDefault(u => u.Email == User.Identity.Name || u.Phone == User.Identity.Name);
 
-        // Prevent deleting self
-        var currentUserId = db.Users.FirstOrDefault(u => u.Email == User.Identity.Name || u.Phone == User.Identity.Name)?.Id;
-        if (currentUserId == id)
+        if (currentUser?.Id != "A001")
         {
-            TempData["Info"] = "You cannot delete your own account while logged in.";
+            TempData["Info"] = "Access Denied: Only System Administrator can delete admins.";
             return RedirectToAction("Admins");
         }
 
+        // Prevent deleting self (System Admin)
+        if (id == "A001")
+        {
+            TempData["Info"] = "System Administrator cannot be deleted.";
+            return RedirectToAction("Admins");
+        }
+
+        var admin = db.Admins.Find(id);
         if (admin != null)
         {
             if (admin.PhotoURL != null && admin.PhotoURL != "beauty_admin.png" && !admin.PhotoURL.StartsWith("/images/"))

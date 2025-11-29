@@ -8,62 +8,42 @@
     <link rel="stylesheet" href="/css/admin.css" asp-append-version="true" />
     <link rel="stylesheet" href="/css/member.css" asp-append-version="true" />
     <script src="/js/user.js" defer></script>
+    <script src="/js/admin.js" asp-append-version="true" defer></script>
 }
 
 <div class="admin-container">
-    <div class="admin-header">
-        <h1>🛡️ Admin Management</h1>
-        <p>Manage system administrators and access.</p>
+    <div class="admin-header admin-header-row">
+        <div>
+            <h1>🛡️ Admin Management</h1>
+            <p>Manage system administrators and access.</p>
+        </div>
+
+        @if (ViewBag.IsSystemAdmin)
+        {
+            <a href="/Admin/CreateAdmin" class="btn-view btn-add">+ Add New Admin</a>
+        }
     </div>
 
-    <div style="display: flex; gap: 15px; margin-bottom: 20px;">
-        <form method="get" class="search-container" id="searchForm" style="flex: 1; margin-bottom: 0;">
+    <div class="search-section">
+        <form method="get" class="search-container" id="searchForm">
             <input type="text" id="searchInput" name="search" value="@ViewBag.Search" placeholder="Search admins..." autocomplete="off">
             <a href="/Admin/Admins" id="clearSearchBtn" class="btn-clear" style="display: none;">✕ Clear</a>
             <button type="submit">Search</button>
         </form>
-
-        <a href="/Admin/CreateAdmin" class="btn-view" style="display: flex; align-items: center; background: #2ed573; font-size: 16px;">+ Add New Admin</a>
     </div>
 
     <div id="tableContainer" class="recent-section">
         <partial name="_AdminTable" model="Model" />
     </div>
 
-    <div class="pagination-container" style="margin-top: 20px; text-align: center;">
+    <div class="pagination-container">
         <ul class="pagination">
             @for (int i = 1; i <= ViewBag.TotalPages; i++)
             {
                 <li class="@(i == ViewBag.CurrentPage ? "active" : "")">
-                    <a href="/Admin/Admins?page=@i&search=@ViewBag.Search&sort=@ViewBag.Sort&dir=@ViewBag.Dir">@i</a>
+                    <a href="javascript:void(0)" onclick="loadTable(@i)">@i</a>
                 </li>
             }
         </ul>
     </div>
 </div>
-
-<script>
-    // Overriding the loadTable function from user.js specifically for this page url
-    window.loadTable = function (page) {
-        const search = $('#searchInput').val();
-        const sort = $('#partialSort').val() || "Id";
-        const dir = $('#partialDir').val() || "asc";
-
-        $('#tableContainer').css('opacity', '0.6');
-
-        $.ajax({
-            url: '/Admin/Admins',
-            type: 'GET',
-            data: { search: search, page: page, sort: sort, dir: dir },
-            success: function (result) {
-                $('#tableContainer').html(result);
-                $('#tableContainer').css('opacity', '1');
-                updateSortIcons();
-            },
-            error: function () {
-                alert("Error loading data.");
-                $('#tableContainer').css('opacity', '1');
-            }
-        });
-    }
-</script>
