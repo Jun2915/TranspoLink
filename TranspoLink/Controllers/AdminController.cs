@@ -161,9 +161,9 @@ public class AdminController(DB db, Helper hp) : Controller
         }
 
         var timeline = db.AuditLogs
-        .Where(l => l.AdminId == id) // 只找这个 Admin 做的通过
-        .OrderByDescending(l => l.Timestamp) // 最新的在上面
-        .Take(10) // 只显示最近 10 条
+        .Where(l => l.AdminId == id)
+        .OrderByDescending(l => l.Timestamp) 
+        .Take(10) 
         .Select(l => new TimelineItemVM
         {
             Title = l.Action,
@@ -173,7 +173,6 @@ public class AdminController(DB db, Helper hp) : Controller
         })
         .ToList();
 
-        // 如果是空的新账号，显示一条默认的“账户创建”
         if (!timeline.Any())
         {
             timeline.Add(new TimelineItemVM
