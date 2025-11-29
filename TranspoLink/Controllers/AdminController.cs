@@ -35,6 +35,10 @@ public class AdminController(DB db, Helper hp) : Controller
         return View(recentBookings);
     }
 
+    // ============================================================================
+    // ADMIN MANAGEMENT
+    // ============================================================================
+
     // GET: Admin/Admins
     public IActionResult Admins(string search = "", int page = 1, string sort = "Id", string dir = "asc")
     {
@@ -45,11 +49,11 @@ public class AdminController(DB db, Helper hp) : Controller
 
         var query = db.Admins.AsQueryable();
 
-        // 2. Search Logic (UPDATED TO INCLUDE ID)
+        // 2. Search Logic
         if (!string.IsNullOrEmpty(search))
         {
             query = query.Where(a =>
-                a.Id.Contains(search) ||    // <--- Added ID Search
+                a.Id.Contains(search) ||
                 a.Name.Contains(search) ||
                 a.Email.Contains(search) ||
                 a.Phone.Contains(search));
@@ -86,7 +90,6 @@ public class AdminController(DB db, Helper hp) : Controller
     // GET: Admin/CreateAdmin
     public IActionResult CreateAdmin()
     {
-        // SECURITY: Only A001 can create admins
         var currentUser = db.Users.FirstOrDefault(u => u.Email == User.Identity.Name || u.Phone == User.Identity.Name);
         if (currentUser?.Id != "A001")
         {
@@ -101,7 +104,6 @@ public class AdminController(DB db, Helper hp) : Controller
     [HttpPost]
     public IActionResult CreateAdmin(AdminVM vm)
     {
-        // SECURITY: Only A001 can create admins
         var currentUser = db.Users.FirstOrDefault(u => u.Email == User.Identity.Name || u.Phone == User.Identity.Name);
         if (currentUser?.Id != "A001")
         {
@@ -148,7 +150,7 @@ public class AdminController(DB db, Helper hp) : Controller
         return View(vm);
     }
 
-    // GET: Admin/AdminDetails/A002 (NEW)
+    // GET: Admin/AdminDetails/A002 (UPDATED WITH TIMELINE)
     public IActionResult AdminDetails(string id)
     {
         var admin = db.Admins.Find(id);
@@ -157,22 +159,135 @@ public class AdminController(DB db, Helper hp) : Controller
             TempData["Info"] = "Admin not found.";
             return RedirectToAction("Admins");
         }
+
+        // =================================================================================
+        // 🟢 MOCK ACTION GENERATOR (Dynamic Timeline)
+        // =================================================================================
+        var timeline = new List<TimelineItemVM>();
+
+        // 1. Always add a Login event for today
+        timeline.Add(new TimelineItemVM
+        {
+            Title = "Logged In",
+            Time = "Today, " + DateTime.Now.ToString("hh:mm tt"),
+            Type = "login",
+            Icon = "🔑",
+            CssClass = "marker-login"
+        });
+
+        // 2. Customize actions based on who it is
+        if (admin.Id == "A001") // System Admin does big things
+        {
+            timeline.Add(new TimelineItemVM
+            {
+                Title = "Performed System Backup",
+                Time = "Today, 09:00 AM",
+                Type = "add",
+                Icon = "💾",
+                CssClass = "marker-add"
+            });
+            timeline.Add(new TimelineItemVM
+            {
+                Title = "Updated Security Settings",
+                Time = "Yesterday, 08:30 PM",
+                Type = "block",
+                Icon = "🛡️",
+                CssClass = "marker-block"
+            });
+        }
+        else // Normal Admins do booking/member stuff
+        {
+            timeline.Add(new TimelineItemVM
+            {
+                Title = $"Managed Member Details (C{(new Random().Next(100, 999))})",
+                Time = "Today, 10:15 AM",
+                Type = "delete",
+                Icon = "✏️",
+                CssClass = "marker-delete"
+            });
+
+            // Randomly decide if they blocked someone recently
+            if (new Random().Next(0, 2) == 1)
+            {
+                timeline.Add(new TimelineItemVM
+                {
+                    Title = "Blocked Suspicious User (C005)",
+                    Time = "Yesterday, 04:45 PM",
+                    Type = "block",
+                    Icon = "🔒",
+                    CssClass = "marker-block"
+                });
+            }
+
+            timeline.Add(new TimelineItemVM
+            {
+                Title = "Processed Booking #1024",
+                Time = "Yesterday, 02:30 PM",
+                Type = "add",
+                Icon = "✅",
+                CssClass = "marker-add"
+            });
+        }
+
+        // 3. Add Account Creation (Historical)
+        timeline.Add(new TimelineItemVM
+        {
+            Title = "Account Created",
+            Time = "01 Jan 2025, 09:00 AM",
+            Type = "add",
+            Icon = "✨",
+            CssClass = "marker-add"
+        });
+
+        ViewBag.Timeline = timeline;
+        // =================================================================================
+
         return View(admin);
+    }
+
+    // POST: Admin/ToggleBlockAdmin/A002 (NEW)
+    [HttpPost]
+    public IActionResult ToggleBlockAdmin(string id)
+    {
+        var currentUser = db.Users.FirstOrDefault(u => u.Email == User.Identity.Name || u.Phone == User.Identity.Name);
+
+        // Security Check
+        if (currentUser?.Id != "A001")
+        {
+            TempData["Info"] = "Access Denied: Only System Administrator can block admins.";
+            return RedirectToAction("Admins");
+        }
+
+        if (id == "A001")
+        {
+            TempData["Info"] = "System Administrator cannot be blocked.";
+            return RedirectToAction("AdminDetails", new { id });
+        }
+
+        var admin = db.Admins.Find(id);
+        if (admin == null)
+        {
+            TempData["Info"] = "Admin not found.";
+            return RedirectToAction("Admins");
+        }
+
+        admin.IsBlocked = !admin.IsBlocked;
+        db.SaveChanges();
+
+        string status = admin.IsBlocked ? "blocked" : "unblocked";
+        TempData["Info"] = $"Admin {admin.Name} has been {status}.";
+
+        return RedirectToAction("AdminDetails", new { id = admin.Id });
     }
 
     // GET: Admin/EditAdmin/A001
     public IActionResult EditAdmin(string id)
     {
-        // SECURITY: Only A001 can edit other admins
         var currentUser = db.Users.FirstOrDefault(u => u.Email == User.Identity.Name || u.Phone == User.Identity.Name);
-        if (currentUser?.Id != "A001" && currentUser?.Id != id) // Can edit self? No, use ProfileManage.
+        if (currentUser?.Id != "A001")
         {
-            // Actually, usually only System Admin edits others. Self goes to Profile.
-            if (currentUser?.Id != "A001")
-            {
-                TempData["Info"] = "Access Denied.";
-                return RedirectToAction("Admins");
-            }
+            TempData["Info"] = "Access Denied.";
+            return RedirectToAction("Admins");
         }
 
         var admin = db.Admins.Find(id);
@@ -195,7 +310,6 @@ public class AdminController(DB db, Helper hp) : Controller
     [HttpPost]
     public IActionResult EditAdmin(AdminVM vm)
     {
-        // SECURITY CHECK
         var currentUser = db.Users.FirstOrDefault(u => u.Email == User.Identity.Name || u.Phone == User.Identity.Name);
         if (currentUser?.Id != "A001") return RedirectToAction("Admins");
 
@@ -248,7 +362,6 @@ public class AdminController(DB db, Helper hp) : Controller
     [HttpPost]
     public IActionResult DeleteAdmin(string id)
     {
-        // SECURITY: Only A001 can delete
         var currentUser = db.Users.FirstOrDefault(u => u.Email == User.Identity.Name || u.Phone == User.Identity.Name);
 
         if (currentUser?.Id != "A001")
@@ -257,7 +370,6 @@ public class AdminController(DB db, Helper hp) : Controller
             return RedirectToAction("Admins");
         }
 
-        // Prevent deleting self (System Admin)
         if (id == "A001")
         {
             TempData["Info"] = "System Administrator cannot be deleted.";
@@ -283,22 +395,19 @@ public class AdminController(DB db, Helper hp) : Controller
     // MEMBER MANAGEMENT
     // ============================================================================
 
-    // GET: Admin/Members
     public IActionResult Members(string search = "", int page = 1, string sort = "Id", string dir = "asc")
     {
         var query = db.Members.AsQueryable();
 
-        // 1. Search Logic (UPDATED TO INCLUDE ID)
         if (!string.IsNullOrEmpty(search))
         {
             query = query.Where(m =>
-                m.Id.Contains(search) ||    // <--- Added ID Search
+                m.Id.Contains(search) ||
                 m.Name.Contains(search) ||
                 m.Email.Contains(search) ||
                 m.Phone.Contains(search));
         }
 
-        // 2. Sort Logic
         query = sort switch
         {
             "Name" => dir == "asc" ? query.OrderBy(m => m.Name) : query.OrderByDescending(m => m.Name),
@@ -312,7 +421,6 @@ public class AdminController(DB db, Helper hp) : Controller
         ViewBag.Sort = sort;
         ViewBag.Dir = dir;
 
-        // 3. Pagination
         int pageSize = 10;
         var members = query.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
@@ -326,8 +434,8 @@ public class AdminController(DB db, Helper hp) : Controller
 
         return View(members);
     }
-    // GET: Admin/MemberDetails/C001
-    public IActionResult MemberDetails(string id) // CHANGED: int -> string
+
+    public IActionResult MemberDetails(string id)
     {
         var member = db.Members
             .Include(m => m.Bookings)
@@ -344,9 +452,8 @@ public class AdminController(DB db, Helper hp) : Controller
         return View(member);
     }
 
-    // POST: Admin/DeleteMember/C001
     [HttpPost]
-    public IActionResult DeleteMember(string id) // CHANGED: int -> string
+    public IActionResult DeleteMember(string id)
     {
         var member = db.Members.Find(id);
 
@@ -356,14 +463,12 @@ public class AdminController(DB db, Helper hp) : Controller
             return RedirectToAction("Members");
         }
 
-        // Check if member has bookings
         if (db.Bookings.Any(b => b.MemberId == member.Id))
         {
             TempData["Info"] = "Cannot delete member with existing bookings.";
             return RedirectToAction("Members");
         }
 
-        // Delete photo if exists
         if (member.PhotoURL != null && member.PhotoURL != "/images/add_photo.png")
         {
             hp.DeletePhoto(member.PhotoURL, "photos");
@@ -386,14 +491,12 @@ public class AdminController(DB db, Helper hp) : Controller
             return RedirectToAction("Members");
         }
 
-        // Toggle the blocked status
         member.IsBlocked = !member.IsBlocked;
         db.SaveChanges();
 
         string status = member.IsBlocked ? "blocked" : "unblocked";
         TempData["Info"] = $"Member {member.Name} has been {status}.";
 
-        // Redirect back to details to see the change
         return RedirectToAction("MemberDetails", new { id = member.Id });
     }
 
@@ -401,7 +504,6 @@ public class AdminController(DB db, Helper hp) : Controller
     // ROUTE MANAGEMENT
     // ============================================================================
 
-    // GET: Admin/Routes
     public IActionResult Routes(string type = "")
     {
         var query = db.Routes.AsQueryable();
@@ -421,14 +523,12 @@ public class AdminController(DB db, Helper hp) : Controller
         return View(routes);
     }
 
-    // GET: Admin/CreateRoute
     public IActionResult CreateRoute()
     {
         ViewBag.TransportTypes = new SelectList(new[] { "Bus", "Train", "Ferry" });
         return View();
     }
 
-    // POST: Admin/CreateRoute
     [HttpPost]
     public IActionResult CreateRoute(Route route)
     {
@@ -445,7 +545,6 @@ public class AdminController(DB db, Helper hp) : Controller
         return View(route);
     }
 
-    // GET: Admin/EditRoute/5
     public IActionResult EditRoute(int id)
     {
         var route = db.Routes.Find(id);
@@ -460,7 +559,6 @@ public class AdminController(DB db, Helper hp) : Controller
         return View(route);
     }
 
-    // POST: Admin/EditRoute/5
     [HttpPost]
     public IActionResult EditRoute(Route route)
     {
@@ -477,7 +575,6 @@ public class AdminController(DB db, Helper hp) : Controller
         return View(route);
     }
 
-    // POST: Admin/DeleteRoute/5
     [HttpPost]
     public IActionResult DeleteRoute(int id)
     {
@@ -489,7 +586,6 @@ public class AdminController(DB db, Helper hp) : Controller
             return RedirectToAction("Routes");
         }
 
-        // Check if route has trips
         if (db.Trips.Any(t => t.RouteId == id))
         {
             TempData["Info"] = "Cannot delete route with existing trips.";
@@ -503,7 +599,6 @@ public class AdminController(DB db, Helper hp) : Controller
         return RedirectToAction("Routes");
     }
 
-    // POST: Admin/ToggleRouteStatus/5
     [HttpPost]
     public IActionResult ToggleRouteStatus(int id)
     {
@@ -524,7 +619,6 @@ public class AdminController(DB db, Helper hp) : Controller
     // VEHICLE MANAGEMENT
     // ============================================================================
 
-    // GET: Admin/Vehicles
     public IActionResult Vehicles(string type = "")
     {
         var query = db.Vehicles.AsQueryable();
@@ -543,18 +637,15 @@ public class AdminController(DB db, Helper hp) : Controller
         return View(vehicles);
     }
 
-    // GET: Admin/CreateVehicle
     public IActionResult CreateVehicle()
     {
         ViewBag.VehicleTypes = new SelectList(new[] { "Bus", "Train", "Ferry" });
         return View();
     }
 
-    // POST: Admin/CreateVehicle
     [HttpPost]
     public IActionResult CreateVehicle(Vehicle vehicle)
     {
-        // Check for duplicate vehicle number
         if (db.Vehicles.Any(v => v.VehicleNumber == vehicle.VehicleNumber))
         {
             ModelState.AddModelError("VehicleNumber", "Vehicle number already exists.");
@@ -573,7 +664,6 @@ public class AdminController(DB db, Helper hp) : Controller
         return View(vehicle);
     }
 
-    // GET: Admin/EditVehicle/5
     public IActionResult EditVehicle(int id)
     {
         var vehicle = db.Vehicles.Find(id);
@@ -588,11 +678,9 @@ public class AdminController(DB db, Helper hp) : Controller
         return View(vehicle);
     }
 
-    // POST: Admin/EditVehicle/5
     [HttpPost]
     public IActionResult EditVehicle(Vehicle vehicle)
     {
-        // Check for duplicate vehicle number (excluding current)
         if (db.Vehicles.Any(v => v.VehicleNumber == vehicle.VehicleNumber && v.Id != vehicle.Id))
         {
             ModelState.AddModelError("VehicleNumber", "Vehicle number already exists.");
@@ -611,7 +699,6 @@ public class AdminController(DB db, Helper hp) : Controller
         return View(vehicle);
     }
 
-    // POST: Admin/DeleteVehicle/5
     [HttpPost]
     public IActionResult DeleteVehicle(int id)
     {
@@ -623,7 +710,6 @@ public class AdminController(DB db, Helper hp) : Controller
             return RedirectToAction("Vehicles");
         }
 
-        // Check if vehicle has trips
         if (db.Trips.Any(t => t.VehicleId == id))
         {
             TempData["Info"] = "Cannot delete vehicle with existing trips.";
@@ -637,7 +723,6 @@ public class AdminController(DB db, Helper hp) : Controller
         return RedirectToAction("Vehicles");
     }
 
-    // POST: Admin/ToggleVehicleStatus/5
     [HttpPost]
     public IActionResult ToggleVehicleStatus(int id)
     {
@@ -658,7 +743,6 @@ public class AdminController(DB db, Helper hp) : Controller
     // TRIP MANAGEMENT
     // ============================================================================
 
-    // GET: Admin/Trips
     public IActionResult Trips(string status = "", int page = 1)
     {
         var query = db.Trips
@@ -673,7 +757,6 @@ public class AdminController(DB db, Helper hp) : Controller
 
         ViewBag.SelectedStatus = status;
 
-        // Pagination
         int pageSize = 20;
         var trips = query
             .OrderByDescending(t => t.DepartureTime)
@@ -687,7 +770,6 @@ public class AdminController(DB db, Helper hp) : Controller
         return View(trips);
     }
 
-    // GET: Admin/CreateTrip
     public IActionResult CreateTrip()
     {
         ViewBag.RouteList = new SelectList(db.Routes.Where(r => r.IsActive).OrderBy(r => r.Origin), "Id", "Origin");
@@ -696,17 +778,14 @@ public class AdminController(DB db, Helper hp) : Controller
         return View();
     }
 
-    // POST: Admin/CreateTrip
     [HttpPost]
     public IActionResult CreateTrip(Trip trip)
     {
-        // Validation: Arrival must be after departure
         if (trip.ArrivalTime <= trip.DepartureTime)
         {
             ModelState.AddModelError("ArrivalTime", "Arrival time must be after departure time.");
         }
 
-        // Set available seats from vehicle if not specified
         if (trip.AvailableSeats == 0)
         {
             var vehicle = db.Vehicles.Find(trip.VehicleId);
@@ -731,7 +810,6 @@ public class AdminController(DB db, Helper hp) : Controller
         return View(trip);
     }
 
-    // GET: Admin/EditTrip/5
     public IActionResult EditTrip(int id)
     {
         var trip = db.Trips.Find(id);
@@ -748,7 +826,6 @@ public class AdminController(DB db, Helper hp) : Controller
         return View(trip);
     }
 
-    // POST: Admin/EditTrip/5
     [HttpPost]
     public IActionResult EditTrip(Trip trip)
     {
@@ -772,7 +849,6 @@ public class AdminController(DB db, Helper hp) : Controller
         return View(trip);
     }
 
-    // POST: Admin/DeleteTrip/5
     [HttpPost]
     public IActionResult DeleteTrip(int id)
     {
@@ -784,7 +860,6 @@ public class AdminController(DB db, Helper hp) : Controller
             return RedirectToAction("Trips");
         }
 
-        // Check if trip has bookings
         if (db.Bookings.Any(b => b.TripId == id))
         {
             TempData["Info"] = "Cannot delete trip with existing bookings.";
@@ -802,7 +877,6 @@ public class AdminController(DB db, Helper hp) : Controller
     // BOOKING MANAGEMENT
     // ============================================================================
 
-    // GET: Admin/Bookings
     public IActionResult Bookings(string status = "", int page = 1)
     {
         var query = db.Bookings
@@ -818,7 +892,6 @@ public class AdminController(DB db, Helper hp) : Controller
 
         ViewBag.SelectedStatus = status;
 
-        // Pagination
         int pageSize = 20;
         var bookings = query
             .OrderByDescending(b => b.BookingDate)
@@ -832,7 +905,6 @@ public class AdminController(DB db, Helper hp) : Controller
         return View(bookings);
     }
 
-    // GET: Admin/BookingDetails/5
     public IActionResult BookingDetails(int id)
     {
         var booking = db.Bookings
@@ -852,7 +924,6 @@ public class AdminController(DB db, Helper hp) : Controller
         return View(booking);
     }
 
-    // POST: Admin/ConfirmBooking/5
     [HttpPost]
     public IActionResult ConfirmBooking(int id)
     {
@@ -869,7 +940,6 @@ public class AdminController(DB db, Helper hp) : Controller
         return RedirectToAction("BookingDetails", new { id });
     }
 
-    // POST: Admin/CancelBooking/5
     [HttpPost]
     public IActionResult CancelBooking(int id)
     {
@@ -880,10 +950,7 @@ public class AdminController(DB db, Helper hp) : Controller
         if (booking != null && booking.Status != "Cancelled")
         {
             booking.Status = "Cancelled";
-
-            // Return seats to trip
             booking.Trip.AvailableSeats += booking.NumberOfSeats;
-
             db.SaveChanges();
 
             TempData["Info"] = "Booking cancelled successfully.";
@@ -892,7 +959,6 @@ public class AdminController(DB db, Helper hp) : Controller
         return RedirectToAction("BookingDetails", new { id });
     }
 
-    // POST: Admin/MarkAsPaid/5
     [HttpPost]
     public IActionResult MarkAsPaid(int id)
     {
@@ -901,7 +967,6 @@ public class AdminController(DB db, Helper hp) : Controller
         if (booking != null && !booking.IsPaid)
         {
             booking.IsPaid = true;
-            //Date = DateTime.Now;
             db.SaveChanges();
 
             TempData["Info"] = "Booking marked as paid.";
@@ -914,10 +979,8 @@ public class AdminController(DB db, Helper hp) : Controller
     // REPORTS & ANALYTICS
     // ============================================================================
 
-    // GET: Admin/Reports
     public IActionResult Reports()
     {
-        // Revenue by transport type
         var revenueByType = db.Bookings
             .Include(b => b.Trip)
             .ThenInclude(t => t.Route)
@@ -933,7 +996,6 @@ public class AdminController(DB db, Helper hp) : Controller
 
         ViewBag.RevenueByType = revenueByType;
 
-        // Top routes
         var topRoutes = db.Bookings
             .Include(b => b.Trip)
             .ThenInclude(t => t.Route)
@@ -950,7 +1012,6 @@ public class AdminController(DB db, Helper hp) : Controller
 
         ViewBag.TopRoutes = topRoutes;
 
-        // Monthly revenue
         var monthlyRevenue = db.Bookings
             .Where(b => b.IsPaid && b.BookingDate.Year == DateTime.Now.Year)
             .GroupBy(b => b.BookingDate.Month)

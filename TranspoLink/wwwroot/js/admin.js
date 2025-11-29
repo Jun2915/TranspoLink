@@ -72,3 +72,54 @@ $(document).ready(function () {
     });
 
 });
+
+/* =========================================================
+PHONE INPUT VALIDATION (Blocks letters visually)
+========================================================= */
+
+$(document).on('input', 'input[name="Phone"]', function () {
+    let value = $(this).val();
+    // Allow only numbers, spaces, dashes, and plus sign
+    // If it contains anything else (like letters), turn RED
+    if (value.length > 0 && !/^[0-9+\-\s]*$/.test(value)) {
+        $(this).addClass('input-validation-error'); // Uses your new CSS red border
+    } else {
+        $(this).removeClass('input-validation-error');
+    }
+});
+
+/* =========================================================
+   DELETE CONFIRMATION MODAL LOGIC
+   ========================================================= */
+let deleteUrl = '';
+
+function openConfirmModal(url, name) {
+    deleteUrl = url;
+
+    // Update the modal text
+    $('#deleteNameDisplay').text(name);
+
+    // Set the form action
+    $('#deleteConfirmForm').attr('action', url);
+
+    // Show the modal
+    $('#confirmModal').css('display', 'flex');
+}
+
+function closeConfirmModal() {
+    $('#confirmModal').hide();
+}
+
+// Close if clicking outside the box
+$(window).on('click', function (e) {
+    if ($(e.target).is('.confirm-overlay')) {
+        closeConfirmModal();
+    }
+});
+
+// Close on Escape key
+$(document).on('keydown', function (e) {
+    if (e.key === "Escape") {
+        closeConfirmModal();
+    }
+});

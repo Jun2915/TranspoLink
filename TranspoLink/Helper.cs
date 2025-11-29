@@ -18,28 +18,43 @@ public class Helper(IWebHostEnvironment en,
     // ------------------------------------------------------------------------
     // ID Generator Helper
     // ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+    // ID Generator Helper (Fills Gaps)
+    // ------------------------------------------------------------------------
     public string GetNextId(DB db, string role)
     {
+        // Determine prefix: Admin -> "A", Member -> "C"
         string prefix = role == "Admin" ? "A" : "C";
 
-        var lastId = db.Users
+        // 1. Get all existing ID numbers for this role
+        // We fetch them into memory to parse and sort them easily
+        var existingIds = db.Users
             .Where(u => u.Id.StartsWith(prefix))
-            .OrderByDescending(u => u.Id)
             .Select(u => u.Id)
-            .FirstOrDefault();
+            .ToList()
+            .Select(id => int.TryParse(id.Substring(1), out int n) ? n : 0) // Extract number part safely
+            .OrderBy(n => n)
+            .ToList();
 
-        if (string.IsNullOrEmpty(lastId))
+        // 2. Find the first missing number (Gap)
+        int nextNum = 1;
+        foreach (var num in existingIds)
         {
-            return prefix + "001";
+            if (num == nextNum)
+            {
+                // If the number exists, move to the next expected number
+                nextNum++;
+            }
+            else if (num > nextNum)
+            {
+                // If we found a number larger than expected, we found a gap!
+                // E.g., We have [1, 3]. We expect 2, but found 3. So 2 is free.
+                break;
+            }
         }
 
-        // Extract number (e.g. C005 -> 5) and increment
-        if (int.TryParse(lastId.Substring(1), out int lastNum))
-        {
-            return prefix + (lastNum + 1).ToString("D3");
-        }
-
-        return prefix + "001"; // Fallback
+        // 3. Format and return (e.g., A002)
+        return prefix + nextNum.ToString("D3");
     }
 
     // ------------------------------------------------------------------------

@@ -2,4 +2,52 @@
     ViewBag.Title += " | Access Denied";
 }
 
-<p>You are <b>NOT AUTHORIZED</b> to access the page.</p>
+@section head {
+    <link rel="stylesheet" href="/css/login.css" asp-append-version="true" />
+}
+
+<div class="auth-container">
+    <div class="auth-card" style="text-align: center; padding: 50px; max-width: 500px;">
+
+        <div style="font-size: 80px; margin-bottom: 20px; animation: popIn 0.5s ease;">
+            🚫
+        </div>
+
+        <h1 style="color: #ef4444; font-size: 32px; font-weight: 800; margin-bottom: 15px;">
+            Access Denied
+        </h1>
+
+        <p style="color: #555; font-size: 16px; line-height: 1.6; margin-bottom: 30px;">
+            Oops! You do not have permission to view this page.<br>
+            If you believe this is a mistake, please contact the administrator.
+        </p>
+
+        <div style="display: flex; gap: 15px; justify-content: center;">
+            <button onclick="history.back()" class="auth-submit-btn"
+                    style="background: #fff; color: #555; border: 1px solid #ccc; box-shadow: none; width: auto; padding: 12px 25px;">
+                ← Go Back
+            </button>
+
+            <a href="/" class="auth-submit-btn"
+               style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center; width: auto; padding: 12px 30px;">
+                Go Home
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // Simple hover effect logic for the 'Go Back' button since it uses inline styles
+    const backBtn = document.querySelector('button[onclick="history.back()"]');
+    if(backBtn) {
+        backBtn.addEventListener('mouseenter', () => {
+            backBtn.style.background = '#f0f0f0';
+            backBtn.style.borderColor = '#bbb';
+        });
+        backBtn.addEventListener('mouseleave', () => {
+            backBtn.style.background = '#fff';
+            backBtn.style.borderColor = '#ccc';
+        });
+    }
+</script>

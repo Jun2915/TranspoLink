@@ -47,3 +47,22 @@
         </ul>
     </div>
 </div>
+
+<div id="confirmModal" class="confirm-overlay">
+    <div class="confirm-box">
+        <span class="confirm-icon">⚠️</span>
+        <h3 class="confirm-title">Delete Admin?</h3>
+        <p class="confirm-text">
+            Are you sure you want to remove <b id="deleteNameDisplay" style="color:#ff4757;"></b>?<br>
+            This action cannot be undone.
+        </p>
+
+        <div class="confirm-actions">
+            <button onclick="closeConfirmModal()" class="btn-confirm-cancel">Cancel</button>
+
+            <form method="post" id="deleteConfirmForm">
+                <button type="submit" class="btn-confirm-delete">Yes, Delete</button>
+            </form>
+        </div>
+    </div>
+</div>

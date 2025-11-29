@@ -151,8 +151,6 @@ public class ResetPasswordVM
     public string ConfirmPassword { get; set; }
 }
 
-// [Existing code...]
-
 public class AdminVM
 {
     public string? Id { get; set; }
@@ -168,6 +166,7 @@ public class AdminVM
 
     [Required]
     [StringLength(20)]
+    [RegularExpression(@"^[0-9+\-\s]*$", ErrorMessage = "Phone number can only contain numbers, +, - and spaces.")]
     public string Phone { get; set; }
 
     // Password is required only for Create, optional for Edit
@@ -184,4 +183,13 @@ public class AdminVM
 
     public string? ExistingPhotoURL { get; set; }
     public bool IsBlocked { get; set; }
+}
+
+public class TimelineItemVM
+{
+    public string Title { get; set; }
+    public string Time { get; set; }
+    public string Type { get; set; } // "login", "logout", "add", "delete", "block"
+    public string Icon { get; set; } // Emoji
+    public string CssClass { get; set; } // CSS Class for color
 }

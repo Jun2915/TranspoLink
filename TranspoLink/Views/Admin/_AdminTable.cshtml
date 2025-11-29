@@ -59,9 +59,10 @@
                                 if (a.Id != "A001")
                                 {
                                     <a href="/Admin/EditAdmin/@a.Id" class="btn-view" style="background-color: #f59e0b;">Edit</a>
-                                    <form method="post" action="/Admin/DeleteAdmin/@a.Id" onsubmit="return confirm('Delete Admin @a.Name?');">
-                                        <button class="btn-delete">Delete</button>
-                                    </form>
+                                    <button type="button" class="btn-delete"
+                                            onclick="openConfirmModal('/Admin/DeleteAdmin/@a.Id', '@a.Name')">
+                                        Delete
+                                    </button>
                                 }
                                 else
                                 {

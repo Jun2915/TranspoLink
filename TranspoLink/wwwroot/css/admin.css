@@ -1,5 +1,5 @@
 ﻿/* =========================================================
-   ADMIN DASHBOARD STYLES (Theme Aware)
+   1. ADMIN DASHBOARD BASE STYLES (Theme Aware)
    ========================================================= */
 
 .admin-container {
@@ -241,8 +241,9 @@
     border-color: #4a5568;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
+
 /* =========================================================
-   EXTRACTED STYLES (For Admins.cshtml)
+   2. LIST PAGE STYLES (Admins.cshtml / Members.cshtml)
    ========================================================= */
 
 /* Header Layout: Aligns title left and button right */
@@ -281,66 +282,113 @@
     text-align: center;
 }
 
-
 /* =========================================================
-   ADMIN FORM STYLES (Register-like Layout)
+   3. ADMIN CREATE/EDIT FORM STYLES (Enhanced & Wider)
    ========================================================= */
 
 .admin-form-card {
-    max-width: 800px !important;
-    margin: 0 auto;
-    padding: 40px !important;
+    /* WIDER LAYOUT */
+    max-width: 1100px !important;
+    margin: 20px auto;
+    padding: 50px !important;
+    border-radius: 20px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+    background: var(--bg-card);
+    transition: transform 0.3s ease;
+    border: 1px solid var(--border-color);
 }
 
 .admin-form-layout {
     display: grid;
-    grid-template-columns: 250px 1fr;
-    gap: 40px;
+    /* Left column (Photo) fixed 300px, Right column fills rest */
+    grid-template-columns: 300px 1fr;
+    gap: 60px;
     align-items: start;
-    text-align: left; /* Ensure inputs align left */
 }
 
-/* Photo Section */
+/* --- LEFT SIDE: PHOTO UPLOAD ZONE --- */
 .admin-form-left {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     border-right: 1px solid var(--border-color);
-    padding-right: 30px;
+    padding-right: 40px;
+    height: 100%;
 }
 
-.upload-label {
+/* The clickable container for Photo Tools */
+#photoContainer {
+    position: relative;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
     cursor: pointer;
-    display: block;
-    text-align: center;
-    transition: transform 0.2s;
+    transition: all 0.3s ease;
+    border: 4px solid var(--bg-body);
+    box-shadow: var(--shadow-soft);
+    overflow: hidden;
+    background: var(--bg-input);
 }
 
-    .upload-label:hover {
-        transform: scale(1.02);
+    #photoContainer:hover {
+        transform: scale(1.03);
+        border-color: #667eea;
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
     }
 
-    .upload-label img {
-        width: 150px;
-        height: 150px;
+    #photoContainer img {
+        width: 100%;
+        height: 100%;
         object-fit: cover;
-        border-radius: 50%;
-        border: 2px dashed #ccc;
-        background: var(--bg-input);
     }
 
-.upload-hint {
-    display: block;
-    margin-top: 10px;
-    color: var(--text-light);
-    font-size: 13px;
+/* Overlay that appears on hover */
+.upload-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
-/* Input Section */
+#photoContainer:hover .upload-overlay {
+    opacity: 1;
+}
+
+.upload-overlay span {
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 5px;
+}
+
+.upload-hint-text {
+    margin-top: 20px;
+    color: var(--text-light);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* --- RIGHT SIDE: INPUTS --- */
 .admin-form-right {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 25px;
+}
+
+/* 2-Column Grid for Inputs to use the width effectively */
+.input-grid-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
 }
 
 .admin-input-group {
@@ -350,10 +398,10 @@
 
     .admin-input-group input {
         width: 100%;
-        padding: 12px 12px 12px 45px; /* Space for icon */
+        padding: 16px 16px 16px 50px; /* Taller inputs */
         font-size: 15px;
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
+        border: 2px solid var(--border-color); /* Thicker border */
+        border-radius: 12px;
         background: var(--bg-input);
         color: var(--text-body);
         box-sizing: border-box;
@@ -363,24 +411,28 @@
         .admin-input-group input:focus {
             outline: none;
             border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 238, 0.2);
+            background: var(--bg-card);
+            box-shadow: 0 0 0 4px rgba(102, 126, 238, 0.15);
         }
 
 .input-icon {
     position: absolute;
     top: 50%;
-    left: 15px;
+    left: 18px;
     transform: translateY(-50%);
     pointer-events: none;
     display: flex;
     align-items: center;
+    color: #999;
+    transition: color 0.3s;
 }
 
-/* SVG Fill Color adjustment for Dark Mode */
-[data-theme="dark"] .input-icon svg {
-    fill: #999;
+.admin-input-group input:focus + .input-icon,
+.admin-input-group input:focus ~ .input-icon {
+    color: #667eea;
 }
 
+/* Toggle Password Button */
 .toggle-password-btn {
     position: absolute;
     top: 50%;
@@ -389,22 +441,426 @@
     background: none;
     border: none;
     cursor: pointer;
-    padding: 0;
+    padding: 5px;
     display: flex;
     align-items: center;
+    opacity: 0.5;
+    transition: opacity 0.3s;
 }
 
+    .toggle-password-btn:hover {
+        opacity: 1;
+        color: #667eea;
+    }
+
+/* Header Styling */
+.form-header {
+    margin-bottom: 30px;
+    text-align: left;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 15px;
+}
+
+    .form-header h2 {
+        font-size: 28px;
+        color: var(--text-main);
+        margin: 0;
+    }
+
+    .form-header p {
+        color: var(--text-light);
+        margin: 5px 0 0 0;
+    }
+
+/* Create Button */
+.btn-create-admin {
+    width: 100%;
+    margin-top: 10px;
+    font-size: 17px;
+    padding: 16px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 238, 0.3);
+}
+
+    .btn-create-admin:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 238, 0.5);
+    }
+
 /* Responsive */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
     .admin-form-layout {
         grid-template-columns: 1fr;
+        gap: 40px;
     }
 
     .admin-form-left {
         border-right: none;
         border-bottom: 1px solid var(--border-color);
         padding-right: 0;
-        padding-bottom: 30px;
-        margin-bottom: 20px;
+        padding-bottom: 40px;
+    }
+
+    .input-grid-row {
+        grid-template-columns: 1fr; /* Stack inputs on mobile */
     }
 }
+
+/* =========================================================
+   4. VALIDATION ERROR STYLES (Red Alerts)
+   ========================================================= */
+
+/* The error text message */
+.field-validation-error {
+    color: #ef4444; /* Bright Red */
+    font-size: 13px;
+    margin-top: 6px;
+    font-weight: 600;
+    display: block;
+    animation: fadeInError 0.3s ease-in-out;
+}
+
+/* The input box itself when invalid */
+.input-validation-error {
+    border-color: #ef4444 !important;
+    background-color: #fff5f5 !important; /* Very light red background */
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15) !important; /* Red glow */
+}
+
+    /* Icon color inside invalid input (optional) */
+    .input-validation-error + .toggle-password-btn,
+    .input-validation-error ~ .input-icon {
+        color: #ef4444 !important;
+    }
+
+/* Animation for the error message popping up */
+@keyframes fadeInError {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =========================================================
+   5. BEAUTIFUL CONFIRMATION MODAL
+   ========================================================= */
+.confirm-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6); /* Darker dim */
+    backdrop-filter: blur(4px); /* Blur background */
+    z-index: 9999;
+    display: none; /* Hidden by default */
+    align-items: center;
+    justify-content: center;
+    animation: fadeInOverlay 0.2s ease-out;
+}
+
+.confirm-box {
+    background: var(--bg-card);
+    width: 90%;
+    max-width: 400px;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    text-align: center;
+    border: 1px solid var(--border-color);
+    transform: scale(0.9);
+    animation: popInBox 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.confirm-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+    display: block;
+}
+
+.confirm-title {
+    margin: 0 0 10px;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.confirm-text {
+    font-size: 15px;
+    color: var(--text-light);
+    margin-bottom: 25px;
+    line-height: 1.5;
+}
+
+.confirm-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.btn-confirm-cancel {
+    padding: 10px 24px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background: transparent;
+    color: var(--text-body);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+    .btn-confirm-cancel:hover {
+        background: rgba(0,0,0,0.05);
+    }
+
+.btn-confirm-delete {
+    padding: 10px 24px;
+    border-radius: 8px;
+    border: none;
+    background: #ff4757;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(255, 71, 87, 0.3);
+    transition: all 0.2s;
+}
+
+    .btn-confirm-delete:hover {
+        background: #ff2e43;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(255, 71, 87, 0.4);
+    }
+
+@keyframes fadeInOverlay {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes popInBox {
+    from {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* =========================================================
+   6. USER ACTIVITY TIMELINE (Action Trajectory)
+   ========================================================= */
+.timeline-section {
+    background: var(--bg-card);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--border-color);
+    height: 100%; /* Fill height */
+    min-height: 400px;
+}
+
+.timeline-header {
+    margin-bottom: 25px;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 15px;
+}
+
+    .timeline-header h3 {
+        margin: 0;
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+.timeline-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    position: relative;
+}
+
+    /* Vertical Line */
+    .timeline-list::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 18px; /* Position line */
+        width: 2px;
+        background: var(--border-color);
+        border-radius: 2px;
+    }
+
+.timeline-item {
+    position: relative;
+    padding-left: 50px;
+    margin-bottom: 25px;
+}
+
+    .timeline-item:last-child {
+        margin-bottom: 0;
+    }
+
+.timeline-marker {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    border: 2px solid #667eea; /* Default Color */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    z-index: 1;
+}
+
+/* Specific Colors for Actions */
+.marker-login {
+    border-color: #2ed573;
+    color: #2ed573;
+    background: #eafff3;
+}
+
+.marker-logout {
+    border-color: #747d8c;
+    color: #747d8c;
+    background: #f1f2f6;
+}
+
+.marker-add {
+    border-color: #3742fa;
+    color: #3742fa;
+    background: #eef0ff;
+}
+
+.marker-delete {
+    border-color: #ff4757;
+    color: #ff4757;
+    background: #ffebee;
+}
+
+.marker-block {
+    border-color: #ffa502;
+    color: #ffa502;
+    background: #fff8e1;
+}
+
+.timeline-content {
+    background: var(--bg-body);
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.timeline-title {
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 5px;
+    font-size: 15px;
+}
+
+.timeline-time {
+    font-size: 12px;
+    color: var(--text-light);
+}
+
+/* =========================================================
+   7. UPDATED PROFILE INFO LIST (For Admin Details)
+   ========================================================= */
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+    .info-row:last-child {
+        border-bottom: none;
+    }
+
+.info-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-light);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.info-value {
+    font-weight: 600;
+    color: var(--text-main);
+    text-align: right;
+}
+
+.status-active {
+    color: #2ed573;
+    font-weight: 700;
+}
+
+.status-blocked {
+    color: #ff4757;
+    font-weight: 700;
+}
+
+/* Buttons in Profile */
+.profile-btn-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.btn-block {
+    flex: 1;
+    background: #ffa502;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+    .btn-block:hover {
+        background: #e19202;
+    }
+
+.btn-unblock {
+    flex: 1;
+    background: #2ed573;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+    .btn-unblock:hover {
+        background: #26b05e;
+    }
