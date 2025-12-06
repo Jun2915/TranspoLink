@@ -18,9 +18,6 @@ public class Helper(IWebHostEnvironment en,
     // ------------------------------------------------------------------------
     // ID Generator Helper
     // ------------------------------------------------------------------------
-    // ------------------------------------------------------------------------
-    // ID Generator Helper (Fills Gaps)
-    // ------------------------------------------------------------------------
     public string GetNextId(DB db, string role)
     {
         // Determine prefix: Admin -> "A", Member -> "C"
@@ -152,6 +149,7 @@ public class Helper(IWebHostEnvironment en,
         AuthenticationProperties properties = new()
         {
             IsPersistent = rememberMe,
+            ExpiresUtc = rememberMe ? DateTime.UtcNow.AddDays(1) : null // Optional: Set explicit expiry for persistent
         };
 
         ct.HttpContext!.SignInAsync(principal, properties);
@@ -269,7 +267,7 @@ public class Helper(IWebHostEnvironment en,
     {
         if (string.IsNullOrEmpty(responseToken)) return false;
 
-        string secretKey = "6Ld3iBosAAAAAK2pXnJdiSD7YCX-wnUjBnZ2C28o"; // <--- PASTE HERE
+        string secretKey = "6Ld3iBosAAAAAK2pXnJdiSD7YCX-wnUjBnZ2C28o";
         string apiUrl = $"https://www.google.com/recaptcha/api/siteverify?secret={secretKey}&response={responseToken}";
 
         using (var client = new HttpClient())

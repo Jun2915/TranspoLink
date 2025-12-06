@@ -11,6 +11,11 @@ public class AccountController(DB db,
     // GET: Account/Login
     public IActionResult Login()
     {
+        // If already logged in, redirect to home
+        if (User.Identity.IsAuthenticated)
+        {
+            return RedirectToAction("Index", "Home");
+        }
         return View();
     }
 
@@ -26,26 +31,21 @@ public class AccountController(DB db,
             return View(vm);
         }
 
-        // 2. Find User
+        // 2. Find User (Combined Logic: Search both columns)
         User? u = null;
-        if (!string.IsNullOrEmpty(vm.Email))
+        if (!string.IsNullOrEmpty(vm.Input))
         {
-            u = db.Users.FirstOrDefault(x => x.Email == vm.Email);
-        }
-        else if (!string.IsNullOrEmpty(vm.Phone))
-        {
-            u = db.Users.FirstOrDefault(x => x.Phone == vm.Phone);
+            u = db.Users.FirstOrDefault(x => x.Email == vm.Input || x.Phone == vm.Input);
         }
 
-        // --- [NEW] CHECK IF BLOCKED ---
+        // --- CHECK IF BLOCKED ---
         if (u != null && u.IsBlocked)
         {
             ModelState.AddModelError("", "Your account has been blocked by Admin. Please contact support.");
             return View(vm);
         }
-        // ------------------------------
 
-        // 3. CHECK IF LOCKED OUT (Existing logic)
+        // 3. CHECK IF LOCKED OUT
         if (u != null && u.LockoutEnd > DateTime.Now)
         {
             var timeLeft = u.LockoutEnd.Value - DateTime.Now;
@@ -91,7 +91,7 @@ public class AccountController(DB db,
             }
             else
             {
-                ModelState.AddModelError("", "Login credentials not matched.");
+                ModelState.AddModelError("", "Invalid credentials.");
             }
         }
 
@@ -107,6 +107,8 @@ public class AccountController(DB db,
                 TempData["Info"] = $"Welcome, {u.Name}!";
 
                 string identifier = u.Email ?? u.Phone ?? u.Id;
+
+                // Helper.SignIn handles the "Remember Me" logic internally via IsPersistent
                 hp.SignIn(identifier, u.Role, vm.RememberMe);
 
                 if (string.IsNullOrEmpty(returnURL))
@@ -138,17 +140,13 @@ public class AccountController(DB db,
         return View();
     }
 
-    public bool CheckEmail(string email)
-    {
-        return !db.Users.Any(u => u.Email == email);
-    }
-    public bool CheckPhone(string phoneNumber)
-    {
-        return !db.Users.Any(u => u.Phone == phoneNumber);
-    }
-
+    // Register Page
     public IActionResult Register()
     {
+        if (User.Identity.IsAuthenticated)
+        {
+            return RedirectToAction("Index", "Home");
+        }
         return View();
     }
 
@@ -164,19 +162,32 @@ public class AccountController(DB db,
             return View(vm);
         }
 
-        if (string.IsNullOrEmpty(vm.Email) && string.IsNullOrEmpty(vm.PhoneNumber))
-        {
-            ModelState.AddModelError("", "Please provide either an Email or a Phone number.");
-        }
+        // Auto-detect logic
+        string? email = null;
+        string? phone = null;
 
-        if (!string.IsNullOrEmpty(vm.Email) && db.Users.Any(u => u.Email == vm.Email))
+        if (!string.IsNullOrEmpty(vm.Input))
         {
-            ModelState.AddModelError("Email", "Duplicated Email.");
-        }
-
-        if (!string.IsNullOrEmpty(vm.PhoneNumber) && db.Users.Any(u => u.Phone == vm.PhoneNumber))
-        {
-            ModelState.AddModelError("PhoneNumber", "Duplicated Phone Number.");
+            if (vm.Input.Contains("@"))
+            {
+                email = vm.Input;
+                if (db.Users.Any(u => u.Email == email))
+                {
+                    ModelState.AddModelError("Input", "This Email is already registered.");
+                }
+            }
+            else
+            {
+                phone = vm.Input;
+                if (!System.Text.RegularExpressions.Regex.IsMatch(phone, @"^[0-9+\-\s]+$"))
+                {
+                    ModelState.AddModelError("Input", "Invalid Phone Number format.");
+                }
+                else if (db.Users.Any(u => u.Phone == phone))
+                {
+                    ModelState.AddModelError("Input", "This Phone Number is already registered.");
+                }
+            }
         }
 
         if (vm.Photo != null)
@@ -192,8 +203,8 @@ public class AccountController(DB db,
             var newMember = new Member()
             {
                 Id = nextId,
-                Email = vm.Email,
-                Phone = vm.PhoneNumber,
+                Email = email,
+                Phone = phone,
                 Hash = hp.HashPassword(vm.Password),
                 Name = vm.Name,
                 PhotoURL = vm.Photo != null ? hp.SavePhoto(vm.Photo, "images") : "default_photo.png",
@@ -204,7 +215,6 @@ public class AccountController(DB db,
 
             ViewBag.Success = true;
             ViewBag.RegisteredName = vm.Name;
-            ViewBag.RegisteredContact = !string.IsNullOrEmpty(vm.Email) ? vm.Email : vm.PhoneNumber;
 
             return View(vm);
         }
@@ -274,7 +284,6 @@ public class AccountController(DB db,
 
         if (u == null) return RedirectToAction("Index", "Home");
 
-        // 1. Check if the New Email/Phone is already taken by SOMEONE ELSE
         if (!string.IsNullOrEmpty(vm.Email) && db.Users.Any(x => x.Id != u.Id && x.Email == vm.Email))
         {
             ModelState.AddModelError("Email", "This Email is already in use by another account.");
@@ -285,7 +294,6 @@ public class AccountController(DB db,
             ModelState.AddModelError("Phone", "This Phone Number is already in use by another account.");
         }
 
-        // 2. Validate Photo
         if (vm.Photo != null)
         {
             var err = hp.ValidatePhoto(vm.Photo);
@@ -294,12 +302,10 @@ public class AccountController(DB db,
 
         if (ModelState.IsValid)
         {
-            // 3. UPDATE THE DATA (This part was missing for Phone/Email!)
             u.Name = vm.Name;
             u.Email = vm.Email;
             u.Phone = vm.Phone;
 
-            // Handle Photo
             if (vm.Photo != null)
             {
                 string newPhoto = hp.SavePhoto(vm.Photo, "images");
@@ -325,13 +331,12 @@ public class AccountController(DB db,
             db.SaveChanges();
 
             string newIdentifier = u.Email ?? u.Phone ?? u.Id;
-            hp.SignIn(newIdentifier, u.Role, true); // Keep them logged in
+            hp.SignIn(newIdentifier, u.Role, true);
 
             TempData["Info"] = "Profile updated successfully.";
             return RedirectToAction();
         }
 
-        // If validation failed, reload current data to show image
         if (u is Member m2) vm.PhotoURL = m2.PhotoURL;
         else if (u is Admin a2) vm.PhotoURL = a2.PhotoURL;
 
@@ -339,10 +344,9 @@ public class AccountController(DB db,
     }
 
     // ============================================================================
-    // FORGOT PASSWORD / OTP FLOW (REPLACES OLD RESET PASSWORD)
+    // FORGOT PASSWORD FLOW
     // ============================================================================
 
-    // STEP 1: Request OTP
     public IActionResult ForgotPassword()
     {
         return View();
@@ -363,7 +367,6 @@ public class AccountController(DB db,
 
             string otp = hp.GenerateOTP();
 
-            // Store in Session
             HttpContext.Session.SetString("Reset_OTP", otp);
             HttpContext.Session.SetString("Reset_UserId", u.Id);
             HttpContext.Session.SetString("Reset_Target", vm.EmailOrPhone);
@@ -375,7 +378,6 @@ public class AccountController(DB db,
             }
             else
             {
-                // Simulated SMS
                 Console.WriteLine($"[SMS SIMULATION] OTP for {u.Phone}: {otp}");
                 TempData["Info"] = $"OTP sent to phone: {otp}";
             }
@@ -385,7 +387,6 @@ public class AccountController(DB db,
         return View(vm);
     }
 
-    // STEP 2: Verify OTP
     public IActionResult VerifyOtp()
     {
         if (HttpContext.Session.GetString("Reset_OTP") == null)
@@ -416,7 +417,6 @@ public class AccountController(DB db,
         return View(vm);
     }
 
-    // STEP 3: Reset Password
     public IActionResult ResetPassword()
     {
         if (HttpContext.Session.GetString("Reset_Verified") != "true")
@@ -444,8 +444,6 @@ public class AccountController(DB db,
             if (u != null)
             {
                 u.Hash = hp.HashPassword(vm.NewPassword);
-
-                // UNLOCK ACCOUNT if it was blocked
                 u.LoginRetryCount = 0;
                 u.LockoutEnd = null;
 

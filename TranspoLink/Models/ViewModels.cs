@@ -10,14 +10,12 @@ namespace TranspoLink.Models;
 
 public class LoginVM
 {
+    [Required(ErrorMessage = "Please enter your Email or Phone Number.")]
     [StringLength(100)]
-    [EmailAddress]
-    public string? Email { get; set; }
+    [DisplayName("Email / Phone Number")]
+    public string Input { get; set; } // Combined Field
 
-    [StringLength(20)]
-    [DisplayName("Phone Number")]
-    public string? Phone { get; set; }
-
+    [Required]
     [StringLength(100, MinimumLength = 5)]
     [DataType(DataType.Password)]
     public string Password { get; set; }
@@ -27,44 +25,45 @@ public class LoginVM
 
 public class RegisterVM
 {
+    [Required(ErrorMessage = "Please enter your Email or Phone Number.")]
     [StringLength(100)]
-    [EmailAddress]
-    [Remote("CheckEmail", "Account", ErrorMessage = "Duplicated {0}.")]
-    public string? Email { get; set; }
+    [DisplayName("Email / Phone Number")]
+    public string Input { get; set; } // Combined Field
 
-    [StringLength(20)]
-    [DisplayName("Phone Number")]
-    [Remote("CheckPhone", "Account", ErrorMessage = "Duplicated {0}.")]
-    public string? PhoneNumber { get; set; }
-
+    [Required]
     [StringLength(100, MinimumLength = 5)]
     [DataType(DataType.Password)]
     public string Password { get; set; }
 
+    [Required]
     [StringLength(100, MinimumLength = 5)]
     [Compare("Password")]
     [DataType(DataType.Password)]
     [DisplayName("Confirm Password")]
     public string Confirm { get; set; }
 
+    [Required]
     [StringLength(100)]
     public string Name { get; set; }
 
-    public IFormFile Photo { get; set; }
+    public IFormFile? Photo { get; set; }
 }
 
 public class UpdatePasswordVM
 {
+    [Required]
     [StringLength(100, MinimumLength = 5)]
     [DataType(DataType.Password)]
     [DisplayName("Current Password")]
     public string Current { get; set; }
 
+    [Required]
     [StringLength(100, MinimumLength = 5)]
     [DataType(DataType.Password)]
     [DisplayName("New Password")]
     public string New { get; set; }
 
+    [Required]
     [StringLength(100, MinimumLength = 5)]
     [Compare("New")]
     [DataType(DataType.Password)]
@@ -77,6 +76,7 @@ public class UpdateProfileVM
     public string? Email { get; set; }
     public string? Phone { get; set; }
 
+    [Required]
     [StringLength(100)]
     public string Name { get; set; }
 
@@ -127,23 +127,27 @@ public class BookTripVM
 
 public class ForgotPasswordVM
 {
+    [Required]
     [StringLength(100)]
     public string EmailOrPhone { get; set; }
 }
 
 public class VerifyOtpVM
 {
+    [Required]
     [StringLength(6, MinimumLength = 6, ErrorMessage = "OTP must be 6 digits")]
     public string Otp { get; set; }
 }
 
 public class ResetPasswordVM
 {
+    [Required]
     [StringLength(100, MinimumLength = 5)]
     [DataType(DataType.Password)]
     [DisplayName("New Password")]
     public string NewPassword { get; set; }
 
+    [Required]
     [StringLength(100, MinimumLength = 5)]
     [Compare("NewPassword")]
     [DataType(DataType.Password)]
@@ -189,7 +193,7 @@ public class TimelineItemVM
 {
     public string Title { get; set; }
     public string Time { get; set; }
-    public string Type { get; set; } // "login", "logout", "add", "delete", "block"
-    public string Icon { get; set; } // Emoji
-    public string CssClass { get; set; } // CSS Class for color
+    public string Type { get; set; }
+    public string Icon { get; set; }
+    public string CssClass { get; set; }
 }

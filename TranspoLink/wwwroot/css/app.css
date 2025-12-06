@@ -31,7 +31,6 @@
     --text-light: #999999;
     --text-white: #e0e0e0;
     --border-color: #333333;
-    /* Darker Gradient */
     --primary-gradient: linear-gradient(135deg, #4b5bb7 0%, #54327a 100%);
     --shadow-soft: 0 4px 15px rgba(0, 0, 0, 0.5);
 }
@@ -56,7 +55,7 @@ body {
 
 header, footer {
     background: var(--bg-header);
-    color: #fff; /* Always white text on dark header */
+    color: #fff;
     padding: 10px 50px;
 }
 
@@ -105,22 +104,36 @@ nav {
         text-decoration: none;
     }
 
-.nav-links a {
-    color: var(--text-main);
-    text-decoration: none;
-    font-weight: 500;
-    padding: 8px 16px;
-    border-radius: 6px;
-    transition: all 0.3s ease;
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 30px;
+    margin: 0;
+    padding: 0;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center; /* Ensure items align vertically */
 }
 
-    .nav-links a:hover {
-        background: var(--bg-header);
-        color: #fff;
+    .nav-links a {
+        color: var(--text-main);
+        text-decoration: none;
+        font-weight: 500;
+        padding: 8px 16px;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+        display: flex; /* Helps center text inside the link */
+        align-items: center;
+        gap: 5px;
     }
 
+        .nav-links a:hover {
+            background: var(--bg-header);
+            color: #fff;
+        }
+
 /* Global Card & Inputs */
-.auth-card, .profile-card, .settings-section, .activity-section, .search-container, .feature, .nav-card, .stat-card, .recent-section {
+.auth-card, .profile-card, .settings-section, .activity-section, .search-container, .feature, .nav-card, .stat-card, .recent-section, .about-container, .about-card {
     background: var(--bg-card) !important;
     color: var(--text-body);
     border: 1px solid var(--border-color);
@@ -132,12 +145,12 @@ input, select, textarea {
     border: 1px solid var(--border-color);
 }
 
-/* Specific Dark Mode Fixes for Profile Page */
-.profile-name {
+/* Specific Dark Mode Fixes */
+.profile-name, .about-header, .about-card-title {
     color: var(--text-main) !important;
 }
 
-.section-title {
+.section-title, .about-intro, .about-card-desc {
     color: var(--text-light) !important;
 }
 
@@ -154,7 +167,7 @@ input, select, textarea {
 
 /* Table Styles */
 .booking-table th {
-    background: var(--bg-body); /* Slightly distinct from card */
+    background: var(--bg-body);
     color: var(--text-main);
     border-bottom: 2px solid var(--border-color);
 }
@@ -200,11 +213,81 @@ input, select, textarea {
 /* Fix Nav Links in Footer */
 footer {
     color: #fff;
-    text-align:center;
+    text-align: center;
 }
 
 /* ============================================================================
-   REST OF ORIGINAL APP.CSS (Utils, Animations, etc.)
+   NEW: NAV BAR DROPDOWN STYLES (Fixed Alignment)
+   ============================================================================ */
+.nav-item-dropdown {
+    position: relative;
+    cursor: pointer;
+}
+
+.nav-dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 180px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    z-index: 1000;
+    margin-top: 5px;
+    flex-direction: column;
+    animation: fadeIn 0.2s ease-out;
+}
+
+    .nav-dropdown-content a {
+        display: flex !important; /* KEY FIX: Uses Flexbox */
+        align-items: center !important; /* KEY FIX: Vertically centers items */
+        gap: 10px; /* Space between icon and text */
+        padding: 12px 16px;
+        color: var(--text-main);
+        text-decoration: none;
+        font-weight: 500;
+        border-bottom: 1px solid var(--border-color);
+        transition: background 0.2s;
+        height: auto;
+        line-height: normal;
+    }
+
+        .nav-dropdown-content a:last-child {
+            border-bottom: none;
+        }
+
+        .nav-dropdown-content a:hover {
+            background: var(--bg-body);
+            color: #667eea;
+        }
+
+        /* Emoji size fix inside dropdown */
+        .nav-dropdown-content a span {
+            font-size: 18px;
+            line-height: 1;
+            display: inline-block;
+        }
+
+.show-nav-dropdown {
+    display: flex !important;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================================================
+   REST OF ORIGINAL APP.CSS 
    ============================================================================ */
 header {
     display: flex;
@@ -247,16 +330,6 @@ header {
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid #fff;
-}
-
-.nav-links {
-    list-style: none;
-    display: flex;
-    gap: 30px;
-    margin: 0;
-    padding: 0;
-    flex-wrap: wrap;
-    justify-content: center;
 }
 
 .hero {
@@ -723,16 +796,4 @@ header {
 .btn-logout:hover {
     background: #ff4757;
     color: white;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
 }

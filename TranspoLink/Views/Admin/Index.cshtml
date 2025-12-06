@@ -4,8 +4,9 @@
     ViewBag.Title += " | Admin Dashboard";
 }
 
-@section head{
-    <link rel="stylesheet" href="/css/admin.css" asp-append-version="true"/>
+@section head {
+    <link rel="stylesheet" href="/css/admin.css" asp-append-version="true" />
+    <script src="/js/admin.js" asp-append-version="true" defer></script>
 }
 <div class="admin-container">
     <div class="admin-header">
@@ -13,7 +14,6 @@
         <p>Welcome back! Here's what's happening with TranspoLink today.</p>
     </div>
 
-    <!-- Statistics Cards -->
     <div class="stats-grid">
         <div class="stat-card">
             <div class="stat-label">👥 Total Members</div>
@@ -41,33 +41,32 @@
         </div>
     </div>
 
-    <!-- Quick Navigation -->
     <div class="admin-nav">
-        <a href="/Admin/Members" class="nav-card">
+
+        <div class="nav-card dropdown-card" id="userMgmtTrigger">
             <div class="nav-card-icon">👥</div>
-            <div class="nav-card-title">Members</div>
-            <div class="nav-card-desc">Manage user accounts</div>
-        </a>
-        <a href="/Admin/Routes" class="nav-card">
-            <div class="nav-card-icon">🗺️</div>
-            <div class="nav-card-title">Routes</div>
-            <div class="nav-card-desc">Manage transportation routes</div>
-        </a>
-        <a href="/Admin/Vehicles" class="nav-card">
+            <div class="nav-card-title">User Management</div>
+            <div class="nav-card-desc">Admins & Members</div>
+
+            <div class="dropdown-menu-content" id="userDropdown">
+                <a href="/Admin/Admins" class="dropdown-item"><span>🛡️</span> Admins</a>
+                <a href="/Admin/Members" class="dropdown-item"><span>👤</span> Members</a>
+            </div>
+        </div>
+
+        <div class="nav-card dropdown-card" id="opsMgmtTrigger">
             <div class="nav-card-icon">🚌</div>
-            <div class="nav-card-title">Vehicles</div>
-            <div class="nav-card-desc">Manage fleet</div>
-        </a>
-        <a href="/Admin/Trips" class="nav-card">
-            <div class="nav-card-icon">🎫</div>
-            <div class="nav-card-title">Trips</div>
-            <div class="nav-card-desc">Manage scheduled trips</div>
-        </a>
-        <a href="/Admin/Bookings" class="nav-card">
-            <div class="nav-card-icon">📋</div>
-            <div class="nav-card-title">Bookings</div>
-            <div class="nav-card-desc">View all bookings</div>
-        </a>
+            <div class="nav-card-title">Transport Ops</div>
+            <div class="nav-card-desc">Routes, Fleet & Trips</div>
+
+            <div class="dropdown-menu-content" id="opsDropdown">
+                <a href="/Admin/Routes" class="dropdown-item"><span>🗺️</span> Routes</a>
+                <a href="/Vehicle/Vehicles" class="dropdown-item"><span>🚌</span> Vehicles</a>
+                <a href="/Admin/Trips" class="dropdown-item"><span>🎫</span> Trips</a>
+                <a href="/Admin/Bookings" class="dropdown-item"><span>📋</span> Bookings</a>
+            </div>
+        </div>
+
         <a href="/Admin/Reports" class="nav-card">
             <div class="nav-card-icon">📊</div>
             <div class="nav-card-title">Reports</div>
@@ -75,7 +74,6 @@
         </a>
     </div>
 
-    <!-- Recent Bookings -->
     <div class="recent-section">
         <h2>📋 Recent Bookings</h2>
         @if (Model.Any())

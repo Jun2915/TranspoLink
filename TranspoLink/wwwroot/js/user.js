@@ -43,24 +43,21 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 // ============================================================================
-// SEARCH CLEAR BUTTON LOGIC (✅ Add this section)
+// SEARCH CLEAR BUTTON LOGIC
 // ============================================================================
 function toggleClearButton() {
     const inputVal = $('#searchInput').val();
     const $btn = $('#clearSearchBtn');
 
     if (inputVal && inputVal.trim() !== '') {
-        $btn.css('display', 'inline-flex'); // Show if text exists
+        $btn.css('display', 'inline-flex');
     } else {
-        $btn.hide(); // Hide if empty
+        $btn.hide();
     }
 }
 
 $(document).ready(function () {
-    // Check on page load (in case there is already a search term)
     toggleClearButton();
-
-    // Check whenever the user types
     $('#searchInput').on('input', function () {
         toggleClearButton();
     });
@@ -126,43 +123,62 @@ $(document).ready(function () {
 });
 
 // ============================================================================
-// PROFILE PAGE LOGIC (EDIT MODE & INLINE BUTTONS)
+// PROFILE PAGE LOGIC (PREVIEW & EDIT)
 // ============================================================================
 
 $(document).ready(function () {
     const $profileForm = $('#profileForm');
 
-    // Only run this logic if we are on the profile page
     if ($profileForm.length) {
         const $btnEdit = $('#btnEditProfile');
         const $editActions = $('#editActions');
         const $inputs = $('.field-input');
-
-        // Updated Selectors for the new structure
         const $photoContainer = $('#photoContainer');
         const $photoInput = $('input[name="Photo"]');
-        const $editOverlay = $('.edit-overlay');
+        const $previewModal = $('#imagePreviewModal');
+        const $previewTarget = $('#previewImgTarget');
 
-        // 1. Handle "Edit User Profile" Click
+        // 1. PHOTO CLICK LOGIC (Dual Mode)
+        $photoContainer.on('click', function (e) {
+            // Check if we are in EDIT mode
+            const isEditMode = !$inputs.first().prop('readonly');
+
+            if (!isEditMode) {
+                // VIEW MODE: Show Preview Modal
+                const currentSrc = $('#profileImagePreview').attr('src');
+                $previewTarget.attr('src', currentSrc);
+                $previewModal.fadeIn(200).css('display', 'flex');
+            }
+            else {
+                // EDIT MODE: Trigger file input (Handled by photo-tools.js usually, but we ensure it works here)
+                // If photo-tools.js handles it, we let it bubble. 
+                // But typically photo-tools checks for .disabled-upload class.
+            }
+        });
+
+        // 2. Handle "Edit User Profile" Click
         $btnEdit.on('click', function () {
             // Enable Inputs
             $inputs.prop('readonly', false);
 
-            // Enable Photo Upload (Logic handled in photo-tools.js via click on container)
+            // Enable Photo Upload
             $photoInput.prop('disabled', false);
 
             // Visual feedback
-            $photoContainer.removeClass('disabled-upload');
-            $photoContainer.css('cursor', 'pointer');
+            $photoContainer.removeClass('disabled-upload'); // Enables click in photo-tools.js
             $photoContainer.css('border-color', '#667eea');
-            $editOverlay.show(); // Show the little pen icon
 
-            // UI Changes: Hide Edit button, Show Save/Cancel Buttons
+            // UI Changes
             $(this).hide();
             $editActions.css('display', 'flex');
+            $('.btn-download-icon').hide(); // Hide download button while editing
 
-            // Focus on the first input
             $inputs.first().focus();
         });
     }
 });
+
+// Close Preview Function (Global scope)
+window.closePreview = function () {
+    $('#imagePreviewModal').fadeOut(200);
+}

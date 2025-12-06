@@ -1,0 +1,201 @@
+﻿@{
+    ViewBag.Title += " | Analytics";
+
+    // Retrieve data from ViewBag
+    var revenueByType = ViewBag.RevenueByType as IEnumerable<dynamic>;
+    var topRoutes = ViewBag.TopRoutes as IEnumerable<dynamic>;
+    var monthlyRevenue = ViewBag.MonthlyRevenue as IEnumerable<dynamic>;
+}
+
+@section head {
+    <link rel="stylesheet" href="/css/admin.css" asp-append-version="true" />
+    <style>
+        .report-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .report-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .report-header {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+            .data-table th, .data-table td {
+                padding: 12px;
+                text-align: left;
+                border-bottom: 1px solid var(--border-color);
+                font-size: 14px;
+            }
+
+            .data-table th {
+                color: var(--text-light);
+                font-weight: 600;
+            }
+
+        .bar-container {
+            display: flex;
+            align-items: flex-end;
+            height: 200px;
+            gap: 10px;
+            padding-top: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .bar {
+            flex: 1;
+            background: #667eea;
+            border-radius: 4px 4px 0 0;
+            position: relative;
+            transition: height 0.5s ease;
+        }
+
+            .bar:hover {
+                background: #764ba2;
+            }
+
+        .bar-label {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        .bar-value {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            font-weight: bold;
+            color: var(--text-main);
+        }
+    </style>
+}
+
+<div class="admin-container">
+    <div class="admin-header">
+        <h1>📊 Analytics & Reports</h1>
+        <p>Overview of revenue, popular routes, and business performance.</p>
+    </div>
+
+    <div class="report-grid">
+
+        <div class="report-card">
+            <div class="report-header">
+                <span>🚌</span> Revenue by Type
+            </div>
+            @if (revenueByType != null && revenueByType.Any())
+            {
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Bookings</th>
+                            <th>Revenue</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in revenueByType)
+                        {
+                            <tr>
+                                <td>@item.Type</td>
+                                <td>@item.Count</td>
+                                <td>RM @item.Revenue.ToString("N2")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p style="color:#999;">No data available.</p>
+            }
+        </div>
+
+        <div class="report-card">
+            <div class="report-header">
+                <span>🔥</span> Top 10 Popular Routes
+            </div>
+            @if (topRoutes != null && topRoutes.Any())
+            {
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Route</th>
+                            <th>Bookings</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in topRoutes)
+                        {
+                            <tr>
+                                <td>@item.Route</td>
+                                <td>@item.BookingCount</td>
+                                <td>RM @item.Revenue.ToString("N2")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p style="color:#999;">No route data available.</p>
+            }
+        </div>
+
+        <div class="report-card" style="grid-column: 1 / -1;">
+            <div class="report-header">
+                <span>📈</span> Monthly Revenue (@DateTime.Now.Year)
+            </div>
+
+            <div class="bar-container">
+                @if (monthlyRevenue != null && monthlyRevenue.Any())
+                {
+                    // Find max value to scale bars
+                    decimal maxRev = 0;
+                    foreach (var m in monthlyRevenue) { if (m.Revenue > maxRev) maxRev = m.Revenue; }
+                    if (maxRev == 0) maxRev = 1; // Prevent division by zero
+
+                    foreach (var item in monthlyRevenue)
+                    {
+                        var height = (item.Revenue / maxRev) * 100;
+                        var monthName = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(item.Month);
+
+                        <div class="bar" style="height: @height%;">
+                            <span class="bar-value">@item.Revenue.ToString("N0")</span>
+                            <span class="bar-label">@monthName</span>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p style="width:100%; text-align:center; color:#999;">No revenue data for this year.</p>
+                }
+            </div>
+        </div>
+
+    </div>
+</div>

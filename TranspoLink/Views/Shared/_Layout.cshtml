@@ -29,22 +29,17 @@
             🌐 Language
         </div>
 
-        @* --- USER DROPDOWN LOGIC START --- *@
         @if (User.Identity.IsAuthenticated)
         {
             var identifier = User.Identity.Name;
             var currentUser = db.Users.FirstOrDefault(u => u.Email == identifier || u.Phone == identifier);
 
-            // ==============================================
-            // 🚫 FORCE LOGOUT IF BLOCKED OR DELETED 🚫
-            // ==============================================
             if (currentUser == null || currentUser.IsBlocked)
             {
                 Context.SignOutAsync("Cookies");
                 Context.Response.Redirect("/Account/Login");
-                return; // Stop rendering
+                return;
             }
-            // ==============================================
 
             string photoUrl = "/images/default_photo.png";
             if (currentUser is Member m && !string.IsNullOrEmpty(m.PhotoURL))
@@ -96,12 +91,30 @@
             @if (User.IsInRole("Admin"))
             {
                 <li><a href="/Admin">Dashboard</a></li>
-                <li><a href="/Admin/Admins">Admins</a></li>
-                <li><a href="/Admin/Members">Members</a></li>
-                <li><a href="/Admin/Routes">Routes</a></li>
-                <li><a href="/Vehicle/Vehicles">Vehicles</a></li>
-                <li><a href="/Admin/Trips">Trips</a></li>
-                <li><a href="/Admin/Bookings">Bookings</a></li>
+
+                <li class="nav-item-dropdown" onclick="toggleNavDropdown(event, 'navUserContent')">
+                    <a href="javascript:void(0)" style="display:flex; align-items:center; gap:5px;">
+                        User Management <span style="font-size:10px;">▼</span>
+                    </a>
+                    <div class="nav-dropdown-content" id="navUserContent">
+                        <a href="/Admin/Admins">🛡️ Admins</a>
+                        <a href="/Admin/Members">👥 Members</a>
+                    </div>
+                </li>
+
+                <li class="nav-item-dropdown" onclick="toggleNavDropdown(event, 'navOpsContent')">
+                    <a href="javascript:void(0)" style="display:flex; align-items:center; gap:5px;">
+                        Operations <span style="font-size:10px;">▼</span>
+                    </a>
+                    <div class="nav-dropdown-content" id="navOpsContent">
+                        <a href="/Admin/Routes">🗺️ Routes</a>
+                        <a href="/Vehicle/Vehicles">🚌 Vehicles</a>
+                        <a href="/Admin/Trips">🎫 Trips</a>
+                        <a href="/Admin/Bookings">📋 Bookings</a>
+                    </div>
+                </li>
+
+                <li><a href="/Home/Reports">📊 Reports</a></li>
             }
             else if (User.IsInRole("Member"))
             {
@@ -115,6 +128,7 @@
                 <li><a href="/#features">Features</a></li>
                 <li><a href="/#trending">News & Offers</a></li>
                 <li><a href="/#contact">Contact</a></li>
+                <li><a href="/Home/AboutUs">About Us</a></li>
             }
         </ul>
     </nav>
@@ -124,8 +138,7 @@
     </main>
 
     <footer>
-        Developed by <b>BMIT 2023 Web And Mobile System</b> &middot;
-        Copyrighted &copy; @DateTime.Today.Year
+        Developed by <b>BMIT 2023 Web And Mobile System</b> &middot; Copyrighted &copy; @DateTime.Today.Year
     </footer>
 
     <script src="/js/jquery.min.js"></script>
@@ -136,6 +149,21 @@
     <script src="/js/user.js" asp-append-version="true"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <script src="/js/photo-tools.js" asp-append-version="true"></script>
+
+    <script>
+        function toggleNavDropdown(e, id) {
+            e.stopPropagation();
+            // Close all others
+            $('.nav-dropdown-content').not('#' + id).removeClass('show-nav-dropdown');
+            // Toggle current
+            $('#' + id).toggleClass('show-nav-dropdown');
+        }
+
+        // Close when clicking outside (Global)
+        $(document).on('click', function () {
+            $('.nav-dropdown-content').removeClass('show-nav-dropdown');
+        });
+    </script>
 
     @RenderSection("foot", false)
 </body>

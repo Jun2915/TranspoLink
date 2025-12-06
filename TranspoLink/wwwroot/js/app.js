@@ -92,7 +92,7 @@ $(document).ready(function () {
     if (savedTheme === 'dark') {
         htmlElement.setAttribute('data-theme', 'dark');
         themeIcon.text('🌙');
-        themeText.text('Night'); 
+        themeText.text('Night');
     } else {
         htmlElement.removeAttribute('data-theme');
         themeIcon.text('☀️');
@@ -110,7 +110,7 @@ $(document).ready(function () {
             // Switch to Dark
             htmlElement.setAttribute('data-theme', 'dark');
             themeIcon.text('🌙');
-            themeText.text('Night'); 
+            themeText.text('Night');
             localStorage.setItem('theme', 'dark');
         }
     });
@@ -129,6 +129,20 @@ $(document).ready(function () {
     $(document).on('click', function (e) {
         if (!$(e.target).closest('.profile-dropdown').length && !$(e.target).closest('#profileTrigger').length) {
             $('#profileDropdown').hide();
+        }
+    });
+
+    // ============================================================================
+    // NEW: NAV BAR USER MANAGEMENT DROPDOWN LOGIC
+    // ============================================================================
+    $('#navUserTrigger').on('click', function (e) {
+        e.stopPropagation();
+        $('#navUserContent').toggleClass('show-nav-dropdown');
+    });
+
+    $(document).on('click', function (e) {
+        if (!$(e.target).closest('#navUserTrigger').length) {
+            $('#navUserContent').removeClass('show-nav-dropdown');
         }
     });
 

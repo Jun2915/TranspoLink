@@ -13,4 +13,16 @@ public class HomeController(DB db) : Controller
     {
         return View();
     }
+
+    // GET: Home/AboutUs
+    public IActionResult AboutUs()
+    {
+        return View();
+    }
+
+    //GET: Home/Reports
+    public IActionResult Reports()
+    {
+        return View();
+    }
 }

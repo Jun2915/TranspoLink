@@ -98,6 +98,7 @@
     box-shadow: var(--shadow-soft);
     transition: all 0.3s ease;
     border: 1px solid var(--border-color);
+    position: relative; /* Needed for dropdown positioning */
 }
 
     .nav-card:hover {
@@ -122,6 +123,67 @@
 .nav-card-desc {
     font-size: 14px;
     color: var(--text-light);
+}
+
+/* --- DROPDOWN CARD STYLES (NEW) --- */
+.dropdown-card {
+    cursor: pointer;
+    overflow: visible !important; /* Allow menu to show outside */
+}
+
+.dropdown-menu-content {
+    display: none; /* Hidden by default */
+    position: absolute;
+    top: 100%; /* Shows right below the card */
+    left: 0;
+    width: 100%;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    z-index: 999;
+    margin-top: 10px;
+    overflow: hidden;
+    animation: fadeInDrop 0.2s ease-out;
+}
+
+    .dropdown-menu-content.show {
+        display: block;
+    }
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px;
+    text-decoration: none;
+    color: var(--text-main);
+    font-weight: 600;
+    border-bottom: 1px solid var(--border-color);
+    transition: background 0.2s;
+    text-align: left;
+}
+
+    .dropdown-item:last-child {
+        border-bottom: none;
+    }
+
+    .dropdown-item:hover {
+        background: var(--bg-body);
+        color: #667eea;
+        padding-left: 20px; /* Slight nudge effect */
+    }
+
+@keyframes fadeInDrop {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* --- RECENT BOOKINGS SECTION --- */

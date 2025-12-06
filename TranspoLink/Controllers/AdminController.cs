@@ -425,9 +425,12 @@ public class AdminController(DB db, Helper hp) : Controller
             return RedirectToAction("Members");
         }
 
-        if (member.PhotoURL != null && member.PhotoURL != "/images/add_photo.png")
+        if (member.PhotoURL != null &&
+            member.PhotoURL != "default_photo.png" &&
+            member.PhotoURL != "add_photo.png" &&
+            !member.PhotoURL.StartsWith("/images/"))
         {
-            hp.DeletePhoto(member.PhotoURL, "photos");
+            hp.DeletePhoto(member.PhotoURL, "images");
         }
 
         db.Members.Remove(member);
