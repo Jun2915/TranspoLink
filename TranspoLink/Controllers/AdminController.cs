@@ -237,7 +237,7 @@ public class AdminController(DB db, Helper hp) : Controller
     }
 
     // GET: Admin/EditAdmin/A001
-    public IActionResult EditAdmin(string id)
+    public IActionResult ModifyAdmin(string id)
     {
         var currentUser = db.Users.FirstOrDefault(u => u.Email == User.Identity.Name || u.Phone == User.Identity.Name);
         if (currentUser?.Id != "A001")
@@ -264,7 +264,7 @@ public class AdminController(DB db, Helper hp) : Controller
 
     // POST: Admin/EditAdmin
     [HttpPost]
-    public IActionResult EditAdmin(AdminVM vm)
+    public IActionResult ModifyAdmin(AdminVM vm)
     {
         var currentUser = db.Users.FirstOrDefault(u => u.Email == User.Identity.Name || u.Phone == User.Identity.Name);
         if (currentUser?.Id != "A001") return RedirectToAction("Admins");

@@ -39,9 +39,11 @@
                     </td>
                     <td class="action-links">
                         <a href="/Admin/MemberDetails/@m.Id" class="btn-view">Details</a>
-                        <form method="post" action="/Admin/DeleteMember/@m.Id" onsubmit="return confirm('Delete @m.Name?');">
-                            <button class="btn-delete">Delete</button>
-                        </form>
+
+                        <button class="btn-delete" type="button"
+                                onclick="openConfirmModal('/Admin/DeleteMember/@m.Id', '@m.Name')">
+                            Delete
+                        </button>
                     </td>
                 </tr>
             }

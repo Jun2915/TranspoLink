@@ -5,76 +5,121 @@
 }
 
 @section head {
-    <link rel="stylesheet" href="/css/admin.css" />
-    <link rel="stylesheet" href="/css/member.css" />
+    <link rel="stylesheet" href="/css/admin.css" asp-append-version="true" />
+    <link rel="stylesheet" href="/css/member.css" asp-append-version="true" />
+    <link rel="stylesheet" href="/css/photo-tools.css" asp-append-version="true" />
+    <link rel="stylesheet" href="/css/vehicle.css" asp-append-version="true" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <script src="/js/photo-tools.js" asp-append-version="true" defer></script>
+    <script src="/js/admin.js" asp-append-version="true" defer></script>
 }
 
-<div class="admin-container">
-    <div style="margin-bottom: 20px;">
-        <a href="/Admin/Admins" class="btn-back">← Back to Admins</a>
-    </div>
+<div class="admin-edit-bg">
 
-    <div class="profile-card" style="max-width: 600px; margin: 0 auto; text-align: left;">
-        <div style="text-align: center; margin-bottom: 20px;">
-            <img src="@(Model.ExistingPhotoURL != null && Model.ExistingPhotoURL.StartsWith("/images/") ? Model.ExistingPhotoURL : "/images/" + Model.ExistingPhotoURL)"
-                 style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;"
-                 onerror="this.src='/images/beauty_admin.png'">
-            <h2>Edit Admin: @Model.Name</h2>
-            <p class="profile-id">ID: @Model.Id</p>
+    <div class="admin-glass-card landscape-mode">
+
+        <div class="edit-card-top">
+            <a href="/Admin/Admins" class="btn-back-link">← Back to Admins</a>
         </div>
 
-        <form method="post" enctype="multipart/form-data">
+        <form method="post" enctype="multipart/form-data" class="edit-admin-form">
             <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="ExistingPhotoURL" />
+
+            <input asp-for="Photo" type="file" accept="image/jpeg,image/png" hidden>
+
             <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
 
-            <div class="field-row">
-                <div class="field-info" style="width: 100%;">
-                    <label asp-for="Name">Name</label>
-                    <input asp-for="Name" class="field-input">
-                    <span asp-validation-for="Name" class="field-validation-error"></span>
-                </div>
-            </div>
+            <div class="edit-layout-grid">
 
-            <div class="field-row">
-                <div class="field-info" style="width: 100%;">
-                    <label asp-for="Email">Email</label>
-                    <input asp-for="Email" class="field-input">
-                    <span asp-validation-for="Email" class="field-validation-error"></span>
-                </div>
-            </div>
+                <div class="edit-col-left">
+                    <div id="photoContainer" class="edit-photo-container large" title="Click to change photo">
+                        <img src="@(Model.ExistingPhotoURL != null && Model.ExistingPhotoURL.StartsWith("/images/") ? Model.ExistingPhotoURL : "/images/" + Model.ExistingPhotoURL)"
+                             id="adminPhotoPreview"
+                             class="edit-profile-img"
+                             alt="Profile Photo"
+                             onerror="this.src='/images/beauty_admin.png'">
 
-            <div class="field-row">
-                <div class="field-info" style="width: 100%;">
-                    <label asp-for="Phone">Phone</label>
-                    <input asp-for="Phone" class="field-input">
-                    <span asp-validation-for="Phone" class="field-validation-error"></span>
-                </div>
-            </div>
+                        <div class="edit-photo-overlay">
+                            <svg width="30" height="30" viewBox="0 0 24 24" fill="white">
+                                <path d="M4,4H7L9,2H15L17,4H20A2,2 0 0,1 22,6V18A2,2 0 0,1 20,20H4A2,2 0 0,1 2,18V6A2,2 0 0,1 4,4M12,7A5,5 0 1,0 17,12A5,5 0 0,0 12,7M12,9A3,3 0 1,1 9,12A3,3 0 0,1 12,9Z" />
+                            </svg>
+                            <span style="margin-top:5px; font-size:12px;">Change</span>
+                        </div>
+                    </div>
 
-            <div class="field-row">
-                <div class="field-info" style="width: 100%;">
-                    <label>Change Photo</label>
-                    <input asp-for="Photo" type="file" accept="image/jpeg,image/png" class="field-input" style="border: none; padding-left: 0;">
-                    <span asp-validation-for="Photo" class="field-validation-error"></span>
+                    <div class="id-badge">
+                        Admin ID: <b>@Model.Id</b>
+                    </div>
                 </div>
-            </div>
 
-            <div class="field-row">
-                <div class="field-info" style="width: 100%;">
-                    <label asp-for="Password">Reset Password (Leave blank to keep current)</label>
-                    <input asp-for="Password" class="field-input" placeholder="New Password">
-                    <span asp-validation-for="Password" class="field-validation-error"></span>
+                <div class="edit-col-right">
+
+                    <h2 class="edit-title-landscape">Edit Profile: @Model.Name</h2>
+                    <hr class="edit-divider">
+
+                    <div class="form-grid-layout">
+
+                        <div class="form-item">
+                            <label asp-for="Name" class="form-label">Full Name</label>
+                            <div class="admin-input-group">
+                                <span class="input-icon">👤</span>
+                                <input asp-for="Name" placeholder="Enter full name">
+                            </div>
+                            <span asp-validation-for="Name" class="field-validation-error"></span>
+                        </div>
+
+                        <div class="form-item">
+                            <label asp-for="Email" class="form-label">Email Address</label>
+                            <div class="admin-input-group">
+                                <span class="input-icon">📧</span>
+                                <input asp-for="Email" placeholder="Enter email address">
+                            </div>
+                            <span asp-validation-for="Email" class="field-validation-error"></span>
+                        </div>
+
+                        <div class="form-item">
+                            <label asp-for="Phone" class="form-label">Phone Number</label>
+                            <div class="admin-input-group">
+                                <span class="input-icon">📞</span>
+                                <input asp-for="Phone" placeholder="e.g. 012-3456789">
+                            </div>
+                            <span asp-validation-for="Phone" class="field-validation-error"></span>
+                        </div>
+
+                        <div class="form-item">
+                            <label asp-for="Password" class="form-label">Reset Password <span class="sub-label">(Optional)</span></label>
+                            <div class="admin-input-group">
+                                <span class="input-icon">🔒</span>
+                                <input asp-for="Password" type="password" placeholder="New Password">
+                                <button type="button" class="toggle-password-btn">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="#999"><path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z" /></svg>
+                                </button>
+                            </div>
+                            <span asp-validation-for="Password" class="field-validation-error"></span>
+                        </div>
+
+                    </div>
+
+                    <div class="form-item" style="margin-top: 15px;">
+                        <div class="block-toggle-card">
+                            <div class="toggle-info">
+                                <span class="toggle-title">Block Access</span>
+                                <span class="toggle-desc">Prevent this admin from logging in to the system.</span>
+                            </div>
+                            <label class="switch">
+                                <input asp-for="IsBlocked" type="checkbox">
+                                <span class="slider round slider-red"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-save-changes">
+                        💾 Save Changes
+                    </button>
                 </div>
-            </div>
 
-            <div class="field-row">
-                <div class="field-info" style="display: flex; align-items: center; gap: 10px;">
-                    <label asp-for="IsBlocked" style="margin: 0;">Block Account?</label>
-                    <input asp-for="IsBlocked" type="checkbox" style="width: auto;">
-                </div>
             </div>
-
-            <button type="submit" class="btn-view" style="width: 100%; margin-top: 20px; font-size: 16px;">Save Changes</button>
         </form>
     </div>
 </div>
