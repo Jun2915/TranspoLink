@@ -100,6 +100,40 @@ public class Helper(IWebHostEnvironment en,
         return file;
     }
 
+    public string SavePhotoFromUrl(string url, string folder)
+    {
+        try
+        {
+            using var client = new HttpClient();
+            var response = client.GetAsync(url).Result;
+
+            if (response.IsSuccessStatusCode)
+            {
+                var file = Guid.NewGuid().ToString("n") + ".jpg";
+                var path = Path.Combine(en.WebRootPath, folder, file);
+
+                using var stream = response.Content.ReadAsStreamAsync().Result;
+                using var img = Image.Load(stream);
+
+                // Resize to match your system standard
+                img.Mutate(x => x.Resize(new ResizeOptions
+                {
+                    Size = new Size(200, 200),
+                    Mode = ResizeMode.Crop
+                }));
+
+                img.Save(path);
+                return file;
+            }
+        }
+        catch
+        {
+            // If download fails, return default
+            return "default_photo.png";
+        }
+        return "default_photo.png";
+    }
+
     public void DeletePhoto(string file, string folder)
     {
         file = Path.GetFileName(file);

@@ -1,5 +1,6 @@
-﻿global using TranspoLink.Models;
-global using TranspoLink;
+﻿global using TranspoLink;
+global using TranspoLink.Models;
+using Microsoft.AspNetCore.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,8 +24,28 @@ builder.Services.AddAuthentication("Cookies").AddCookie("Cookies", options =>
     options.AccessDeniedPath = "/Account/AccessDenied";
     options.ExpireTimeSpan = TimeSpan.FromDays(7);
     options.SlidingExpiration = true;
-});
-
+})
+    .AddGoogle(options =>
+    {
+        options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+        options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+        options.CallbackPath = "/signin-google";
+        options.ClaimActions.MapJsonKey("urn:google:picture", "picture", "url");
+        options.Events = new Microsoft.AspNetCore.Authentication.OAuth.OAuthEvents
+        {
+            OnRedirectToAuthorizationEndpoint = context =>
+            {
+                context.Response.Redirect(context.RedirectUri + "&prompt=select_account");
+                return Task.CompletedTask;
+            },
+            OnRemoteFailure = context =>
+            {
+                context.Response.Redirect("/Account/GoogleLogin");
+                context.HandleResponse();
+                return Task.CompletedTask;
+            }
+        };
+    });
 builder.Services.AddAuthorization();
 
 //Session & Http Context

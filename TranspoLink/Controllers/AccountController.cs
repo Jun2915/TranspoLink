@@ -1,6 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Mail;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Security.Claims;
 
 namespace TranspoLink.Controllers;
 
@@ -126,6 +130,102 @@ public class AccountController(DB db,
         }
 
         return View(vm);
+    }
+
+    public IActionResult GoogleLogin()
+    {
+        var properties = new AuthenticationProperties { RedirectUri = Url.Action("GoogleResponse") };
+        return Challenge(properties, GoogleDefaults.AuthenticationScheme);
+    }
+
+    public async Task<IActionResult> GoogleResponse()
+    {
+        var result = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
+
+        if (!result.Succeeded)
+        {
+            TempData["Info"] = "Google Login Failed.";
+            return RedirectToAction("Login");
+        }
+
+        // Retrieve Claims
+        var claims = result.Principal.Identities.FirstOrDefault()?.Claims;
+        var email = claims?.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+        var name = claims?.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+
+        // 👇 UPDATED: Get the photo using the key we defined in Program.cs
+        var photoUrl = claims?.FirstOrDefault(c => c.Type == "urn:google:picture")?.Value;
+
+        if (string.IsNullOrEmpty(email))
+        {
+            TempData["Info"] = "Could not retrieve email from Google.";
+            return RedirectToAction("Login");
+        }
+
+        // Check if user exists
+        var u = db.Users.FirstOrDefault(x => x.Email == email);
+
+        if (u == null)
+        {
+            // --- NEW USER REGISTRATION ---
+            string nextId = hp.GetNextId(db, "Member");
+
+            // Download photo
+            string localPhoto = "default_photo.png";
+            if (!string.IsNullOrEmpty(photoUrl))
+            {
+                localPhoto = hp.SavePhotoFromUrl(photoUrl, "images");
+            }
+
+            var newMember = new Member
+            {
+                Id = nextId,
+                Email = email,
+                Name = name ?? "Google User",
+                Hash = hp.HashPassword(hp.RandomPassword()),
+                PhotoURL = localPhoto,
+                IsBlocked = false
+            };
+
+            db.Members.Add(newMember);
+            db.SaveChanges();
+            u = newMember;
+        }
+        else
+        {
+            // --- EXISTING USER UPDATE (Fix for your issue) ---
+            // If the user exists but has the default photo, try to update it from Google
+            if ((string.IsNullOrEmpty(u.Role) || u.Role == "Member") && // Only update Members
+                (string.IsNullOrEmpty(u.Name) || u.Name == "Google User" || u is Member m && m.PhotoURL == "default_photo.png"))
+            {
+                if (!string.IsNullOrEmpty(photoUrl))
+                {
+                    // Cast to Member to access PhotoURL
+                    if (u is Member member)
+                    {
+                        member.PhotoURL = hp.SavePhotoFromUrl(photoUrl, "images");
+                        // Optional: Update name if it was generic
+                        if (member.Name == "Google User" && !string.IsNullOrEmpty(name)) member.Name = name;
+
+                        db.SaveChanges();
+                    }
+                }
+            }
+        }
+
+        // Check Block Status
+        if (u.IsBlocked)
+        {
+            TempData["Info"] = "Your account is blocked. Please contact admin.";
+            return RedirectToAction("Login");
+        }
+
+        // Login the user
+        string identifier = u.Email ?? u.Id;
+        hp.SignIn(identifier, u.Role, true);
+        TempData["Info"] = $"Welcome back, {u.Name}!";
+
+        return RedirectToAction("Index", "Home");
     }
 
     public IActionResult Logout(string? returnURL)
