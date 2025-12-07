@@ -87,13 +87,13 @@ body {
     display: flex;
     align-items: center;
     gap: 5px;
-    padding: 6px 12px; /* Touch target */
+    padding: 6px 12px;
     border-radius: 6px;
 }
 
     .top-bar-item:hover {
         background-color: rgba(255, 255, 255, 0.15);
-        color: #ffd700; /* Subtle gold on hover */
+        color: #ffd700;
     }
 
     .top-bar-item a {
@@ -196,7 +196,7 @@ footer {
 }
 
 /* Global Card & Inputs */
-.auth-card, .profile-card, .settings-section, .activity-section, .search-container, .feature, .nav-card, .stat-card, .recent-section, .about-container, .about-card {
+.auth-card, .profile-card, .settings-section, .activity-section, .feature, .nav-card, .stat-card, .recent-section, .about-container, .about-card {
     background: var(--bg-card);
     color: var(--text-body);
     border: 1px solid var(--border-color);
@@ -376,161 +376,244 @@ input, select, textarea {
     color: #991b1b;
 }
 
-/* Home Page Specifics */
-.hero {
-    background: var(--primary-gradient);
-    color: #fff;
-    padding: 60px 50px;
+/* ============================================================================
+   NEW HOME PAGE STYLES (SINGLE ROW LAYOUT)
+   ============================================================================ */
+
+.hero-section {
+    background-image: url('/images/bustrip_background.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    padding: 80px 20px 120px;
     text-align: center;
-}
-
-    .hero h1 {
-        font-size: 42px;
-        margin: 0 0 40px 0;
-        font-weight: 700;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-    }
-
-.tabs {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin-bottom: 40px;
-    flex-wrap: wrap;
-}
-
-.tab {
-    background: rgba(255,255,255,0.2);
-    border: 2px solid transparent;
-    color: #fff;
-    padding: 12px 30px;
-    border-radius: 30px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
-}
-
-    .tab:hover {
-        background: rgba(255,255,255,0.3);
-        transform: translateY(-2px);
-    }
-
-    .tab.active {
-        background: #fff;
-        color: #667eea;
-        border-color: #fff;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    }
-
-.search-container {
-    border-radius: 15px;
-    padding: 35px;
-    max-width: 900px;
-    margin: 0 auto 20px auto;
-    box-shadow: var(--shadow-soft);
-}
-
-.search-form {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.origin-destination {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    gap: 15px;
-    align-items: end;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-    .form-group label {
-        color: var(--text-main);
-        font-weight: 600;
-        font-size: 14px;
-    }
-
-.input-wrapper {
+    color: white;
     position: relative;
-    display: flex;
-    align-items: center;
+    z-index: 1;
+    transition: background-image 0.5s ease-in-out;
+}
+    .hero-section::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(1px);
+        z-index: -1;
+    }
+
+.hero-title {
+    font-size: 38px;
+    font-weight: 800;
+    margin-bottom: 10px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
 }
 
-    .input-wrapper .icon {
-        position: absolute;
-        left: 12px;
-        width: 20px;
-        height: 20px;
-        pointer-events: none;
+.hero-subtitle {
+    font-size: 18px;
+    margin-bottom: 40px;
+    opacity: 0.9;
+}
+
+/* --- 1. Transport Tabs (Floating Dark Style) --- */
+.transport-tabs {
+    display: inline-flex;
+    background: rgba(30, 41, 59, 0.9);
+    border-radius: 30px;
+    padding: 5px;
+    gap: 5px;
+    margin-bottom: -20px; /* Overlap the search bar */
+    position: relative;
+    z-index: 10;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.transport-tab {
+    background: transparent;
+    border: none;
+    color: #cbd5e1; /* Light grey */
+    padding: 10px 25px;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+    .transport-tab:hover {
+        color: white;
     }
 
-    .input-wrapper input {
-        width: 100%;
-        padding: 14px 14px 14px 40px;
-        border-radius: 8px;
+    /* Active Yellow State */
+    .transport-tab.active {
+        background: #f59e0b;
+        color: #0f1b3d;
+        box-shadow: 0 2px 10px rgba(245, 158, 11, 0.4);
+    }
+
+/* --- 2. Single Row Search Bar --- */
+.search-bar-container {
+    background: white;
+    padding: 10px;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    max-width: 1100px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 5;
+    border: 1px solid var(--border-color);
+}
+
+.search-form-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+}
+
+/* Input Segments */
+.input-group-row {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    border-right: 1px solid #e2e8f0;
+    position: relative;
+    min-width: 150px;
+}
+
+    .input-group-row.first {
+        padding-left: 20px;
+    }
+
+    .input-group-row:last-of-type {
+        border-right: none;
+    }
+
+[data-theme="dark"] .input-group-row {
+    border-color: #333;
+}
+
+.input-icon {
+    font-size: 20px;
+    color: #64748b;
+    margin-right: 12px;
+}
+
+.input-text-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+}
+
+    .input-text-wrapper label {
+        font-size: 11px;
+        text-transform: uppercase;
+        color: #94a3b8;
+        font-weight: 700;
+        margin-bottom: 2px;
+        letter-spacing: 0.5px;
+    }
+
+    .input-text-wrapper input {
+        border: none;
+        background: transparent;
+        padding: 0;
         font-size: 15px;
-        transition: all 0.3s ease;
-        box-sizing: border-box;
+        font-weight: 600;
+        color: var(--text-main);
+        width: 100%;
+        outline: none;
+        box-shadow: none; /* Remove default shadow */
     }
 
-        .input-wrapper input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        .input-text-wrapper input::placeholder {
+            color: #cbd5e1;
+            font-weight: 400;
         }
 
-.swap-btn {
-    background: var(--bg-body);
-    border: 2px solid var(--border-color);
+/* --- 3. Swap Button (Centered on border) --- */
+.btn-swap {
+    width: 35px;
+    height: 35px;
     border-radius: 50%;
-    width: 45px;
-    height: 45px;
+    border: 1px solid #e2e8f0;
+    background: var(--bg-card);
+    color: #f59e0b;
+    font-size: 18px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    margin: 0 -18px; /* Negative margin to float on border */
+    z-index: 20;
     transition: all 0.3s ease;
-    margin-bottom: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
-    .swap-btn:hover {
-        background: #667eea;
-        border-color: #667eea;
+    .btn-swap:hover {
+        background: #f59e0b;
+        color: white;
         transform: rotate(180deg);
+        border-color: #f59e0b;
     }
 
-        .swap-btn:hover svg {
-            fill: #fff;
-        }
-
-.search-btn {
-    background: var(--primary-gradient);
-    color: #fff;
+/* --- 4. Search Submit Button --- */
+.btn-search-trip {
+    background: #f59e0b;
+    color: #0f1b3d;
     border: none;
-    padding: 16px 40px;
+    padding: 15px 30px;
     border-radius: 8px;
-    font-size: 18px;
-    font-weight: 600;
+    font-weight: 700;
+    font-size: 16px;
     cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(102,126,234,0.3);
+    margin-left: 10px;
+    transition: all 0.2s;
+    white-space: nowrap;
+    box-shadow: 0 4px 10px rgba(245, 158, 11, 0.2);
 }
 
-    .search-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(102,126,234,0.4);
+    .btn-search-trip:hover {
+        background: #d97706;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 15px rgba(245, 158, 11, 0.4);
     }
 
+/* --- 5. Flatpickr Styling Overrides --- */
+.flatpickr-calendar {
+    border-radius: 12px !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+    border: none !important;
+    font-family: 'Roboto', sans-serif !important;
+}
+
+.flatpickr-day.selected,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange,
+.flatpickr-day.selected.inRange,
+.flatpickr-day.startRange.inRange,
+.flatpickr-day.endRange.inRange,
+.flatpickr-day.selected:focus,
+.flatpickr-day.startRange:focus,
+.flatpickr-day.endRange:focus,
+.flatpickr-day.selected:hover,
+.flatpickr-day.startRange:hover,
+.flatpickr-day.endRange:hover {
+    background: #f59e0b !important;
+    border-color: #f59e0b !important;
+    color: #0f1b3d !important;
+    font-weight: bold;
+}
+
+/* ============================================================================
+   FEATURES & TRENDING (Retained)
+   ============================================================================ */
 .features {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -561,6 +644,7 @@ input, select, textarea {
     justify-content: center;
     margin: 0 auto 20px;
     box-shadow: 0 4px 15px rgba(102,126,234,0.3);
+    font-size: 32px; /* Adjusted for text icons if used */
 }
 
 .feature h3 {
@@ -622,6 +706,7 @@ input, select, textarea {
         box-shadow: 0 8px 25px rgba(0,0,0,0.15);
     }
 
+/* Pagination & Badges */
 .pagination a, .pagination span {
     background: #667eea !important;
     color: #fff !important;
@@ -724,20 +809,44 @@ input, select, textarea {
     box-shadow: 0 2px 8px rgba(102,126,234,0.3);
 }
 
+/* RESPONSIVE LAYOUT */
+@media (max-width: 900px) {
+    .search-form-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .input-group-row {
+        border-right: none;
+        border-bottom: 1px solid #e2e8f0;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .btn-swap {
+        margin: -15px auto;
+        transform: rotate(90deg);
+    }
+
+        .btn-swap:hover {
+            transform: rotate(270deg);
+        }
+
+    .btn-search-trip {
+        width: 100%;
+        margin-left: 0;
+        margin-top: 10px;
+    }
+
+    .hero-section {
+        padding-bottom: 60px;
+    }
+}
+
 @media (max-width: 768px) {
-    .top-bar, nav, .hero, .features, .trending {
+    .top-bar, nav, .hero-section, .features, .trending {
         padding-left: 20px;
         padding-right: 20px;
-    }
-
-    .origin-destination {
-        grid-template-columns: 1fr;
-        gap: 15px;
-    }
-
-    .swap-btn {
-        transform: rotate(90deg);
-        margin: 0 auto;
     }
 
     .features, .trending-items {

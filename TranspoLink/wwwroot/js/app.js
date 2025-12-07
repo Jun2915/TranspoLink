@@ -1,4 +1,8 @@
-﻿// Initiate GET request (AJAX-supported)
+﻿// ============================================================================
+// 1. GLOBAL HELPERS (AJAX, INPUTS, CHECKBOXES, FILE PREVIEW)
+// ============================================================================
+
+// Initiate GET request (AJAX-supported)
 $(document).on('click', '[data-get]', e => {
     e.preventDefault();
     const url = e.target.dataset.get;
@@ -75,13 +79,14 @@ $('.upload input').on('change', e => {
 });
 
 // ============================================================================
-// MAIN FUNCTIONALITY
+// 2. MAIN FUNCTIONALITY (DOM READY)
 // ============================================================================
 
 $(document).ready(function () {
-    // ============================================================================
-    // 🌙 THEME TOGGLE LOGIC (Added here!)
-    // ============================================================================
+
+    // ------------------------------------------------------------------------
+    // A. THEME TOGGLE LOGIC
+    // ------------------------------------------------------------------------
     const themeToggle = $('#themeToggle');
     const themeIcon = $('#themeIcon');
     const themeText = $('#themeText');
@@ -115,9 +120,9 @@ $(document).ready(function () {
         }
     });
 
-    // ============================================================================
-    // PROFILE DROPDOWN LOGIC
-    // ============================================================================
+    // ------------------------------------------------------------------------
+    // B. DROPDOWN MENUS (Profile & Nav)
+    // ------------------------------------------------------------------------
 
     // Toggle dropdown when clicking the name/photo
     $('#profileTrigger').on('click', function (e) {
@@ -125,56 +130,69 @@ $(document).ready(function () {
         $('#profileDropdown').toggle(); // Shows or Hides
     });
 
-    // Close dropdown when clicking ANYWHERE else on the page
-    $(document).on('click', function (e) {
-        if (!$(e.target).closest('.profile-dropdown').length && !$(e.target).closest('#profileTrigger').length) {
-            $('#profileDropdown').hide();
-        }
-    });
-
-    // ============================================================================
-    // NEW: NAV BAR USER MANAGEMENT DROPDOWN LOGIC
-    // ============================================================================
+    // Nav User Management Dropdown
     $('#navUserTrigger').on('click', function (e) {
         e.stopPropagation();
         $('#navUserContent').toggleClass('show-nav-dropdown');
     });
 
+    // Close dropdowns when clicking ANYWHERE else on the page
     $(document).on('click', function (e) {
+        if (!$(e.target).closest('.profile-dropdown').length && !$(e.target).closest('#profileTrigger').length) {
+            $('#profileDropdown').hide();
+        }
         if (!$(e.target).closest('#navUserTrigger').length) {
             $('#navUserContent').removeClass('show-nav-dropdown');
         }
     });
 
-    // ============================================================================
-    // HOME PAGE FUNCTIONALITY
-    // ============================================================================
+    // ------------------------------------------------------------------------
+    // C. HOME PAGE: SEARCH WIDGET & BACKGROUND LOGIC (NEW)
+    // ------------------------------------------------------------------------
 
-    // Tab switching functionality for transport types
-    $('.tab').on('click', function () {
-        $('.tab').removeClass('active');
+    // 1. Define Background Images for Tabs
+    const heroImages = {
+        'Bus': '/images/bustrip_background.png',
+        'Train': '/images/traintrip_background.png',
+        'Ferry': '/images/ferrytrip_background.png'
+    };
+
+    // Preload images to prevent flickering
+    for (const key in heroImages) {
+        new Image().src = heroImages[key];
+    }
+
+    // 2. Transport Tab Switching
+    $('.transport-tab').on('click', function () {
+        // Handle Active Classes
+        $('.transport-tab').removeClass('active');
         $(this).addClass('active');
 
-        // Optional: You can add different behavior based on transport type
-        const transportType = $(this).data('transport');
-        console.log('Selected transport:', transportType);
+        // Get Transport Type
+        const type = $(this).data('transport');
+        console.log('Selected transport:', type);
 
-        // Add visual feedback
+        // Swap Background Image Dynamically
+        if (heroImages[type]) {
+            $('.hero-section').css('background-image', `url('${heroImages[type]}')`);
+        }
+
+        // Add visual ripple/scale feedback
         $(this).css('transform', 'scale(0.95)');
         setTimeout(() => {
             $(this).css('transform', '');
         }, 100);
     });
 
-    // Swap origin and destination
-    $('.swap-btn').on('click', function () {
-        const origin = $('#origin');
-        const destination = $('#destination');
+    // 3. Swap Origin/Destination
+    $('.btn-swap').on('click', function () {
+        const $origin = $('#origin');
+        const $dest = $('#destination');
 
         // Swap values
-        const temp = origin.val();
-        origin.val(destination.val());
-        destination.val(temp);
+        const temp = $origin.val();
+        $origin.val($dest.val());
+        $dest.val(temp);
 
         // Add rotation animation
         $(this).css('transform', 'rotate(180deg)');
@@ -183,25 +201,33 @@ $(document).ready(function () {
         }, 300);
     });
 
-    // Set minimum date to today for date inputs
-    const today = new Date().toISOString().split('T')[0];
-    $('#departDate').attr('min', today);
-    $('#returnDate').attr('min', today);
+    // 4. Flatpickr Calendar Initialization
+    // Check if element exists to avoid errors on other pages
+    if ($('#departDate').length) {
+        flatpickr("#departDate", {
+            dateFormat: "Y-m-d",
+            minDate: "today",
+            disableMobile: "true", // Forces the custom styled calendar
+            onChange: function (selectedDates, dateStr, instance) {
+                // Update return date minimum when depart date is picked
+                if (returnPicker) {
+                    returnPicker.set('minDate', dateStr);
+                }
+            }
+        });
+    }
 
-    // Update return date minimum when depart date changes
-    $('#departDate').on('change', function () {
-        const departDate = $(this).val();
-        $('#returnDate').attr('min', departDate);
+    let returnPicker;
+    if ($('#returnDate').length) {
+        returnPicker = flatpickr("#returnDate", {
+            dateFormat: "Y-m-d",
+            minDate: "today",
+            disableMobile: "true"
+        });
+    }
 
-        // Clear return date if it's before depart date
-        const returnDate = $('#returnDate').val();
-        if (returnDate && returnDate < departDate) {
-            $('#returnDate').val('');
-        }
-    });
-
-    // Form validation before submit
-    $('.search-form').on('submit', function (e) {
+    // 5. Search Form Validation
+    $('.search-form-row').on('submit', function (e) {
         const origin = $('#origin').val().trim();
         const destination = $('#destination').val().trim();
         const departDate = $('#departDate').val();
@@ -221,17 +247,19 @@ $(document).ready(function () {
         }
 
         // Show loading state
-        const btn = $(this).find('.search-btn');
+        const btn = $(this).find('.btn-search-trip');
         btn.prop('disabled', true);
         btn.html('🔍 Searching...');
     });
 
+    // ------------------------------------------------------------------------
+    // D. SITE-WIDE ANIMATIONS & INTERACTIONS
+    // ------------------------------------------------------------------------
+
     // Smooth scroll for navigation links
     $('a[href^="#"]').on('click', function (e) {
         const target = $(this).attr('href');
-
-        // Don't prevent default for # only
-        if (target === '#') return;
+        if (target === '#') return; // Don't prevent default for # only
 
         const targetElement = $(target);
         if (targetElement.length) {
@@ -242,37 +270,22 @@ $(document).ready(function () {
         }
     });
 
+    // Autocomplete Logic
     const popularCities = [
-        'Kuala Lumpur',
-        'Penang',
-        'Johor Bahru',
-        'Ipoh',
-        'Melaka',
-        'Kuching',
-        'Kota Kinabalu',
-        'Shah Alam',
-        'Putrajaya',
-        'Langkawi',
-        'Singapore',
-        'Seremban',
-        'Kuantan',
-        'Alor Setar',
-        'Kota Bharu'
+        'Kuala Lumpur', 'Penang', 'Johor Bahru', 'Ipoh', 'Melaka',
+        'Kuching', 'Kota Kinabalu', 'Shah Alam', 'Putrajaya', 'Langkawi',
+        'Singapore', 'Seremban', 'Kuantan', 'Alor Setar', 'Kota Bharu'
     ];
 
-    // Simple autocomplete for origin and destination
     $('#origin, #destination').on('input', function () {
         const input = $(this).val().toLowerCase();
         if (input.length < 2) return;
 
-        // Filter cities
+        // Filter cities logic (expand with UI dropdown if needed)
         const matches = popularCities.filter(city =>
             city.toLowerCase().includes(input)
         );
-
-        // You can implement a dropdown here if you want
-        // For now, we'll just log the matches
-        console.log('Matches:', matches);
+        // console.log('Matches:', matches);
     });
 
     // Add loading animation to trending items
@@ -291,14 +304,14 @@ $(document).ready(function () {
         }, index * 100);
     });
 
-    // Add hover effect to features
+    // Feature Icon Hover Effect
     $('.feature').on('mouseenter', function () {
         $(this).find('.feature-icon').css('transform', 'scale(1.1) rotate(5deg)');
     }).on('mouseleave', function () {
         $(this).find('.feature-icon').css('transform', 'scale(1) rotate(0deg)');
     });
 
-    // Popular routes click handler
+    // Popular Routes Click Handler
     $('[style*="border-left"]').on('click', function () {
         const routeText = $(this).find('div:first').text();
         const [origin, destination] = routeText.split('→').map(s => s.trim());
@@ -309,71 +322,52 @@ $(document).ready(function () {
 
             // Smooth scroll to search form
             $('html, body').animate({
-                scrollTop: $('.search-container').offset().top - 100
+                scrollTop: $('.search-bar-container').offset().top - 150
             }, 600);
-
-            // Highlight the form
-            $('.search-container').css('box-shadow', '0 0 30px rgba(102,126,234,0.5)');
-            setTimeout(() => {
-                $('.search-container').css('box-shadow', '0 10px 40px rgba(0,0,0,0.15)');
-            }, 2000);
         }
     });
 
-    // Add keyboard shortcuts
+    // Keyboard Shortcuts
     $(document).on('keydown', function (e) {
         // Alt + S to focus on search
         if (e.altKey && e.key === 's') {
             e.preventDefault();
             $('#origin').focus();
         }
-
         // Alt + W to swap origin/destination
         if (e.altKey && e.key === 'w') {
             e.preventDefault();
-            $('.swap-btn').click();
+            $('.btn-swap').click();
         }
     });
 
     // Animate stats on scroll (Why Choose Us section)
     const animateStats = () => {
-        $('.why-choose-stats').each(function () {
+        $('.about-stats').each(function () {
             const elementTop = $(this).offset().top;
             const elementBottom = elementTop + $(this).outerHeight();
             const viewportTop = $(window).scrollTop();
             const viewportBottom = viewportTop + $(window).height();
 
             if (elementBottom > viewportTop && elementTop < viewportBottom) {
-                $(this).find('[style*="font-size: 48px"]').each(function () {
-                    const target = $(this).text();
-                    if (!$(this).data('animated')) {
-                        $(this).data('animated', true);
-                        // Animate number counting (simple version)
-                        $(this).css('opacity', '1');
-                    }
+                $(this).find('.stat-number').each(function () {
+                    $(this).css('opacity', '1');
                 });
             }
         });
     };
 
-    // Check on scroll
     $(window).on('scroll', animateStats);
     animateStats(); // Check on load
 
-    // Add parallax effect to hero section (subtle)
-    $(window).on('scroll', function () {
-        const scrolled = $(window).scrollTop();
-        $('.hero').css('transform', 'translateY(' + (scrolled * 0.3) + 'px)');
-    });
-
-    // Responsive navigation toggle (for mobile - if you add a hamburger menu)
+    // Responsive navigation toggle
     $('.menu-toggle').on('click', function () {
         $('.nav-links').toggleClass('active');
         $(this).toggleClass('active');
     });
 
     // Add ripple effect to buttons
-    $('.search-btn, .tab').on('click', function (e) {
+    $('.btn-search-trip, .transport-tab').on('click', function (e) {
         const ripple = $('<span class="ripple"></span>');
         $(this).append(ripple);
 
@@ -391,22 +385,16 @@ $(document).ready(function () {
     });
 
     // ------------------------------------------------------------------------
-    // FLASH MESSAGE LOGIC (UPDATED)
+    // E. FLASH MESSAGE LOGIC
     // ------------------------------------------------------------------------
     const infoBox = $('.info');
     if (infoBox.text().trim().length > 0) {
-
-        // If it's a "Welcome" message, apply the fast-fade class
         if (infoBox.text().includes('Welcome')) {
             infoBox.addClass('fast-fade');
-            // Force removal after animation to be safe
             setTimeout(() => {
                 infoBox.hide();
             }, 1500);
-        }
-        else {
-            // Normal message handling (CSS animation 'fade' handles appearance)
-            // Just ensure it hides eventually if animation ends
+        } else {
             setTimeout(() => {
                 infoBox.hide();
             }, 5500);
@@ -416,7 +404,7 @@ $(document).ready(function () {
 });
 
 // ============================================================================
-// UTILITY FUNCTIONS
+// 3. UTILITY FUNCTIONS
 // ============================================================================
 
 // Format date to readable format
