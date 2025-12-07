@@ -20,38 +20,79 @@ public class Helper(IWebHostEnvironment en,
     // ------------------------------------------------------------------------
     public string GetNextId(DB db, string role)
     {
-        // Determine prefix: Admin -> "A", Member -> "C"
         string prefix = role == "Admin" ? "A" : "C";
 
-        // 1. Get all existing ID numbers for this role
-        // We fetch them into memory to parse and sort them easily
         var existingIds = db.Users
             .Where(u => u.Id.StartsWith(prefix))
             .Select(u => u.Id)
             .ToList()
-            .Select(id => int.TryParse(id.Substring(1), out int n) ? n : 0) // Extract number part safely
+            .Select(id => int.TryParse(id.Substring(1), out int n) ? n : 0)
             .OrderBy(n => n)
             .ToList();
 
-        // 2. Find the first missing number (Gap)
         int nextNum = 1;
         foreach (var num in existingIds)
         {
             if (num == nextNum)
             {
-                // If the number exists, move to the next expected number
                 nextNum++;
             }
             else if (num > nextNum)
             {
-                // If we found a number larger than expected, we found a gap!
-                // E.g., We have [1, 3]. We expect 2, but found 3. So 2 is free.
                 break;
             }
         }
 
-        // 3. Format and return (e.g., A002)
         return prefix + nextNum.ToString("D3");
+    }
+
+    public string GetNextRouteId(DB db)
+    {
+        var ids = db.Routes.Select(r => r.Id).ToList()
+                    .Where(id => id.StartsWith("R"))
+                    .Select(id => int.TryParse(id.Substring(1), out int n) ? n : 0)
+                    .OrderBy(n => n).ToList();
+        return "R" + GetNextNumber(ids).ToString("D3");
+    }
+
+    public string GetNextTripId(DB db)
+    {
+        var ids = db.Trips.Select(t => t.Id).ToList()
+                    .Where(id => id.StartsWith("T"))
+                    .Select(id => int.TryParse(id.Substring(1), out int n) ? n : 0)
+                    .OrderBy(n => n).ToList();
+        return "T" + GetNextNumber(ids).ToString("D3");
+    }
+
+    public string GetNextRouteStopId(DB db)
+    {
+        var ids = db.RouteStops.Select(s => s.Id).ToList()
+                    .Where(id => id.StartsWith("RS"))
+                    .Select(id => int.TryParse(id.Substring(2), out int n) ? n : 0)
+                    .OrderBy(n => n).ToList();
+        return "RS" + GetNextNumber(ids).ToString("D3");
+    }
+
+    public string GetNextTripStopId(DB db)
+    {
+        var ids = db.TripStops.Select(s => s.Id).ToList()
+                    .Where(id => id.StartsWith("TS"))
+                    .Select(id => int.TryParse(id.Substring(2), out int n) ? n : 0)
+                    .OrderBy(n => n).ToList();
+        return "TS" + GetNextNumber(ids).ToString("D3");
+    }
+
+    private int GetNextNumber(List<int> existingNums)
+    {
+        int next = 1;
+        foreach (var num in existingNums)
+        {
+            if (num == next)
+                next++;
+            else if (num > next)
+                break;
+        }
+        return next;
     }
 
     // ------------------------------------------------------------------------

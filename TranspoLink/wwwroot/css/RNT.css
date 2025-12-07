@@ -1,0 +1,152 @@
+﻿/* RNT.css - Route & Trip Management Styles */
+
+.rnt-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    border: 1px solid #e0e0e0;
+}
+
+.rnt-title h2 {
+    margin: 0;
+    font-size: 24px;
+    color: #0f1b3d;
+}
+
+.rnt-title p {
+    margin: 5px 0 0;
+    color: #666;
+    font-size: 14px;
+}
+
+/* Filter Tabs */
+.rnt-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.rnt-tab {
+    padding: 8px 16px;
+    border-radius: 20px;
+    background: #f1f2f6;
+    color: #666;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+    .rnt-tab.active, .rnt-tab:hover {
+        background: #667eea;
+        color: white;
+    }
+
+/* Data Tables */
+.rnt-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+    .rnt-table th {
+        background: #f8f9fa;
+        padding: 15px;
+        text-align: left;
+        color: #0f1b3d;
+        font-weight: 700;
+    }
+
+    .rnt-table td {
+        padding: 15px;
+        border-bottom: 1px solid #eee;
+        color: #333;
+    }
+
+    .rnt-table tr:last-child td {
+        border-bottom: none;
+    }
+
+/* Inputs in tables */
+.rnt-input {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Action Buttons */
+.btn-rnt {
+    padding: 8px 14px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 13px;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.btn-rnt-primary {
+    background: #667eea;
+    color: white;
+}
+
+.btn-rnt-danger {
+    background: #ff4757;
+    color: white;
+}
+
+.btn-rnt-success {
+    background: #2ed573;
+    color: white;
+}
+
+/* Timeline for Stops */
+.stop-timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+    .stop-timeline::before {
+        content: '';
+        position: absolute;
+        left: 10px;
+        top: 10px;
+        bottom: 10px;
+        width: 2px;
+        background: #ddd;
+    }
+
+.stop-item {
+    position: relative;
+    margin-bottom: 20px;
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #eee;
+}
+
+.stop-dot {
+    position: absolute;
+    left: -26px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 14px;
+    height: 14px;
+    background: #667eea;
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 0 0 2px #ddd;
+}

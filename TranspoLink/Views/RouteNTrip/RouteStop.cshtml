@@ -1,5 +1,61 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model IEnumerable<RouteStop>
 @{
+    ViewBag.Title += " | Manage Route Stops";
 }
+
+@section head {
+    <link rel="stylesheet" href="/css/RNT.css" />
+}
+
+<div class="admin-container">
+    <div class="rnt-header">
+        <div class="rnt-title">
+            <h2>📍 Stops for: @ViewBag.RouteName</h2>
+            <p>Define the sequence of stops and time offsets.</p>
+        </div>
+        <a href="/RouteNTrip/Routes" class="btn-rnt btn-rnt-primary">← Back to Routes</a>
+    </div>
+
+    <div style="display:grid; grid-template-columns: 1fr 350px; gap:30px;">
+        <div class="stop-timeline">
+            @if (Model.Any())
+            {
+                foreach (var s in Model)
+                {
+                    <div class="stop-item">
+                        <div class="stop-dot"></div>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <strong>Step @s.Sequence:</strong> @s.StopName
+                                <div style="font-size:12px; color:#666;">+@s.MinutesFromStart mins from start</div>
+                            </div>
+                            <form action="/RouteNTrip/DeleteRouteStop" method="post">
+                                <input type="hidden" name="id" value="@s.Id" />
+                                <button class="btn-rnt btn-rnt-danger">Remove</button>
+                            </form>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <p>No stops defined. This route is direct.</p>
+            }
+        </div>
+
+        <div style="background:white; padding:20px; border-radius:12px; height:fit-content; border:1px solid #ddd;">
+            <h3>Add New Stop</h3>
+            <form action="/RouteNTrip/AddRouteStop" method="post">
+                <input type="hidden" name="routeId" value="@ViewBag.RouteId" />
+
+                <label style="display:block; margin-bottom:5px;">Stop Name</label>
+                <input name="stopName" class="rnt-input" style="margin-bottom:15px;" required />
+
+                <label style="display:block; margin-bottom:5px;">Minutes from Start</label>
+                <input name="minutes" type="number" class="rnt-input" style="margin-bottom:15px;" required />
+
+                <button class="btn-rnt btn-rnt-success" style="width:100%;">+ Add Stop</button>
+            </form>
+        </div>
+    </div>
+</div>

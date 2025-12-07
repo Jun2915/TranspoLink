@@ -1,5 +1,56 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model IEnumerable<Trip>
 @{
+    ViewBag.Title = "Trip Operations";
 }
+
+@section head {
+    <link rel="stylesheet" href="/css/RNT.css" />
+    <script src="/js/RNT.js" defer></script>
+}
+
+<div class="admin-container">
+    <div class="rnt-header">
+        <div class="rnt-title">
+            <h2>🎫 Daily Trips</h2>
+            <p>Monitor scheduled trips and operational status.</p>
+        </div>
+        <a href="/RouteNTrip/CreateTrip" class="btn-rnt btn-rnt-success">+ Schedule Trip</a>
+    </div>
+
+    <div class="rnt-tabs">
+        <a href="?status=" class="rnt-tab @(ViewBag.SelectedStatus == "" ? "active" : "")">All</a>
+        <a href="?status=Scheduled" class="rnt-tab @(ViewBag.SelectedStatus == "Scheduled" ? "active" : "")">Scheduled</a>
+        <a href="?status=EnRoute" class="rnt-tab @(ViewBag.SelectedStatus == "EnRoute" ? "active" : "")">En Route</a>
+        <a href="?status=Completed" class="rnt-tab @(ViewBag.SelectedStatus == "Completed" ? "active" : "")">Completed</a>
+    </div>
+
+    <table class="rnt-table">
+        <thead>
+            <tr>
+                <th>Trip ID</th>
+                <th>Route</th>
+                <th>Vehicle</th>
+                <th>Departure</th>
+                <th>Status</th>
+                <th>Control</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var t in Model)
+            {
+                <tr>
+                    <td><span style="font-weight:bold; color:#667eea;">@t.Id</span></td>
+                    <td>@t.Route.Origin ➝ @t.Route.Destination</td>
+                    <td>@t.Vehicle.VehicleNumber</td>
+                    <td>@t.DepartureTime.ToString("dd MMM HH:mm")</td>
+                    <td>
+                        <span class="status-badge status-@t.Status.ToLower()">@t.Status</span>
+                    </td>
+                    <td>
+                        <a href="/RouteNTrip/TripStop/@t.Id" class="btn-rnt btn-rnt-primary">Update Stops (ETA)</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

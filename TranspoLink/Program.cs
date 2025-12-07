@@ -75,7 +75,7 @@ using (var scope = app.Services.CreateScope())
             Email = "admin@transpolink.com",
             Hash = hp.HashPassword("Admin123"),
             Name = "System Administrator",
-            PhotoURL = "/images/beauty_admin.png" 
+            PhotoURL = "/images/beauty_admin.png"
         };
 
         db.Admins.Add(admin);

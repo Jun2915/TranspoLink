@@ -1,5 +1,69 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model IEnumerable<TripStop>
 @{
+    ViewBag.Title += " | Trip Tracking";
 }
+
+@section head {
+    <link rel="stylesheet" href="/css/RNT.css" />
+    <script src="/js/RNT.js" defer></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+}
+
+<div class="admin-container">
+    <div class="rnt-header">
+        <div class="rnt-title">
+            <h2>⏱️ Trip Control: @ViewBag.TripInfo</h2>
+            <p>Update Actual Arrival Times (ATA) and Status.</p>
+        </div>
+        <a href="/RouteNTrip/Trips" class="btn-rnt btn-rnt-primary">← Back to Trips</a>
+    </div>
+
+    <table class="rnt-table">
+        <thead>
+            <tr>
+                <th>Stop Sequence</th>
+                <th>Location</th>
+                <th>Scheduled (ETA)</th>
+                <th>Actual (ATA)</th>
+                <th>Status</th>
+                <th>Update</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var s in Model)
+            {
+                <tr>
+                    <td>Step @s.RouteStop.Sequence</td>
+                    <td><b>@s.RouteStop.StopName</b></td>
+                    <td>@s.ScheduledArrival.ToString("HH:mm")</td>
+                    <td>
+                        <input type="text" class="rnt-input ata-input flatpickr"
+                               value="@(s.ActualArrival?.ToString("yyyy-MM-dd HH:mm"))"
+                               placeholder="Set Actual Time" />
+                    </td>
+                    <td>
+                        <select class="rnt-input status-select">
+                            <option value="Scheduled" selected="@(s.Status == "Scheduled")">Scheduled</option>
+                            <option value="Arrived" selected="@(s.Status == "Arrived")">Arrived</option>
+                            <option value="Departed" selected="@(s.Status == "Departed")">Departed</option>
+                            <option value="Skipped" selected="@(s.Status == "Skipped")">Skipped</option>
+                        </select>
+                    </td>
+                    <td>
+                        <button class="btn-rnt btn-rnt-success update-ata-btn" data-id="@s.Id">Save</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        flatpickr(".flatpickr", {
+            enableTime: true,
+            dateFormat: "Y-m-d H:i",
+        });
+    });
+</script>

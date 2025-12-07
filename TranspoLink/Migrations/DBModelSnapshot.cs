@@ -97,8 +97,10 @@ namespace TranspoLink.Migrations
                     b.Property<decimal>("TotalPrice")
                         .HasColumnType("decimal(10,2)");
 
-                    b.Property<int>("TripId")
-                        .HasColumnType("int");
+                    b.Property<string>("TripId")
+                        .IsRequired()
+                        .HasMaxLength(5)
+                        .HasColumnType("nvarchar(5)");
 
                     b.HasKey("Id");
 
@@ -111,11 +113,9 @@ namespace TranspoLink.Migrations
 
             modelBuilder.Entity("TranspoLink.Models.Route", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<string>("Id")
+                        .HasMaxLength(5)
+                        .HasColumnType("nvarchar(5)");
 
                     b.Property<decimal>("BasePrice")
                         .HasColumnType("decimal(10,2)");
@@ -146,13 +146,40 @@ namespace TranspoLink.Migrations
                     b.ToTable("Routes");
                 });
 
-            modelBuilder.Entity("TranspoLink.Models.Trip", b =>
+            modelBuilder.Entity("TranspoLink.Models.RouteStop", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<string>("Id")
+                        .HasMaxLength(6)
+                        .HasColumnType("nvarchar(6)");
+
+                    b.Property<int>("MinutesFromStart")
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<string>("RouteId")
+                        .IsRequired()
+                        .HasMaxLength(5)
+                        .HasColumnType("nvarchar(5)");
+
+                    b.Property<int>("Sequence")
+                        .HasColumnType("int");
+
+                    b.Property<string>("StopName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RouteId");
+
+                    b.ToTable("RouteStops");
+                });
+
+            modelBuilder.Entity("TranspoLink.Models.Trip", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(5)
+                        .HasColumnType("nvarchar(5)");
 
                     b.Property<DateTime>("ArrivalTime")
                         .HasColumnType("datetime2");
@@ -166,8 +193,10 @@ namespace TranspoLink.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(10,2)");
 
-                    b.Property<int>("RouteId")
-                        .HasColumnType("int");
+                    b.Property<string>("RouteId")
+                        .IsRequired()
+                        .HasMaxLength(5)
+                        .HasColumnType("nvarchar(5)");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -184,6 +213,42 @@ namespace TranspoLink.Migrations
                     b.HasIndex("VehicleId");
 
                     b.ToTable("Trips");
+                });
+
+            modelBuilder.Entity("TranspoLink.Models.TripStop", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(6)
+                        .HasColumnType("nvarchar(6)");
+
+                    b.Property<DateTime?>("ActualArrival")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RouteStopId")
+                        .IsRequired()
+                        .HasMaxLength(6)
+                        .HasColumnType("nvarchar(6)");
+
+                    b.Property<DateTime>("ScheduledArrival")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("TripId")
+                        .IsRequired()
+                        .HasMaxLength(5)
+                        .HasColumnType("nvarchar(5)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RouteStopId");
+
+                    b.HasIndex("TripId");
+
+                    b.ToTable("TripStops");
                 });
 
             modelBuilder.Entity("TranspoLink.Models.User", b =>
@@ -323,6 +388,17 @@ namespace TranspoLink.Migrations
                     b.Navigation("Trip");
                 });
 
+            modelBuilder.Entity("TranspoLink.Models.RouteStop", b =>
+                {
+                    b.HasOne("TranspoLink.Models.Route", "Route")
+                        .WithMany("RouteStops")
+                        .HasForeignKey("RouteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Route");
+                });
+
             modelBuilder.Entity("TranspoLink.Models.Trip", b =>
                 {
                     b.HasOne("TranspoLink.Models.Route", "Route")
@@ -342,14 +418,37 @@ namespace TranspoLink.Migrations
                     b.Navigation("Vehicle");
                 });
 
+            modelBuilder.Entity("TranspoLink.Models.TripStop", b =>
+                {
+                    b.HasOne("TranspoLink.Models.RouteStop", "RouteStop")
+                        .WithMany()
+                        .HasForeignKey("RouteStopId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TranspoLink.Models.Trip", "Trip")
+                        .WithMany("TripStops")
+                        .HasForeignKey("TripId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("RouteStop");
+
+                    b.Navigation("Trip");
+                });
+
             modelBuilder.Entity("TranspoLink.Models.Route", b =>
                 {
+                    b.Navigation("RouteStops");
+
                     b.Navigation("Trips");
                 });
 
             modelBuilder.Entity("TranspoLink.Models.Trip", b =>
                 {
                     b.Navigation("Bookings");
+
+                    b.Navigation("TripStops");
                 });
 
             modelBuilder.Entity("TranspoLink.Models.Vehicle", b =>
