@@ -11,6 +11,7 @@ public class DB(DbContextOptions options) : DbContext(options)
     public DbSet<User> Users { get; set; }
     public DbSet<Admin> Admins { get; set; }
     public DbSet<Member> Members { get; set; }
+    public DbSet<Driver> Drivers { get; set; } 
 
     public DbSet<Route> Routes { get; set; }
     public DbSet<RouteStop> RouteStops { get; set; }
@@ -49,9 +50,14 @@ public class DB(DbContextOptions options) : DbContext(options)
 
         modelBuilder.Entity<TripStop>()
             .HasOne(ts => ts.RouteStop).WithMany().HasForeignKey(ts => ts.RouteStopId).OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Vehicle>()
+            .HasOne(v => v.Driver)
+            .WithOne(d => d.Vehicle)
+            .HasForeignKey<Vehicle>(v => v.DriverId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }
-
 
 public class User
 {
@@ -67,8 +73,16 @@ public class User
     public bool IsBlocked { get; set; } = false;
     public string Role => GetType().Name;
 }
+
 public class Admin : User { [MaxLength(100)] public string? PhotoURL { get; set; } }
 public class Member : User { [MaxLength(100)] public string PhotoURL { get; set; } public virtual ICollection<Booking> Bookings { get; set; } }
+
+public class Driver : User
+{
+    [MaxLength(100)] public string? PhotoURL { get; set; }
+    [MaxLength(20)] public string LicenseNumber { get; set; }
+    public virtual Vehicle? Vehicle { get; set; }
+}
 
 public class Route
 {
@@ -144,9 +158,14 @@ public class Vehicle
     [MaxLength(20)] public string VehicleNumber { get; set; }
     [MaxLength(20)] public string Type { get; set; }
     public int TotalSeats { get; set; }
-    [MaxLength(50)] public string Operator { get; set; }
+
+    [MaxLength(5)]
+    public string? DriverId { get; set; }
+
     public bool IsActive { get; set; } = true;
+
     public virtual ICollection<Trip> Trips { get; set; }
+    public virtual Driver? Driver { get; set; }
 }
 
 public class Booking

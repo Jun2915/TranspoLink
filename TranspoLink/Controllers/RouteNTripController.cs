@@ -6,10 +6,75 @@ using Route = TranspoLink.Models.Route;
 
 namespace TranspoLink.Controllers;
 
-[Authorize(Roles = "Admin")]
 public class RouteNTripController(DB db, Helper hp) : Controller
 {
-    // ROUTES
+    // ============================================================================
+    // PUBLIC SEARCH ACTIONS (Accessible by Everyone)
+    // ============================================================================
+
+    // 1. AJAX Autocomplete: Get unique locations
+    [HttpGet]
+    public IActionResult GetLocations()
+    {
+        var origins = db.Routes.Where(r => r.IsActive).Select(r => r.Origin).Distinct();
+        var destinations = db.Routes.Where(r => r.IsActive).Select(r => r.Destination).Distinct();
+
+        var locations = origins.Union(destinations)
+                               .Distinct()
+                               .OrderBy(x => x)
+                               .ToList();
+
+        return Json(locations);
+    }
+
+    // 2. Search Results Page
+    [Authorize]
+    [AcceptVerbs("GET", "POST")]
+    public IActionResult SearchTrip(string origin, string destination, DateTime departDate, string transportType = "Bus")
+    {
+        // Basic Validation
+        if (string.IsNullOrEmpty(origin) || string.IsNullOrEmpty(destination))
+        {
+            TempData["Info"] = "Please select an Origin and Destination.";
+            return RedirectToAction("Index", "Home");
+        }
+
+        // Query Logic
+        var query = db.Trips
+            .Include(t => t.Route)
+            .Include(t => t.Vehicle)
+            .Where(t => t.Status == "Scheduled") // Only show scheduled trips
+            .AsQueryable();
+
+        // 1. Filter by Transport Type
+        if (!string.IsNullOrEmpty(transportType))
+        {
+            query = query.Where(t => t.Route.TransportType == transportType);
+        }
+
+        // 2. Filter by Route (Case insensitive matches)
+        query = query.Where(t => t.Route.Origin == origin && t.Route.Destination == destination);
+
+        // 3. Filter by Date (Compare Date parts only)
+        query = query.Where(t => t.DepartureTime.Date == departDate.Date);
+
+        var results = query.OrderBy(t => t.DepartureTime).ToList();
+
+        // Pass params back for display
+        ViewBag.SearchOrigin = origin;
+        ViewBag.SearchDest = destination;
+        ViewBag.SearchDate = departDate.ToString("dd MMM yyyy");
+        ViewBag.TransportType = transportType;
+
+        return View(results);
+    }
+
+
+    // ============================================================================
+    // ADMIN MANAGEMENT ACTIONS (Authorized Only)
+    // ============================================================================
+
+    [Authorize(Roles = "Admin")]
     public IActionResult Routes(string type = "")
     {
         var query = db.Routes.AsQueryable();
@@ -22,16 +87,17 @@ public class RouteNTripController(DB db, Helper hp) : Controller
 
         if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
             return PartialView(routes);
+
         return View(routes);
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public IActionResult CreateRoute(Route route)
     {
         if (ModelState.IsValid)
         {
             route.Id = hp.GetNextRouteId(db);
-
             db.Routes.Add(route);
             db.SaveChanges();
             TempData["Info"] = $"Route {route.Id} created successfully.";
@@ -39,8 +105,29 @@ public class RouteNTripController(DB db, Helper hp) : Controller
         return RedirectToAction("Routes");
     }
 
-    // ROUTE STOPS
-    public IActionResult RouteStop(string id) // Changed int -> string
+    [Authorize(Roles = "Admin")]
+    [HttpPost]
+    public IActionResult DeleteRoute(string id)
+    {
+        var route = db.Routes.Find(id);
+        if (route != null)
+        {
+            if (db.Trips.Any(t => t.RouteId == id))
+            {
+                TempData["Info"] = "Cannot delete: Route is in use by existing trips.";
+            }
+            else
+            {
+                db.Routes.Remove(route);
+                db.SaveChanges();
+                TempData["Info"] = "Route deleted.";
+            }
+        }
+        return RedirectToAction("Routes");
+    }
+
+    [Authorize(Roles = "Admin")]
+    public IActionResult RouteStop(string id)
     {
         var route = db.Routes.Include(r => r.RouteStops).FirstOrDefault(r => r.Id == id);
         if (route == null)
@@ -51,6 +138,7 @@ public class RouteNTripController(DB db, Helper hp) : Controller
         return View(route.RouteStops.OrderBy(s => s.Sequence).ToList());
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public IActionResult AddRouteStop(string routeId, string stopName, int minutes)
     {
@@ -58,7 +146,7 @@ public class RouteNTripController(DB db, Helper hp) : Controller
 
         var stop = new RouteStop
         {
-            Id = hp.GetNextRouteStopId(db), // GENERATE ID RSXXX
+            Id = hp.GetNextRouteStopId(db),
             RouteId = routeId,
             StopName = stopName,
             MinutesFromStart = minutes,
@@ -69,8 +157,9 @@ public class RouteNTripController(DB db, Helper hp) : Controller
         return RedirectToAction("RouteStop", new { id = routeId });
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPost]
-    public IActionResult DeleteRouteStop(string id) // Changed int -> string
+    public IActionResult DeleteRouteStop(string id)
     {
         var stop = db.RouteStops.Find(id);
         if (stop != null)
@@ -83,7 +172,7 @@ public class RouteNTripController(DB db, Helper hp) : Controller
         return RedirectToAction("Routes");
     }
 
-    // TRIPS
+    [Authorize(Roles = "Admin")]
     public IActionResult Trips(string status = "")
     {
         var query = db.Trips.Include(t => t.Route).Include(t => t.Vehicle).AsQueryable();
@@ -91,15 +180,21 @@ public class RouteNTripController(DB db, Helper hp) : Controller
             query = query.Where(t => t.Status == status);
 
         var trips = query.OrderByDescending(t => t.DepartureTime).ToList();
+
+        ViewBag.SelectedStatus = status;
+
         if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
             return PartialView(trips);
+
         return View(trips);
     }
 
+    [Authorize(Roles = "Admin")]
     public IActionResult CreateTrip()
     {
         var routes = db.Routes.Where(r => r.IsActive)
                        .Select(r => new { r.Id, Name = r.Origin + " ➝ " + r.Destination }).ToList();
+
         ViewBag.RouteList = new SelectList(routes, "Id", "Name");
         ViewBag.VehicleList = new SelectList(db.Vehicles.Where(v => v.IsActive), "Id", "VehicleNumber");
         ViewBag.NextTripId = hp.GetNextTripId(db);
@@ -107,7 +202,7 @@ public class RouteNTripController(DB db, Helper hp) : Controller
         return View();
     }
 
-    [HttpPost]
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public IActionResult CreateTrip(Trip trip)
     {
@@ -122,14 +217,13 @@ public class RouteNTripController(DB db, Helper hp) : Controller
                 trip.AvailableSeats = v?.TotalSeats ?? 40;
             }
 
-            // 👇 FORCE GENERATE ID (Ignores user input)
             trip.Id = hp.GetNextTripId(db);
             trip.Status = "Scheduled";
 
             db.Trips.Add(trip);
             db.SaveChanges();
 
-            // (Generate TripStops logic...)
+            // Auto-generate TripStops based on RouteStops
             var routeStops = db.RouteStops.Where(rs => rs.RouteId == trip.RouteId).ToList();
             foreach (var rs in routeStops)
             {
@@ -154,8 +248,8 @@ public class RouteNTripController(DB db, Helper hp) : Controller
         return View(trip);
     }
 
-    // TRIP STOPS
-    public IActionResult TripStop(string id) // Changed int -> string
+    [Authorize(Roles = "Admin")]
+    public IActionResult TripStop(string id)
     {
         var trip = db.Trips.Include(t => t.Route).FirstOrDefault(t => t.Id == id);
         if (trip == null)
@@ -172,8 +266,9 @@ public class RouteNTripController(DB db, Helper hp) : Controller
         return View(stops);
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPost]
-    public IActionResult UpdateTripStop(string id, DateTime actualTime, string status) // Changed int -> string
+    public IActionResult UpdateTripStop(string id, DateTime actualTime, string status)
     {
         var ts = db.TripStops.Find(id);
         if (ts != null)

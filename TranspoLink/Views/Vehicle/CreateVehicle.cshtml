@@ -46,9 +46,14 @@
 
             <div class="form-group-row">
                 <div class="vehicle-input-group">
-                    <label asp-for="Operator">Operator / Company</label>
-                    <input asp-for="Operator" class="vehicle-input" placeholder="e.g. TransNasional">
-                    <span asp-validation-for="Operator" class="field-validation-error"></span>
+                    <label asp-for="DriverId">Assign Driver (One driver per vehicle)</label>
+                    <div class="input-with-icon">
+                        <span class="input-icon">👤</span>
+                        <select asp-for="DriverId" asp-items="ViewBag.Drivers" class="vehicle-select">
+                            <option value="">-- No Driver --</option>
+                        </select>
+                    </div>
+                    <span asp-validation-for="DriverId" class="field-validation-error"></span>
                 </div>
 
                 <div class="vehicle-input-group">

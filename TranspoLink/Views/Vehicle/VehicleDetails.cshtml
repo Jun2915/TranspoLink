@@ -40,8 +40,8 @@
 
             <div class="profile-info-list">
                 <div class="info-row">
-                    <span class="info-label">🏗️ Operator</span>
-                    <span class="info-value">@Model.Operator</span>
+                    <span class="info-label">👤 Driver</span>
+                    <span class="info-value">@(Model.Driver != null ? Model.Driver.Name : "Unassigned")</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">💺 Total Seats</span>

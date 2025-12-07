@@ -6,7 +6,7 @@
             <th class="sortable" data-col="Id">ID <span class="sort-arrow"></span></th>
             <th class="sortable" data-col="VehicleNumber">Vehicle No. <span class="sort-arrow"></span></th>
             <th class="sortable" data-col="Type">Type <span class="sort-arrow"></span></th>
-            <th class="sortable" data-col="Operator">Operator <span class="sort-arrow"></span></th>
+            <th class="sortable" data-col="Driver">Driver <span class="sort-arrow"></span></th>
             <th class="sortable" data-col="Seats">Seats <span class="sort-arrow"></span></th>
             <th class="sortable" data-col="Status">Status <span class="sort-arrow"></span></th>
             <th>Actions</th>
@@ -38,7 +38,9 @@
                             <span>🚢 Ferry</span>
                         }
                     </td>
-                    <td>@v.Operator</td>
+                    <td>
+                        @(v.Driver != null ? v.Driver.Name : "- No Driver -")
+                    </td>
                     <td>@v.TotalSeats</td>
                     <td>
                         @if (v.IsActive)

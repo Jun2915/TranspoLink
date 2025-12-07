@@ -15,25 +15,27 @@
         <div class="search-widget-wrapper">
 
             <div class="transport-tabs">
-                <button class="transport-tab active" data-transport="Bus">
+                <button type="button" class="transport-tab active" data-transport="Bus">
                     <span>🚌</span> Bus
                 </button>
-                <button class="transport-tab" data-transport="Train">
+                <button type="button" class="transport-tab" data-transport="Train">
                     <span>🚄</span> Train
                 </button>
-                <button class="transport-tab" data-transport="Ferry">
+                <button type="button" class="transport-tab" data-transport="Ferry">
                     <span>🚢</span> Ferry
                 </button>
             </div>
 
             <div class="search-bar-container">
-                <form class="search-form-row" method="post" action="/Home/SearchTrip">
+                <form class="search-form-row" method="post" action="/RouteNTrip/SearchTrip">
+
+                    <input type="hidden" id="transportTypeInput" name="transportType" value="Bus">
 
                     <div class="input-group-row first">
                         <span class="input-icon">📍</span>
                         <div class="input-text-wrapper">
                             <label for="origin">Origin</label>
-                            <input type="text" id="origin" name="origin" placeholder="From..." required autocomplete="off">
+                            <input type="text" id="origin" name="origin" placeholder="From..." required autocomplete="off" list="locationList">
                         </div>
                     </div>
 
@@ -45,7 +47,7 @@
                         <span class="input-icon">📍</span>
                         <div class="input-text-wrapper">
                             <label for="destination">Destination</label>
-                            <input type="text" id="destination" name="destination" placeholder="To..." required autocomplete="off">
+                            <input type="text" id="destination" name="destination" placeholder="To..." required autocomplete="off" list="locationList">
                         </div>
                     </div>
 
@@ -65,9 +67,20 @@
                         </div>
                     </div>
 
+                    @if (User.Identity.IsAuthenticated)
+                    {
                     <button type="submit" class="btn-search-trip">
                         Search Trip
                     </button>
+                    }
+                    else
+                    {
+                    <button type="button" class="btn-search-trip" onclick="openLoginModal()">
+                        Search Trip
+                    </button>
+                    }
+
+                    <datalist id="locationList"></datalist>
 
                 </form>
             </div>
@@ -115,3 +128,22 @@
         </div>
     </div>
 </section>
+<div id="loginModal" class="login-modal-overlay" style="display:none;">
+    <div class="login-modal-card">
+        <span class="close-modal" onclick="closeLoginModal()">×</span>
+
+        <div class="modal-icon-wrapper">
+            <span style="font-size: 40px;">🔐</span>
+        </div>
+
+        <h3 style="margin: 15px 0 10px; color: var(--text-main);">Login Required</h3>
+        <p style="color: var(--text-light); margin-bottom: 25px; line-height: 1.5;">
+            To ensure a secure booking experience, please log in or create an account to search for trips.
+        </p>
+
+        <div class="modal-actions">
+            <a href="/Account/Login" class="btn-modal btn-modal-primary">Log In</a>
+            <a href="/Account/Register" class="btn-modal btn-modal-secondary">Create Account</a>
+        </div>
+    </div>
+</div>

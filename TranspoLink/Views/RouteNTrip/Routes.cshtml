@@ -1,77 +1,104 @@
 ﻿@model IEnumerable<Route>
 @{
-    ViewBag.Title = "Route Management";
+    ViewBag.Title += " | Route Management";
 }
 
 @section head {
-    <link rel="stylesheet" href="/css/RNT.css" />
+    <link rel="stylesheet" href="/css/RNT.css" asp-append-version="true" />
     <script src="/js/RNT.js" defer></script>
 }
 
-<div class="admin-container">
-    <div class="rnt-header">
-        <div class="rnt-title">
-            <h2>🗺️ Route Master</h2>
-            <p>Define origins, destinations, and base paths.</p>
+<div class="rnt-page-container">
+    <div class="rnt-content-wrapper">
+
+        <div class="rnt-card">
+            <div class="rnt-header">
+                <div class="rnt-title">
+                    <h2>🗺️ Route Master</h2>
+                    <p>Define origins, destinations, and base pricing paths.</p>
+                </div>
+                <button class="btn-rnt btn-rnt-success" onclick="$('#addRouteForm').slideToggle()">+ New Route</button>
+            </div>
+
+            <div id="addRouteForm" style="display:none; margin-top:25px; padding-top:25px; border-top:1px solid #eee;">
+                <form action="/RouteNTrip/CreateRoute" method="post" style="display:grid; grid-template-columns: 100px 1fr 1fr 1fr 1fr auto; gap:15px;">
+                    <input value="@ViewBag.NextRouteId" class="rnt-input" readonly
+                           style="background-color:#f0f2f5; color:#666; font-weight:bold; cursor:not-allowed;"
+                           title="Auto-Generated ID" />
+
+                    <input name="Origin" class="rnt-input" placeholder="Origin (e.g. KL)" required />
+                    <input name="Destination" class="rnt-input" placeholder="Destination (e.g. Penang)" required />
+                    <select name="TransportType" class="rnt-input">
+                        <option value="Bus">Bus</option>
+                        <option value="Train">Train</option>
+                        <option value="Ferry">Ferry</option>
+                    </select>
+                    <input name="BasePrice" class="rnt-input" type="number" step="0.01" placeholder="Price (RM)" required />
+                    <button class="btn-rnt btn-rnt-primary">Save</button>
+                </form>
+            </div>
         </div>
-        <button class="btn-rnt btn-rnt-success" onclick="$('#addRouteForm').slideToggle()">+ New Route</button>
+
+        <div class="rnt-tabs">
+            <a href="?type=" class="rnt-tab @(ViewBag.SelectedType == "" ? "active" : "")">All Routes</a>
+            <a href="?type=Bus" class="rnt-tab @(ViewBag.SelectedType == "Bus" ? "active" : "")">🚌 Bus</a>
+            <a href="?type=Train" class="rnt-tab @(ViewBag.SelectedType == "Train" ? "active" : "")">🚄 Train</a>
+            <a href="?type=Ferry" class="rnt-tab @(ViewBag.SelectedType == "Ferry" ? "active" : "")">🚢 Ferry</a>
+        </div>
+
+        <div class="rnt-card" style="padding: 0; overflow: hidden;">
+            <div class="rnt-table-wrapper">
+                <table class="rnt-table">
+                    <thead>
+                        <tr>
+                            <th>Route ID</th>
+                            <th>Path (Origin ➝ Dest)</th>
+                            <th>Type</th>
+                            <th>Base Price</th>
+                            <th>Stops</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var r in Model)
+                        {
+                            <tr>
+                                <td><span style="font-weight:bold; color:#667eea;">@r.Id</span></td>
+                                <td>
+                                    <div style="font-size:16px; font-weight:700;">@r.Origin ➝ @r.Destination</div>
+                                </td>
+                                <td>
+                                    @if (r.TransportType == "Bus")
+                                    {
+                                        <span>🚌 Bus</span>
+                                    }
+                                    else if (r.TransportType == "Train")
+                                    {
+
+                                        <span>🚄 Train</span>
+                                    }
+                                    else
+                                    {
+
+                                        <span>🚢 Ferry</span>
+                                    }
+                                </td>
+                                <td>RM @r.BasePrice.ToString("N2")</td>
+                                <td>
+                                    <a href="/RouteNTrip/RouteStop/@r.Id" class="btn-rnt btn-rnt-primary" style="padding: 6px 15px; font-size: 13px;">Manage Stops</a>
+                                </td>
+                                <td>
+                                    <form action="/Admin/DeleteRoute" method="post" onsubmit="return confirm('Delete route @r.Id?');">
+                                        <input type="hidden" name="id" value="@r.Id" />
+                                        <button class="btn-rnt btn-rnt-danger" style="padding: 6px 15px; font-size: 13px;">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
-
-    <div id="addRouteForm" style="display:none; background:white; padding:20px; margin-bottom:20px; border-radius:12px;">
-        <form action="/RouteNTrip/CreateRoute" method="post" style="display:grid; grid-template-columns: 100px 1fr 1fr 1fr 1fr auto; gap:10px;">
-
-            <input value="@ViewBag.NextRouteId" class="rnt-input" readonly
-                   style="background-color:#eee; color:#666; font-weight:bold; cursor:not-allowed;" title="Auto-Generated ID" />
-
-            <input name="Origin" class="rnt-input" placeholder="Origin (e.g. KL)" required />
-            <input name="Destination" class="rnt-input" placeholder="Destination (e.g. Penang)" required />
-            <select name="TransportType" class="rnt-input">
-                <option value="Bus">Bus</option>
-                <option value="Train">Train</option>
-                <option value="Ferry">Ferry</option>
-            </select>
-            <input name="BasePrice" class="rnt-input" type="number" step="0.01" placeholder="Price" required />
-            <button class="btn-rnt btn-rnt-primary">Save</button>
-        </form>
-    </div>
-
-    <div class="rnt-tabs">
-        <a href="?type=" class="rnt-tab @(ViewBag.SelectedType == "" ? "active" : "")">All</a>
-        <a href="?type=Bus" class="rnt-tab @(ViewBag.SelectedType == "Bus" ? "active" : "")">Bus</a>
-        <a href="?type=Train" class="rnt-tab @(ViewBag.SelectedType == "Train" ? "active" : "")">Train</a>
-        <a href="?type=Ferry" class="rnt-tab @(ViewBag.SelectedType == "Ferry" ? "active" : "")">Ferry</a>
-    </div>
-
-    <table class="rnt-table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Path</th>
-                <th>Type</th>
-                <th>Base Price</th>
-                <th>Stops</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var r in Model)
-            {
-                <tr>
-                    <td><span style="font-weight:bold; color:#667eea;">@r.Id</span></td>
-                    <td><b>@r.Origin</b> ➝ <b>@r.Destination</b></td>
-                    <td>@r.TransportType</td>
-                    <td>RM @r.BasePrice.ToString("N2")</td>
-                    <td>
-                        <a href="/RouteNTrip/RouteStop/@r.Id" class="btn-rnt btn-rnt-primary">Manage Stops</a>
-                    </td>
-                    <td>
-                        <form action="/Admin/DeleteRoute" method="post" onsubmit="return confirm('Delete route @r.Id?');">
-                            <input type="hidden" name="id" value="@r.Id" />
-                            <button class="btn-rnt btn-rnt-danger">Delete</button>
-                        </form>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
 </div>

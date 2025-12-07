@@ -1,0 +1,90 @@
+﻿@model IEnumerable<Trip>
+@{
+    ViewBag.Title += " | Search Results";
+}
+
+@section head {
+    <link rel="stylesheet" href="/css/RNT.css" asp-append-version="true" />
+    <script src="/js/RNT.js" defer></script>
+}
+
+<div class="rnt-page-container">
+    <div class="rnt-content-wrapper">
+
+        <div class="rnt-card" style="margin-bottom: 20px;">
+            <div class="rnt-header">
+                <div class="rnt-title">
+                    <h2>@ViewBag.TransportType Trips</h2>
+                    <p>
+                        Results for: <b>@ViewBag.SearchOrigin</b> ➝ <b>@ViewBag.SearchDest</b>
+                        on <span style="color:#667eea; font-weight:bold;">@ViewBag.SearchDate</span>
+                    </p>
+                </div>
+                <a href="/Home/Index" class="btn-rnt btn-rnt-primary">Modify Search</a>
+            </div>
+        </div>
+
+        @if (Model.Any())
+        {
+            <div class="ticket-list">
+                @foreach (var trip in Model)
+                {
+                    <div class="rnt-card ticket-card">
+                        <div class="ticket-left">
+                            <div class="ticket-time">
+                                <span class="time-main">@trip.DepartureTime.ToString("HH:mm")</span>
+                                <span class="time-sub">@trip.DepartureTime.ToString("tt")</span>
+                            </div>
+
+                            <div class="ticket-path">
+                                <div class="path-line">
+                                    <div class="dot start"></div>
+                                    <div class="line"></div>
+                                    <div class="dot end"></div>
+                                </div>
+                                <div class="path-details">
+                                    <span class="loc">@trip.Route.Origin</span>
+                                    <span class="duration">@trip.Route.durationMinutes mins</span>
+                                    <span class="loc">@trip.Route.Destination</span>
+                                </div>
+                            </div>
+
+                            <div class="ticket-time">
+                                <span class="time-main">@trip.ArrivalTime.ToString("HH:mm")</span>
+                                <span class="time-sub">@trip.ArrivalTime.ToString("tt")</span>
+                            </div>
+                        </div>
+
+                        <div class="ticket-divider"></div>
+
+                        <div class="ticket-right">
+                            <div class="vehicle-info">
+                                <span class="v-name">@trip.Vehicle.Driver</span>
+                                <span class="v-no">@trip.Vehicle.VehicleNumber</span>
+                                <span class="v-seats">@trip.AvailableSeats seats left</span>
+                            </div>
+
+                            <div class="price-action">
+                                <div class="price-tag">
+                                    <small>MYR</small> @trip.Price.ToString("N2")
+                                </div>
+                                <a href="/Booking/Book/@trip.Id" class="btn-rnt btn-rnt-success" style="width:100%; text-align:center;">Select</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="rnt-card empty-state" style="text-align:center; padding: 50px;">
+                <div style="font-size: 50px; margin-bottom: 20px;">🚍💨</div>
+                <h3>No trips found!</h3>
+                <p style="color:#666;">We couldn't find any @ViewBag.TransportType trips for this route on this date.</p>
+                <br>
+                <a href="/Home/Index" class="btn-rnt btn-rnt-primary">Try a different date</a>
+            </div>
+        }
+
+    </div>
+</div>
