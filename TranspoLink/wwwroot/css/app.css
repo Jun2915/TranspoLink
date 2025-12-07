@@ -34,26 +34,19 @@
 }
 
 /* ============================================================================
-   BASE STYLES
+   BASE STYLES & TOP BAR
    ============================================================================ */
-body, input, select, textarea, button {
-    font-family: 'Roboto', sans-serif;
-    color: var(--text-body);
-}
-
 body {
     margin: 0;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     background: var(--bg-body);
-    transition: background 0.3s ease, color 0.3s ease;
-    font-size: 15px; /* Balanced Base Size */
+    font-family: 'Roboto', sans-serif;
+    font-size: 15px;
 }
 
-/* ============================================================================
-   TOP BAR (Logo + User Actions)
-   ============================================================================ */
+/* TOP BAR */
 .top-bar {
     background: var(--bg-header);
     color: #fff;
@@ -63,15 +56,13 @@ body {
     gap: 20px;
     font-size: 14px;
     height: 55px;
-    box-sizing: border-box;
 }
 
-/* Logo Area */
+/* LOGO STYLES */
 .top-bar-logo {
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-right: auto; /* Pushes everything else to the right */
 }
 
     .top-bar-logo img {
@@ -79,7 +70,6 @@ body {
         height: 36px;
         border-radius: 6px;
         border: 1px solid rgba(255,255,255,0.2);
-        display: block;
     }
 
 .brand-text {
@@ -90,20 +80,28 @@ body {
     letter-spacing: 0.5px;
 }
 
+/* TOP BAR ITEMS HOVER FIX */
 .top-bar-item {
     cursor: pointer;
-    transition: color 0.3s ease;
+    transition: all 0.2s ease;
     display: flex;
     align-items: center;
     gap: 5px;
+    padding: 6px 12px; /* Touch target */
+    border-radius: 6px;
 }
+
+    .top-bar-item:hover {
+        background-color: rgba(255, 255, 255, 0.15);
+        color: #ffd700; /* Subtle gold on hover */
+    }
 
     .top-bar-item a {
         color: inherit;
         text-decoration: none;
     }
 
-/* User Profile Trigger */
+/* User Profile in Top Bar */
 .user-profile-display {
     cursor: pointer;
     display: flex;
@@ -112,18 +110,16 @@ body {
     padding: 5px 12px;
     border-radius: 20px;
     transition: background 0.2s;
-    user-select: none;
 }
 
     .user-profile-display:hover {
-        background: rgba(255,255,255,0.1);
+        background: rgba(255,255,255,0.15);
     }
 
 .nav-user-photo {
     width: 30px;
     height: 30px;
     border-radius: 50%;
-    object-fit: cover;
     border: 2px solid rgba(255,255,255,0.8);
 }
 
@@ -135,21 +131,19 @@ body {
     position: relative;
 }
 
-/* ============================================================================
-   NAVIGATION BAR (Centered & Balanced)
-   ============================================================================ */
+/* NAVIGATION (BALANCED) */
 nav {
     background: var(--bg-nav);
     padding: 0 30px;
-    height: 55px; /* Matches Top Bar height */
+    height: 55px;
     display: flex;
     align-items: center;
-    justify-content: center; /* Center the links */
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     position: sticky;
     top: 0;
     z-index: 100;
     border-bottom: 1px solid var(--border-color);
+    justify-content: center;
 }
 
 .nav-links {
@@ -187,7 +181,34 @@ nav {
             background: rgba(102, 126, 234, 0.1);
         }
 
-/* Nav Dropdown Logic */
+/* Dropdown Fixes */
+.profile-dropdown {
+    top: 50px;
+}
+
+footer {
+    background: var(--bg-footer);
+    color: #fff;
+    text-align: center;
+    padding: 15px;
+    font-size: 13px;
+    margin-top: auto;
+}
+
+/* Global Card & Inputs */
+.auth-card, .profile-card, .settings-section, .activity-section, .search-container, .feature, .nav-card, .stat-card, .recent-section, .about-container, .about-card {
+    background: var(--bg-card);
+    color: var(--text-body);
+    border: 1px solid var(--border-color);
+}
+
+input, select, textarea {
+    background: var(--bg-input);
+    color: var(--text-body);
+    border: 1px solid var(--border-color);
+}
+
+/* Nav Dropdown alignment */
 .nav-item-dropdown {
     position: relative;
     cursor: pointer;
@@ -247,32 +268,115 @@ nav {
     }
 }
 
-/* ============================================================================
-   GLOBAL STYLES (Cards, Inputs, Footer)
-   ============================================================================ */
-.auth-card, .profile-card, .settings-section, .activity-section, .search-container, .feature, .nav-card, .stat-card, .recent-section, .about-container, .about-card {
+/* Profile Dropdown (Top Bar) */
+.profile-dropdown {
+    display: none;
+    position: absolute;
+    top: 50px;
+    right: 0;
+    width: 280px;
+    border-radius: 16px;
+    box-shadow: var(--shadow-soft);
+    z-index: 1000;
+    overflow: hidden;
+    animation: fadeIn 0.2s ease-out;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-body);
+}
+
+.dropdown-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 25px 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.dropdown-big-photo {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 10px;
+    border: 3px solid var(--border-color);
+}
+
+.dropdown-name {
+    margin: 0;
+    font-weight: bold;
+    font-size: 18px;
+    color: var(--text-main);
+}
+
+.dropdown-email {
+    margin: 2px 0 0;
+    font-size: 13px;
+    color: var(--text-light);
+}
+
+.dropdown-actions {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.dropdown-btn {
+    display: block;
+    text-align: center;
+    padding: 10px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.btn-manage {
     background: var(--bg-card);
     color: var(--text-body);
     border: 1px solid var(--border-color);
 }
 
-input, select, textarea {
-    background: var(--bg-input);
+    .btn-manage:hover {
+        background: rgba(102, 126, 238, 0.8);
+        color: white;
+        border-color: transparent;
+    }
+
+.btn-logout {
+    background: var(--bg-body);
     color: var(--text-body);
     border: 1px solid var(--border-color);
 }
 
-footer {
-    background: var(--bg-footer);
-    color: #fff;
-    text-align: center;
-    padding: 15px 50px;
-    margin-top: auto;
+    .btn-logout:hover {
+        background: #ff4757;
+        color: white;
+        border-color: transparent;
+    }
+
+/* GLOBAL STATUS BADGES (Backup) */
+.status-badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
 }
 
-/* ============================================================================
-   HOME PAGE SPECIFIC STYLES
-   ============================================================================ */
+.status-active {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.status-blocked {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+/* Home Page Specifics */
 .hero {
     background: var(--primary-gradient);
     color: #fff;
@@ -323,7 +427,6 @@ footer {
         box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     }
 
-/* Search Container (Home) */
 .search-container {
     border-radius: 15px;
     padding: 35px;
@@ -428,7 +531,6 @@ footer {
         box-shadow: 0 6px 20px rgba(102,126,234,0.4);
     }
 
-/* Features Section */
 .features {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -468,7 +570,6 @@ footer {
     color: var(--text-main);
 }
 
-/* Trending Section */
 .trending {
     padding: 60px 50px;
     background: var(--bg-body);
@@ -521,9 +622,6 @@ footer {
         box-shadow: 0 8px 25px rgba(0,0,0,0.15);
     }
 
-/* ============================================================================
-   UTILITY & MISC
-   ============================================================================ */
 .pagination a, .pagination span {
     background: #667eea !important;
     color: #fff !important;
@@ -626,96 +724,6 @@ footer {
     box-shadow: 0 2px 8px rgba(102,126,234,0.3);
 }
 
-/* User Profile Dropdown (Top Bar) */
-.profile-dropdown {
-    display: none;
-    position: absolute;
-    top: 50px;
-    right: 0;
-    width: 280px;
-    border-radius: 16px;
-    box-shadow: var(--shadow-soft);
-    z-index: 1000;
-    overflow: hidden;
-    animation: fadeIn 0.2s ease-out;
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    color: var(--text-body);
-}
-
-.dropdown-header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 25px 20px;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.dropdown-big-photo {
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-bottom: 10px;
-    border: 3px solid var(--border-color);
-}
-
-.dropdown-name {
-    margin: 0;
-    font-weight: bold;
-    font-size: 18px;
-    color: var(--text-main);
-}
-
-.dropdown-email {
-    margin: 2px 0 0;
-    font-size: 13px;
-    color: var(--text-light);
-}
-
-.dropdown-actions {
-    padding: 15px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.dropdown-btn {
-    display: block;
-    text-align: center;
-    padding: 10px;
-    border-radius: 25px;
-    text-decoration: none;
-    font-weight: 500;
-    font-size: 14px;
-    transition: all 0.2s;
-}
-
-.btn-manage {
-    background: var(--bg-card);
-    color: var(--text-body);
-    border: 1px solid var(--border-color);
-}
-
-    .btn-manage:hover {
-        background: rgba(102, 126, 238, 0.8);
-        color: white;
-        border-color: transparent;
-    }
-
-.btn-logout {
-    background: var(--bg-body);
-    color: var(--text-body);
-    border: 1px solid var(--border-color);
-}
-
-    .btn-logout:hover {
-        background: #ff4757;
-        color: white;
-        border-color: transparent;
-    }
-
-/* Responsive adjustments */
 @media (max-width: 768px) {
     .top-bar, nav, .hero, .features, .trending {
         padding-left: 20px;

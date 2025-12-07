@@ -17,7 +17,6 @@
         z-index: 0;
     }
 
-        /* Overlay */
         .admin-container.admin-bg-page::before {
             content: "";
             position: absolute;
@@ -25,7 +24,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.4); /* 40% White Overlay */
+            background: rgba(255, 255, 255, 0.4);
             z-index: -1;
         }
 
@@ -33,13 +32,12 @@
     background: rgba(0, 0, 0, 0.6);
 }
 
-/* --- GLASS EFFECT (Cards) --- */
-/* This makes the cards semi-transparent */
+/* --- GLASS EFFECT --- */
 .admin-container.admin-bg-page .profile-card,
 .admin-container.admin-bg-page .timeline-section,
 .admin-container.admin-bg-page .activity-section,
 .admin-container.admin-bg-page .admin-glass-card {
-    background: rgba(255, 255, 255, 0.65) !important; /* Semi-transparent */
+    background: rgba(255, 255, 255, 0.65) !important;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.5);
@@ -47,7 +45,8 @@
 }
 
 [data-theme="dark"] .admin-container.admin-bg-page .profile-card,
-[data-theme="dark"] .admin-container.admin-bg-page .timeline-section {
+[data-theme="dark"] .admin-container.admin-bg-page .timeline-section,
+[data-theme="dark"] .admin-container.admin-bg-page .activity-section {
     background: rgba(30, 30, 30, 0.65) !important;
     border-color: rgba(255, 255, 255, 0.1);
 }
@@ -60,7 +59,7 @@
     align-items: stretch;
 }
 
-/* Profile Card - Left Side */
+/* Profile Card */
 .profile-card {
     background: var(--bg-card);
     padding: 30px;
@@ -74,14 +73,14 @@
     box-sizing: border-box;
 }
 
-/* --- PROFILE HEADER --- */
+/* Profile Header */
 .profile-header-img {
     margin-bottom: 15px;
 }
 
     .profile-header-img img {
         width: 100px;
-        height: 100px; /* Consistent size */
+        height: 100px;
         border-radius: 50%;
         object-fit: cover;
         border: 4px solid rgba(255,255,255,0.5);
@@ -102,7 +101,7 @@
     margin-bottom: 20px;
 }
 
-/* --- PROFILE INFO LIST (The part you wanted fixed) --- */
+/* Profile Info List */
 .profile-info-list {
     width: 100%;
     margin-top: 10px;
@@ -112,10 +111,10 @@
 
 .info-row {
     display: flex;
-    justify-content: space-between; /* Pushes label left, value right */
+    justify-content: space-between;
     align-items: center;
     padding: 12px 0;
-    border-bottom: 1px solid rgba(0,0,0,0.05); /* Divider line */
+    border-bottom: 1px solid rgba(0,0,0,0.05);
     font-size: 14px;
 }
 
@@ -137,7 +136,7 @@
     text-align: right;
 }
 
-/* --- BUTTON GROUP (Pushed to Bottom) --- */
+/* Buttons at bottom */
 .profile-btn-group, .profile-actions {
     margin-top: auto;
     display: flex;
@@ -145,7 +144,6 @@
     width: 100%;
 }
 
-/* --- RIGHT SIDE SECTIONS --- */
 .timeline-section, .activity-section {
     background: var(--bg-card);
     padding: 30px;
@@ -388,7 +386,61 @@
         background: var(--bg-body);
     }
 
-/* --- BUTTONS (General) --- */
+/* --- UPDATED STATUS BADGES --- */
+.status-badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+/* 1. Active (Green) */
+.status-active, .status-confirmed {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+/* 2. Blocked (Yellow) */
+.status-blocked {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+/* 3. Disabled (Red) - Used for cancelled or inactive items */
+.status-disabled, .status-cancelled, .status-inactive {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* 4. Pending (Blue - Optional) */
+.status-pending {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+/* Text Colors for Details Page (No bg) */
+span.status-active {
+    background: none;
+    color: #2ed573;
+    font-weight: 700;
+}
+
+span.status-blocked {
+    background: none;
+    color: #f59e0b;
+    font-weight: 700;
+}
+/* Yellow */
+span.status-disabled {
+    background: none;
+    color: #ff4757;
+    font-weight: 700;
+}
+/* Red */
+
+/* --- BUTTONS --- */
 .btn-view, .btn-delete, .btn-add, .btn-tool {
     padding: 8px 16px;
     font-size: 13px;
@@ -478,7 +530,7 @@
         transform: translateY(-2px);
     }
 
-/* --- BACK BUTTON --- */
+/* Back Button */
 .btn-back {
     display: inline-flex;
     align-items: center;
@@ -546,7 +598,7 @@
         cursor: pointer;
     }
 
-/* --- EMPTY STATE --- */
+/* Empty State */
 .empty-state {
     display: flex;
     flex-direction: column;
@@ -572,24 +624,6 @@
 .pagination a {
     padding: 6px 12px !important;
     font-size: 13px !important;
-}
-
-.status-badge {
-    display: inline-block;
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.status-active {
-    color: #2ed573;
-    font-weight: 700;
-}
-
-.status-blocked {
-    color: #ff4757;
-    font-weight: 700;
 }
 
 .badge-you {
@@ -812,15 +846,6 @@
     cursor: pointer;
 }
 
-.timeline-section {
-    background: var(--bg-card);
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: var(--shadow-soft);
-    border: 1px solid var(--border-color);
-    min-height: 400px;
-}
-
 .timeline-list {
     list-style: none;
     padding: 0;
@@ -894,34 +919,6 @@
     border-color: #ffa502;
     color: #ffa502;
     background: #fff8e1;
-}
-
-.admin-edit-bg {
-    position: relative;
-    background: url('/images/about_background.png') no-repeat center center fixed;
-    background-size: cover;
-    min-height: 100vh;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 40px 20px;
-}
-
-    .admin-edit-bg::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(255, 255, 255, 0.6);
-        backdrop-filter: blur(8px);
-        z-index: -1;
-    }
-
-[data-theme="dark"] .admin-edit-bg::before {
-    background: rgba(0, 0, 0, 0.75);
 }
 
 .admin-glass-card {
