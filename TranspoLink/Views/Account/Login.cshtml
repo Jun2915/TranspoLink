@@ -5,6 +5,7 @@
 
 @section head {
     <link rel="stylesheet" href="/css/login.css" asp-append-version="true" />
+    <link rel="stylesheet" href="/css/policy.css" asp-append-version="true" />
     <script src="/js/regNlog.js" asp-append-version="true" defer></script>
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 }
@@ -51,11 +52,26 @@
                 <a href="/Account/ResetPassword" class="auth-link">Forgot password?</a>
             </div>
 
+            @* --- CHECKBOX WITHOUT NEW TAB (target=_blank removed) --- *@
+            <div style="margin-top: 10px; margin-bottom: 5px;">
+                <label class="auth-checkbox">
+                    <input asp-for="TermsAgreed" type="checkbox" id="termsCheck">
+                    <span class="legal-text-row" style="margin-left: 0;">
+                        I agree to the
+                        <a href="/Home/TermsAndConditions" class="legal-link">Terms</a>
+                        &
+                        <a href="/Home/PrivacyPolicy" class="legal-link">Privacy Policy</a>.
+                    </span>
+                </label>
+                <span asp-validation-for="TermsAgreed" class="field-validation-error"></span>
+            </div>
+
             <div class="g-recaptcha"
                  data-sitekey="6Ld3iBosAAAAAHOjrhAT_ufqDtdaUHcKIYH94G4-"
-                 style="margin-bottom: 15px; display: flex; justify-content: center;">
+                 style="margin-bottom: 15px; display: flex; justify-content: center; margin-top: 15px;">
             </div>
-            <button type="submit" class="auth-submit-btn">Log In</button>
+
+            <button type="submit" class="auth-submit-btn" id="loginBtn" disabled>Log In</button>
 
             <div class="auth-divider"><span>or log in with</span></div>
 

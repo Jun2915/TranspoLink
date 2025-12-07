@@ -1,0 +1,150 @@
+﻿/* =========================================================
+   POLICY PAGES (Terms & Privacy) - NO CARD STYLE
+   ========================================================= */
+
+/* 1. Full Page Wrapper with Fixed Background */
+.policy-page-wrapper {
+    position: relative;
+    /* Use the same image as About Us */
+    background: url('/images/about_background.png') no-repeat center center fixed;
+    background-size: cover;
+    min-height: 100vh; /* Full screen height */
+    width: 100%;
+    padding: 80px 20px; /* Spacing top/bottom */
+    font-family: 'Roboto', sans-serif;
+    color: var(--text-main);
+}
+
+    /* 2. Half-Transparent White Overlay (Fixed, No Blur) */
+    .policy-page-wrapper::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        /* 85% White overlay so text is readable on the map background */
+        background: rgba(255, 255, 255, 0.85);
+        z-index: 0; /* Behind the text */
+    }
+
+/* Dark Mode Overlay Support */
+[data-theme="dark"] .policy-page-wrapper::before {
+    background: rgba(0, 0, 0, 0.85);
+}
+
+/* 3. Content Container (No Card, No Border, No Shadow) */
+.policy-content-container {
+    position: relative; /* Sits on top of overlay */
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: left; /* Reading mode */
+}
+
+/* 4. Typography & Styling */
+.policy-title {
+    font-size: 42px;
+    font-weight: 800;
+    margin-bottom: 5px;
+    text-align: center;
+    /* Gradient Text */
+    background: linear-gradient(135deg, #0f1b3d 0%, #667eea 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+[data-theme="dark"] .policy-title {
+    background: linear-gradient(135deg, #ffffff 0%, #a3bffa 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.policy-date {
+    display: block;
+    text-align: center;
+    color: var(--text-light);
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 50px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.policy-body h2 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-top: 40px;
+    margin-bottom: 15px;
+    color: #0f1b3d; /* Strong dark color */
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+[data-theme="dark"] .policy-body h2 {
+    color: #e0e0e0;
+}
+
+/* Underline decoration for headers */
+.policy-body h2::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(0,0,0,0.1);
+    margin-left: 15px;
+}
+
+.policy-body p {
+    font-size: 17px;
+    line-height: 1.8;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+[data-theme="dark"] .policy-body p {
+    color: #ccc;
+}
+
+.policy-body ul {
+    margin-bottom: 30px;
+    padding-left: 20px;
+}
+
+.policy-body li {
+    font-size: 17px;
+    line-height: 1.8;
+    margin-bottom: 10px;
+    color: #444;
+}
+
+[data-theme="dark"] .policy-body li {
+    color: #bbb;
+}
+
+/* 5. Footer Buttons */
+.policy-footer {
+    margin-top: 60px;
+    text-align: center;
+    padding-top: 30px;
+    border-top: 2px solid rgba(0,0,0,0.05);
+}
+
+.btn-back-home {
+    display: inline-block;
+    padding: 14px 35px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: 700;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+    .btn-back-home:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.5);
+        color: white;
+    }

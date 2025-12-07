@@ -20,8 +20,20 @@ public class HomeController(DB db) : Controller
         return View();
     }
 
-    //GET: Home/Reports
+    // GET: Home/Reports
     public IActionResult Reports()
+    {
+        return View();
+    }
+
+    // GET: Home/TermsAndConditions
+    public IActionResult TermsAndConditions()
+    {
+        return View();
+    }
+
+    // GET: Home/PrivacyPolicy
+    public IActionResult PrivacyPolicy()
     {
         return View();
     }

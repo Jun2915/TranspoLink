@@ -5,6 +5,7 @@
 
 @section head {
     <link rel="stylesheet" href="/css/login.css" asp-append-version="true" />
+    <link rel="stylesheet" href="/css/policy.css" asp-append-version="true" />
     <script src="/js/regNlog.js" asp-append-version="true" defer></script>
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 }
@@ -93,10 +94,25 @@
                                 <span class="auth-input-icon">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="#666"><path d="M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z" /></svg>
                                 </span>
-                                <input asp-for="Password" type="password" placeholder="Password">
+
+                                @* ID needed for JS to target this specific field *@
+                                <input asp-for="Password" type="password" placeholder="Password" id="regPassword">
+
                                 <button type="button" class="auth-toggle-password">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="#999"><path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z" /></svg>
                                 </button>
+
+                                @* --- PASSWORD REQUIREMENT POPUP --- *@
+                                <div id="passwordPopup" class="password-requirements-popup">
+                                    <p>Password must contain:</p>
+                                    <div class="req-item invalid" id="req-letter"><span class="req-icon">✖</span> At least one letter</div>
+                                    <div class="req-item invalid" id="req-capital"><span class="req-icon">✖</span> At least one capital letter</div>
+                                    <div class="req-item invalid" id="req-number"><span class="req-icon">✖</span> At least one number</div>
+                                    <div class="req-item invalid" id="req-symbol"><span class="req-icon">✖</span> At least one symbol</div>
+                                    <div class="req-item invalid" id="req-length"><span class="req-icon">✖</span> Be at least 8 characters</div>
+                                </div>
+                                @* ---------------------------------- *@
+
                             </div>
                             <span asp-validation-for="Password" class="field-validation-error"></span>
 
@@ -113,12 +129,26 @@
                         </div>
                     </div>
 
+                    @* --- MANDATORY CHECKBOX WITHOUT TARGET BLANK --- *@
+                    <div style="margin-top: 10px; margin-bottom: 5px;">
+                        <label class="auth-checkbox">
+                            <input asp-for="TermsAgreed" type="checkbox" id="termsCheck">
+                            <span class="legal-text-row" style="margin-left: 0;">
+                                I agree to the
+                                <a href="/Home/TermsAndConditions" class="legal-link">Terms</a>
+                                &
+                                <a href="/Home/PrivacyPolicy" class="legal-link">Privacy Policy</a>.
+                            </span>
+                        </label>
+                        <span asp-validation-for="TermsAgreed" class="field-validation-error"></span>
+                    </div>
+
                     <div class="g-recaptcha"
                          data-sitekey="6Ld3iBosAAAAAHOjrhAT_ufqDtdaUHcKIYH94G4-"
                          style="margin-top: 20px; display: flex; justify-content: center;">
                     </div>
 
-                    <button type="submit" class="auth-submit-btn">Sign Up</button>
+                    <button type="submit" class="auth-submit-btn" id="regBtn" disabled>Sign Up</button>
 
                     <div class="auth-divider"><span>or sign up with</span></div>
                     <div class="auth-social-buttons">

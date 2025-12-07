@@ -14,27 +14,101 @@ function initAuthPages() {
     setupFormValidation();
     setupPhotoUpload();
     setupInputAnimations();
-    setupDynamicInputIcon(); // Initialize Icon Switcher
+    setupDynamicInputIcon();
+    setupTermsValidation();
+    setupPasswordRequirements(); // <--- NEW: Real-time Check
 
+    // Focus first input
     setTimeout(() => {
         $('.auth-input-group input:visible:first').focus();
     }, 300);
 }
 
 // ============================================================================
+// REAL-TIME PASSWORD REQUIREMENT POPUP
+// ============================================================================
+function setupPasswordRequirements() {
+    // Select the password input on Register page
+    const $passInput = $('#regPassword');
+    const $popup = $('#passwordPopup');
+
+    if ($passInput.length && $popup.length) {
+
+        // Show/Hide on focus/blur
+        $passInput.on('focus', function () {
+            $popup.fadeIn(200);
+        });
+
+        $passInput.on('blur', function () {
+            $popup.fadeOut(200);
+        });
+
+        // Real-time check
+        $passInput.on('input', function () {
+            const val = $(this).val();
+
+            // 1. One Letter
+            toggleReq('#req-letter', /[a-zA-Z]/.test(val));
+
+            // 2. Capital Letter
+            toggleReq('#req-capital', /[A-Z]/.test(val));
+
+            // 3. Number
+            toggleReq('#req-number', /[0-9]/.test(val));
+
+            // 4. Symbol
+            toggleReq('#req-symbol', /[^a-zA-Z0-9]/.test(val));
+
+            // 5. Length (8+)
+            toggleReq('#req-length', val.length >= 8);
+        });
+    }
+}
+
+function toggleReq(id, isValid) {
+    const $el = $(id);
+    const $icon = $el.find('.req-icon');
+
+    if (isValid) {
+        $el.removeClass('invalid').addClass('valid');
+        $icon.text('✔');
+    } else {
+        $el.removeClass('valid').addClass('invalid');
+        $icon.text('✖');
+    }
+}
+
+// ============================================================================
+// CHECKBOX VALIDATION (Disables Button until Checked)
+// ============================================================================
+function setupTermsValidation() {
+    const $check = $('#termsCheck');
+    const $btn = $('#loginBtn').length ? $('#loginBtn') : $('#regBtn');
+
+    if ($check.length && $btn.length) {
+        function toggle() {
+            if ($check.is(':checked')) {
+                $btn.prop('disabled', false);
+            } else {
+                $btn.prop('disabled', true);
+            }
+        }
+        toggle(); // On load
+        $check.on('change', toggle);
+    }
+}
+
+// ============================================================================
 // DYNAMIC ICON SWITCHER (Email 📧 <-> Phone 📞)
 // ============================================================================
 function setupDynamicInputIcon() {
-    // Listen for typing in any input named "Input"
     $(document).on('input propertychange paste', 'input[name="Input"]', function () {
         const val = $(this).val().trim();
         const $container = $(this).closest('.auth-input-group');
-
-        // Find the specific icons inside this group
         const $emailIcon = $container.find('.icon-email');
         const $phoneIcon = $container.find('.icon-phone');
 
-        // Logic: If digits/plus/dash/space only -> Show Phone
+        // Logic: digits, plus, dash, space -> Phone
         if (val.length > 0 && /^[0-9+\-\s]+$/.test(val)) {
             $emailIcon.hide();
             $phoneIcon.show();

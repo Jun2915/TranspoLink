@@ -6,6 +6,15 @@ namespace TranspoLink.Models;
 
 #nullable disable warnings
 
+// Custom Attribute for Mandatory Checkbox
+public class MustBeTrueAttribute : ValidationAttribute
+{
+    public override bool IsValid(object? value)
+    {
+        return value is bool b && b;
+    }
+}
+
 // View Models ----------------------------------------------------------------
 
 public class LoginVM
@@ -13,14 +22,16 @@ public class LoginVM
     [Required(ErrorMessage = "Please enter your Email or Phone Number.")]
     [StringLength(100)]
     [DisplayName("Email / Phone Number")]
-    public string Input { get; set; } // Combined Field
+    public string Input { get; set; }
 
     [Required]
-    [StringLength(100, MinimumLength = 5)]
     [DataType(DataType.Password)]
     public string Password { get; set; }
 
     public bool RememberMe { get; set; }
+
+    [MustBeTrue(ErrorMessage = "You must agree to the Terms and Conditions.")]
+    public bool TermsAgreed { get; set; }
 }
 
 public class RegisterVM
@@ -28,16 +39,17 @@ public class RegisterVM
     [Required(ErrorMessage = "Please enter your Email or Phone Number.")]
     [StringLength(100)]
     [DisplayName("Email / Phone Number")]
-    public string Input { get; set; } // Combined Field
+    public string Input { get; set; }
 
     [Required]
-    [StringLength(100, MinimumLength = 5)]
     [DataType(DataType.Password)]
+    // Regex: At least 1 Upper, 1 Number, 1 Symbol, Min 8 chars
+    [RegularExpression(@"^(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$",
+        ErrorMessage = "Password must be 8+ chars, with 1 Uppercase, 1 Number, and 1 Symbol.")]
     public string Password { get; set; }
 
     [Required]
-    [StringLength(100, MinimumLength = 5)]
-    [Compare("Password")]
+    [Compare("Password", ErrorMessage = "Passwords do not match.")]
     [DataType(DataType.Password)]
     [DisplayName("Confirm Password")]
     public string Confirm { get; set; }
@@ -47,25 +59,27 @@ public class RegisterVM
     public string Name { get; set; }
 
     public IFormFile? Photo { get; set; }
+
+    [MustBeTrue(ErrorMessage = "You must agree to the Terms and Conditions.")]
+    public bool TermsAgreed { get; set; }
 }
 
 public class UpdatePasswordVM
 {
     [Required]
-    [StringLength(100, MinimumLength = 5)]
     [DataType(DataType.Password)]
     [DisplayName("Current Password")]
     public string Current { get; set; }
 
     [Required]
-    [StringLength(100, MinimumLength = 5)]
     [DataType(DataType.Password)]
     [DisplayName("New Password")]
+    [RegularExpression(@"^(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$",
+        ErrorMessage = "Password must be 8+ chars, with 1 Uppercase, 1 Number, and 1 Symbol.")]
     public string New { get; set; }
 
     [Required]
-    [StringLength(100, MinimumLength = 5)]
-    [Compare("New")]
+    [Compare("New", ErrorMessage = "Passwords do not match.")]
     [DataType(DataType.Password)]
     [DisplayName("Confirm Password")]
     public string Confirm { get; set; }
@@ -73,7 +87,12 @@ public class UpdatePasswordVM
 
 public class UpdateProfileVM
 {
+    [EmailAddress]
+    [StringLength(100)]
     public string? Email { get; set; }
+
+    [StringLength(11, ErrorMessage = "Phone number cannot exceed 11 digits.")]
+    [RegularExpression(@"^[0-9+\-\s]*$", ErrorMessage = "Invalid phone format.")]
     public string? Phone { get; set; }
 
     [Required]
@@ -81,9 +100,7 @@ public class UpdateProfileVM
     public string Name { get; set; }
 
     public string? PhotoURL { get; set; }
-
     public string? Role { get; set; }
-
     public IFormFile? Photo { get; set; }
 }
 
@@ -110,7 +127,7 @@ public class SearchTripVM
     public int Passengers { get; set; } = 1;
 
     [MaxLength(20)]
-    public string? TransportType { get; set; } // Bus, Train, Ferry
+    public string? TransportType { get; set; }
 }
 
 public class BookTripVM
@@ -142,14 +159,14 @@ public class VerifyOtpVM
 public class ResetPasswordVM
 {
     [Required]
-    [StringLength(100, MinimumLength = 5)]
     [DataType(DataType.Password)]
     [DisplayName("New Password")]
+    [RegularExpression(@"^(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$",
+        ErrorMessage = "Password must be 8+ chars, with 1 Uppercase, 1 Number, and 1 Symbol.")]
     public string NewPassword { get; set; }
 
     [Required]
-    [StringLength(100, MinimumLength = 5)]
-    [Compare("NewPassword")]
+    [Compare("NewPassword", ErrorMessage = "Passwords do not match.")]
     [DataType(DataType.Password)]
     [DisplayName("Confirm Password")]
     public string ConfirmPassword { get; set; }
@@ -169,12 +186,10 @@ public class AdminVM
     public string Email { get; set; }
 
     [Required]
-    [StringLength(20)]
+    [StringLength(11, ErrorMessage = "Phone number cannot exceed 11 digits.")]
     [RegularExpression(@"^[0-9+\-\s]*$", ErrorMessage = "Phone number can only contain numbers, +, - and spaces.")]
     public string Phone { get; set; }
 
-    // Password is required only for Create, optional for Edit
-    [StringLength(100, MinimumLength = 8)]
     [DataType(DataType.Password)]
     public string? Password { get; set; }
 
@@ -184,7 +199,6 @@ public class AdminVM
     public string? ConfirmPassword { get; set; }
 
     public IFormFile? Photo { get; set; }
-
     public string? ExistingPhotoURL { get; set; }
     public bool IsBlocked { get; set; }
 }
