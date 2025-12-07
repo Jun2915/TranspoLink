@@ -16,9 +16,8 @@ function initAuthPages() {
     setupInputAnimations();
     setupDynamicInputIcon();
     setupTermsValidation();
-    setupPasswordRequirements(); // <--- NEW: Real-time Check
+    setupPasswordRequirements(); // <--- This runs the popup logic
 
-    // Focus first input
     setTimeout(() => {
         $('.auth-input-group input:visible:first').focus();
     }, 300);
@@ -28,45 +27,39 @@ function initAuthPages() {
 // REAL-TIME PASSWORD REQUIREMENT POPUP
 // ============================================================================
 function setupPasswordRequirements() {
-    // Select the password input on Register page
-    const $passInput = $('#regPassword');
-    const $popup = $('#passwordPopup');
+    // UPDATED SELECTOR: Targets Register, Reset, and Update pages
+    const $passInput = $('#regPassword, #resetPassInput, #updatePassInput');
 
-    if ($passInput.length && $popup.length) {
+    if ($passInput.length) {
+        $passInput.each(function () {
+            const $input = $(this);
+            const $popup = $input.siblings('.password-requirements-popup'); // Find the specific popup for this input
 
-        // Show/Hide on focus/blur
-        $passInput.on('focus', function () {
-            $popup.fadeIn(200);
-        });
+            // Show/Hide on focus/blur
+            $input.on('focus', function () {
+                $popup.fadeIn(200);
+            });
 
-        $passInput.on('blur', function () {
-            $popup.fadeOut(200);
-        });
+            $input.on('blur', function () {
+                $popup.fadeOut(200);
+            });
 
-        // Real-time check
-        $passInput.on('input', function () {
-            const val = $(this).val();
+            // Real-time check
+            $input.on('input', function () {
+                const val = $(this).val();
 
-            // 1. One Letter
-            toggleReq('#req-letter', /[a-zA-Z]/.test(val));
-
-            // 2. Capital Letter
-            toggleReq('#req-capital', /[A-Z]/.test(val));
-
-            // 3. Number
-            toggleReq('#req-number', /[0-9]/.test(val));
-
-            // 4. Symbol
-            toggleReq('#req-symbol', /[^a-zA-Z0-9]/.test(val));
-
-            // 5. Length (8+)
-            toggleReq('#req-length', val.length >= 8);
+                // We use find() inside the specific popup to update only relevant icons
+                toggleReq($popup.find('.req-letter'), /[a-zA-Z]/.test(val));
+                toggleReq($popup.find('.req-capital'), /[A-Z]/.test(val));
+                toggleReq($popup.find('.req-number'), /[0-9]/.test(val));
+                toggleReq($popup.find('.req-symbol'), /[^a-zA-Z0-9]/.test(val));
+                toggleReq($popup.find('.req-length'), val.length >= 8);
+            });
         });
     }
 }
 
-function toggleReq(id, isValid) {
-    const $el = $(id);
+function toggleReq($el, isValid) {
     const $icon = $el.find('.req-icon');
 
     if (isValid) {
@@ -78,6 +71,8 @@ function toggleReq(id, isValid) {
     }
 }
 
+// ... (Rest of your existing functions: setupTermsValidation, etc.) ...
+// Ensure you keep the existing functions below unmodified
 // ============================================================================
 // CHECKBOX VALIDATION (Disables Button until Checked)
 // ============================================================================
@@ -93,14 +88,11 @@ function setupTermsValidation() {
                 $btn.prop('disabled', true);
             }
         }
-        toggle(); // On load
+        toggle();
         $check.on('change', toggle);
     }
 }
 
-// ============================================================================
-// DYNAMIC ICON SWITCHER (Email 📧 <-> Phone 📞)
-// ============================================================================
 function setupDynamicInputIcon() {
     $(document).on('input propertychange paste', 'input[name="Input"]', function () {
         const val = $(this).val().trim();
@@ -108,7 +100,6 @@ function setupDynamicInputIcon() {
         const $emailIcon = $container.find('.icon-email');
         const $phoneIcon = $container.find('.icon-phone');
 
-        // Logic: digits, plus, dash, space -> Phone
         if (val.length > 0 && /^[0-9+\-\s]+$/.test(val)) {
             $emailIcon.hide();
             $phoneIcon.show();
@@ -119,9 +110,6 @@ function setupDynamicInputIcon() {
     });
 }
 
-// ============================================================================
-// PASSWORD VISIBILITY TOGGLE
-// ============================================================================
 function setupPasswordToggle() {
     $(document).on('click', '.auth-toggle-password', function (e) {
         e.preventDefault();
@@ -142,9 +130,11 @@ function setupPasswordToggle() {
 }
 
 function setupFormValidation() {
-    $(document).on('input', 'input[name="Confirm"]', function () {
-        const password = $('input[name="Password"]').val();
+    $(document).on('input', 'input[name="Confirm"], input[name="ConfirmPassword"]', function () {
+        const passName = $(this).attr('name') === 'Confirm' ? 'Password' : 'NewPassword';
+        const password = $(`input[name="${passName}"]`).val();
         const confirm = $(this).val();
+
         if (confirm && password !== confirm) {
             $(this).parent().addClass('input-error');
         } else {

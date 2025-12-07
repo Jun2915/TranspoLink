@@ -4,7 +4,7 @@
 }
 
 @section head {
-    <link rel="stylesheet" href="/css/forgotpass.css" />
+    <link rel="stylesheet" href="/css/forgotpass.css" asp-append-version="true" />
 }
 
 <div class="auth-container">
@@ -16,16 +16,13 @@
             <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
 
             <div class="auth-input-group">
-                <!-- No icon needed for centered OTP -->
                 <input asp-for="Otp" class="otp-input" placeholder="000000" maxlength="6" autofocus>
             </div>
             <span asp-validation-for="Otp" class="field-validation-error"></span>
 
             <button type="submit" class="auth-submit-btn">Verify Code</button>
 
-            <div style="margin-top: 20px;">
-                <a href="/Account/ForgotPassword" class="auth-link">Resend Code</a>
-            </div>
+            <a href="/Account/ForgotPassword" class="auth-link">Resend Code</a>
         </form>
     </div>
 </div>
