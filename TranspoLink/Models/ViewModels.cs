@@ -6,7 +6,6 @@ namespace TranspoLink.Models;
 
 #nullable disable warnings
 
-// Custom Attribute for Mandatory Checkbox
 public class MustBeTrueAttribute : ValidationAttribute
 {
     public override bool IsValid(object? value)
@@ -43,7 +42,6 @@ public class RegisterVM
 
     [Required]
     [DataType(DataType.Password)]
-    // Regex: At least 1 Upper, 1 Number, 1 Symbol, Min 8 chars
     [RegularExpression(@"^(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$",
         ErrorMessage = "Password must be 8+ chars, with 1 Uppercase, 1 Number, and 1 Symbol.")]
     public string Password { get; set; }
