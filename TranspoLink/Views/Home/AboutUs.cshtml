@@ -25,25 +25,40 @@
             </p>
         </section>
 
-        <section class="about-map-section animate-on-scroll slide-right">
+        <section class="about-section animate-on-scroll slide-right" style="text-align: left;">
+            <h3 class="about-section-title">Our Logo</h3>
+            <br>
+            <div class="logo-showcase">
+                <img src="/images/shortcut_icon.png" alt="TranspoLink Official Logo" class="about-logo-large">
+            </div>
+
+            <p class="about-text" style="max-width: 800px; margin: 0 auto;">
+                Our logo represents the core of our mission: <b>Connection</b>.
+                The <b>Globe</b> signifies our extensive network covering every corner of the region.
+                The <b>Train</b> emerging from the center symbolizes the speed, efficiency, and forward momentum of our services.
+                Finally, the <b>Checkmark</b> is our promise to you—a guarantee of a secure, verified, and hassle-free booking experience every time.
+            </p>
+        </section>
+
+        <section class="about-map-section animate-on-scroll slide-left">
             <h3 class="about-section-title">Visit Our HQ</h3>
             <p class="about-text" style="margin-bottom: 25px;">
                 Come say hello! We are located in the heart of Kuala Lumpur.
             </p>
 
             <div class="map-wrapper">
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3983.5377912547056!2d101.72397681008096!3d3.215260552730139!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31cc3843bfb6a031%3A0x2dc5e067aae3ab84!2sTunku%20Abdul%20Rahman%20University%20of%20Management%20and%20Technology%20(TAR%20UMT)!5e0!3m2!1sen!2smy!4v1765033560820!5m2!1sen!2smy" 
-                        width="600" 
-                        height="450" 
-                        style="border:0;" 
-                        allowfullscreen="" 
-                        loading="lazy" 
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3983.793746671049!2d101.6841283749712!3d3.149029996826388!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31cc37004f26c361%3A0x6d9a0d8e8e7e7e0!2sKuala%20Lumpur%2C%20Federal%20Territory%20of%20Kuala%20Lumpur!5e0!3m2!1sen!2smy!4v1700000000000!5m2!1sen!2smy"
+                        width="100%"
+                        height="100%"
+                        style="border:0;"
+                        allowfullscreen=""
+                        loading="lazy"
                         referrerpolicy="no-referrer-when-downgrade">
-                    </iframe>
+                </iframe>
             </div>
         </section>
 
-        <section class="about-section animate-on-scroll slide-left">
+        <section class="about-section animate-on-scroll slide-right">
             <div class="about-stats">
                 <div class="stat-item">
                     <h2 class="stat-number">10k+</h2>
@@ -60,7 +75,7 @@
             </div>
         </section>
 
-        <section class="about-section animate-on-scroll slide-right">
+        <section class="about-section animate-on-scroll slide-left">
             <h3 class="about-section-title">Our Vision</h3>
             <p class="about-text">
                 To become the leading digital transportation hub in Southeast Asia, making travel accessible, affordable, and efficient for everyone.
@@ -68,7 +83,7 @@
             </p>
         </section>
 
-        <section class="about-section animate-on-scroll slide-left">
+        <section class="about-section animate-on-scroll slide-right">
             <h3 class="about-section-title">Loved by Locals & Tourists</h3>
             <div class="about-grid">
                 <div class="about-card testimonial-card">
@@ -120,7 +135,7 @@
                         entry.target.classList.add('is-visible');
                     }
                 });
-            }, { threshold: 0.1 }); // Trigger when 10% visible
+            }, { threshold: 0.1 });
 
             document.querySelectorAll('.animate-on-scroll').forEach((el) => {
                 observer.observe(el);
