@@ -157,16 +157,33 @@
    4. MEMBER DETAILS PAGE
    ========================================================= */
 .btn-back {
-    display: inline-block;
-    color: var(--text-light);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px; /* Space between arrow and text */
+    padding: 12px 25px;
+    background-color: var(--bg-card); /* White background */
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+    border-radius: 50px; /* Pill shape */
     text-decoration: none;
-    font-weight: 500;
-    transition: color 0.2s;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Bouncy effect */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    margin-bottom: 25px; /* Spacing below button */
 }
 
-    .btn-back:hover {
-        color: var(--text-main);
-    }
+.btn-back:hover {
+    transform: translateX(-5px); /* Slide left on hover */
+    border-color: #667eea;
+    color: #667eea;
+    box-shadow: 0 8px 20px rgba(102, 126, 238, 0.2); /* Glow effect */
+}
+
+/* Dark Mode Hover Adjustment */
+[data-theme="dark"] .btn-back:hover {
+    background-color: #2d2d2d;
+}
 
 .details-grid {
     display: grid;
@@ -796,4 +813,32 @@ th[data-dir="desc"] .sort-arrow {
 
 .disabled-upload {
     cursor: pointer !important; /* Changed from default to pointer to indicate clickability for preview */
+}
+
+/* =========================================================
+   6. MEMBER BACKGROUND MODE (CUSTOM ADDITION)
+   ========================================================= */
+.admin-container.member-bg-page {
+    background: url('/images/about_background.png') no-repeat center center fixed !important;
+    background-size: cover !important;
+    position: relative;
+    z-index: 0;
+    /* Ensure content inside doesn't hit edges awkwardly if overlay is used */
+}
+
+    /* Half Transparent Overlay */
+    .admin-container.member-bg-page::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.5); /* 50% opacity white */
+        z-index: -1; /* Behind content, in front of background image */
+    }
+
+/* Dark Mode Support for Overlay */
+[data-theme="dark"] .admin-container.member-bg-page::before {
+    background: rgba(0, 0, 0, 0.5); /* 50% opacity black */
 }

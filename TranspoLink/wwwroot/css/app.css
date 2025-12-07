@@ -1,8 +1,7 @@
 ﻿/* ============================================================================
-   THEME VARIABLES (Light Mode Default)
+   THEME VARIABLES
    ============================================================================ */
 :root {
-    /* Colors */
     --bg-body: #f5f7fa;
     --bg-card: #ffffff;
     --bg-nav: #ffffff;
@@ -18,7 +17,6 @@
     --shadow-soft: 0 4px 15px rgba(0, 0, 0, 0.08);
 }
 
-/* DARK MODE OVERRIDES */
 [data-theme="dark"] {
     --bg-body: #121212;
     --bg-card: #1e1e1e;
@@ -38,9 +36,8 @@
 /* ============================================================================
    BASE STYLES
    ============================================================================ */
-
 body, input, select, textarea, button {
-    font: 16px Roboto, sans-serif;
+    font-family: 'Roboto', sans-serif;
     color: var(--text-body);
 }
 
@@ -51,177 +48,152 @@ body {
     flex-direction: column;
     background: var(--bg-body);
     transition: background 0.3s ease, color 0.3s ease;
+    font-size: 15px; /* Balanced Base Size */
 }
 
-header, footer {
-    background: var(--bg-header);
-    color: #fff;
-    padding: 10px 50px;
-}
-
-/* Top Bar */
+/* ============================================================================
+   TOP BAR (Logo + User Actions)
+   ============================================================================ */
 .top-bar {
     background: var(--bg-header);
     color: #fff;
     display: flex;
-    justify-content: flex-end;
     align-items: center;
-    padding: 10px 50px;
-    gap: 30px;
+    padding: 8px 30px;
+    gap: 20px;
     font-size: 14px;
+    height: 55px;
+    box-sizing: border-box;
 }
 
-.top-bar-item a {
-    color: inherit;
-    text-decoration: none;
-}
-
-/* Navigation */
-nav {
-    background: var(--bg-nav);
-    padding: 15px 50px;
+/* Logo Area */
+.top-bar-logo {
     display: flex;
     align-items: center;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    gap: 12px;
+    margin-right: auto; /* Pushes everything else to the right */
+}
+
+    .top-bar-logo img {
+        width: 36px;
+        height: 36px;
+        border-radius: 6px;
+        border: 1px solid rgba(255,255,255,0.2);
+        display: block;
+    }
+
+.brand-text {
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+    text-decoration: none;
+    letter-spacing: 0.5px;
+}
+
+.top-bar-item {
+    cursor: pointer;
+    transition: color 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+    .top-bar-item a {
+        color: inherit;
+        text-decoration: none;
+    }
+
+/* User Profile Trigger */
+.user-profile-display {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    transition: background 0.2s;
+    user-select: none;
+}
+
+    .user-profile-display:hover {
+        background: rgba(255,255,255,0.1);
+    }
+
+.nav-user-photo {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255,255,255,0.8);
+}
+
+.user-welcome-text {
+    font-weight: 500;
+}
+
+.user-dropdown-container {
+    position: relative;
+}
+
+/* ============================================================================
+   NAVIGATION BAR (Centered & Balanced)
+   ============================================================================ */
+nav {
+    background: var(--bg-nav);
+    padding: 0 30px;
+    height: 55px; /* Matches Top Bar height */
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Center the links */
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     position: sticky;
     top: 0;
     z-index: 100;
     border-bottom: 1px solid var(--border-color);
 }
 
-.logo {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 26px;
-    font-weight: bold;
-    color: var(--text-main);
-    flex: 1;
-}
-
-    .logo a {
-        color: inherit;
-        text-decoration: none;
-    }
-
 .nav-links {
     list-style: none;
     display: flex;
+    align-items: center;
     gap: 30px;
     margin: 0;
     padding: 0;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center; /* Ensure items align vertically */
+    height: 100%;
 }
+
+    .nav-links li {
+        display: flex;
+        align-items: center;
+        height: 100%;
+    }
 
     .nav-links a {
         color: var(--text-main);
         text-decoration: none;
-        font-weight: 500;
-        padding: 8px 16px;
+        font-weight: 600;
+        padding: 8px 12px;
+        font-size: 15px;
         border-radius: 6px;
         transition: all 0.3s ease;
-        display: flex; /* Helps center text inside the link */
+        display: flex;
         align-items: center;
-        gap: 5px;
+        gap: 6px;
+        line-height: 1;
     }
 
         .nav-links a:hover {
-            background: var(--bg-header);
-            color: #fff;
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
         }
 
-/* Global Card & Inputs */
-.auth-card, .profile-card, .settings-section, .activity-section, .search-container, .feature, .nav-card, .stat-card, .recent-section, .about-container, .about-card {
-    background: var(--bg-card) !important;
-    color: var(--text-body);
-    border: 1px solid var(--border-color);
-}
-
-input, select, textarea {
-    background: var(--bg-input);
-    color: var(--text-body);
-    border: 1px solid var(--border-color);
-}
-
-/* Specific Dark Mode Fixes */
-.profile-name, .about-header, .about-card-title {
-    color: var(--text-main) !important;
-}
-
-.section-title, .about-intro, .about-card-desc {
-    color: var(--text-light) !important;
-}
-
-.field-input {
-    background: var(--bg-input) !important;
-    color: var(--text-body) !important;
-    border-color: var(--border-color) !important;
-}
-
-.user-header-banner {
-    background: #1a1a1a !important;
-    border: 1px solid #333;
-}
-
-/* Table Styles */
-.booking-table th {
-    background: var(--bg-body);
-    color: var(--text-main);
-    border-bottom: 2px solid var(--border-color);
-}
-
-.booking-table td {
-    color: var(--text-body);
-    border-bottom: 1px solid var(--border-color);
-}
-
-.booking-table tr:hover {
-    background-color: var(--bg-body) !important;
-}
-
-/* Feature/Trending Text */
-.feature h3, .trending-header h2 {
-    color: var(--text-main);
-}
-
-/* User Dropdown */
-.profile-dropdown {
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    color: var(--text-body);
-}
-
-.dropdown-name {
-    color: var(--text-main);
-}
-
-.dropdown-email {
-    color: var(--text-light);
-}
-
-.btn-manage {
-    background: var(--bg-card);
-}
-
-.btn-logout {
-    background: var(--bg-body);
-    color: var(--text-body);
-}
-
-/* Fix Nav Links in Footer */
-footer {
-    color: #fff;
-    text-align: center;
-}
-
-/* ============================================================================
-   NEW: NAV BAR DROPDOWN STYLES (Fixed Alignment)
-   ============================================================================ */
+/* Nav Dropdown Logic */
 .nav-item-dropdown {
     position: relative;
     cursor: pointer;
+    height: 100%;
+    display: flex;
+    align-items: center;
 }
 
 .nav-dropdown-content {
@@ -232,47 +204,36 @@ footer {
     min-width: 180px;
     background: var(--bg-card);
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: 0 0 8px 8px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     z-index: 1000;
-    margin-top: 5px;
     flex-direction: column;
     animation: fadeIn 0.2s ease-out;
 }
 
-    .nav-dropdown-content a {
-        display: flex !important; /* KEY FIX: Uses Flexbox */
-        align-items: center !important; /* KEY FIX: Vertically centers items */
-        gap: 10px; /* Space between icon and text */
-        padding: 12px 16px;
-        color: var(--text-main);
-        text-decoration: none;
-        font-weight: 500;
-        border-bottom: 1px solid var(--border-color);
-        transition: background 0.2s;
-        height: auto;
-        line-height: normal;
-    }
-
-        .nav-dropdown-content a:last-child {
-            border-bottom: none;
-        }
-
-        .nav-dropdown-content a:hover {
-            background: var(--bg-body);
-            color: #667eea;
-        }
-
-        /* Emoji size fix inside dropdown */
-        .nav-dropdown-content a span {
-            font-size: 18px;
-            line-height: 1;
-            display: inline-block;
-        }
-
 .show-nav-dropdown {
     display: flex !important;
 }
+
+.nav-dropdown-content a {
+    display: flex !important;
+    justify-content: flex-start;
+    width: 100%;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-color);
+    border-radius: 0;
+    box-sizing: border-box;
+}
+
+    .nav-dropdown-content a:last-child {
+        border-bottom: none;
+        border-radius: 0 0 8px 8px;
+    }
+
+    .nav-dropdown-content a:hover {
+        background: var(--bg-body);
+        color: #667eea;
+    }
 
 @keyframes fadeIn {
     from {
@@ -287,51 +248,31 @@ footer {
 }
 
 /* ============================================================================
-   REST OF ORIGINAL APP.CSS 
+   GLOBAL STYLES (Cards, Inputs, Footer)
    ============================================================================ */
-header {
-    display: flex;
-    gap: 10px;
-    align-items: center;
+.auth-card, .profile-card, .settings-section, .activity-section, .search-container, .feature, .nav-card, .stat-card, .recent-section, .about-container, .about-card {
+    background: var(--bg-card);
+    color: var(--text-body);
+    border: 1px solid var(--border-color);
 }
 
-    header h1 {
-        flex: 1;
-        margin: 0;
-        padding-left: 40px;
-        background: url(/images/favicon.png) no-repeat left / 32px;
-    }
-
-    header img {
-        width: 36px;
-        height: 36px;
-        border: 1px solid #999;
-        border-radius: 5px;
-    }
-
-.top-bar-item {
-    cursor: pointer;
-    transition: color 0.3s ease;
+input, select, textarea {
+    background: var(--bg-input);
+    color: var(--text-body);
+    border: 1px solid var(--border-color);
 }
 
-    .top-bar-item:hover {
-        color: #ffd700;
-    }
-
-.user-profile-display {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+footer {
+    background: var(--bg-footer);
+    color: #fff;
+    text-align: center;
+    padding: 15px 50px;
+    margin-top: auto;
 }
 
-.nav-user-photo {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid #fff;
-}
-
+/* ============================================================================
+   HOME PAGE SPECIFIC STYLES
+   ============================================================================ */
 .hero {
     background: var(--primary-gradient);
     color: #fff;
@@ -351,6 +292,7 @@ header {
     justify-content: center;
     gap: 15px;
     margin-bottom: 40px;
+    flex-wrap: wrap;
 }
 
 .tab {
@@ -381,16 +323,12 @@ header {
         box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     }
 
-    .tab .icon {
-        width: 24px;
-        height: 24px;
-    }
-
+/* Search Container (Home) */
 .search-container {
     border-radius: 15px;
     padding: 35px;
     max-width: 900px;
-    margin: 0 auto;
+    margin: 0 auto 20px auto;
     box-shadow: var(--shadow-soft);
 }
 
@@ -439,6 +377,7 @@ header {
         border-radius: 8px;
         font-size: 15px;
         transition: all 0.3s ease;
+        box-sizing: border-box;
     }
 
         .input-wrapper input:focus {
@@ -489,6 +428,7 @@ header {
         box-shadow: 0 6px 20px rgba(102,126,234,0.4);
     }
 
+/* Features Section */
 .features {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -525,8 +465,10 @@ header {
     font-size: 18px;
     margin: 0;
     font-weight: 600;
+    color: var(--text-main);
 }
 
+/* Trending Section */
 .trending {
     padding: 60px 50px;
     background: var(--bg-body);
@@ -543,6 +485,7 @@ header {
         font-size: 32px;
         margin: 0;
         font-weight: 700;
+        color: var(--text-main);
     }
 
 .see-all {
@@ -578,6 +521,9 @@ header {
         box-shadow: 0 8px 25px rgba(0,0,0,0.15);
     }
 
+/* ============================================================================
+   UTILITY & MISC
+   ============================================================================ */
 .pagination a, .pagination span {
     background: #667eea !important;
     color: #fff !important;
@@ -680,59 +626,11 @@ header {
     box-shadow: 0 2px 8px rgba(102,126,234,0.3);
 }
 
-@media (max-width: 768px) {
-    .top-bar, nav, .hero, .features, .trending {
-        padding-left: 20px;
-        padding-right: 20px;
-    }
-
-        .hero h1 {
-            font-size: 28px;
-        }
-
-    .origin-destination {
-        grid-template-columns: 1fr;
-        gap: 15px;
-    }
-
-    .swap-btn {
-        transform: rotate(90deg);
-        margin: 0;
-    }
-
-    .tabs {
-        flex-wrap: wrap;
-    }
-
-    .features {
-        grid-template-columns: 1fr;
-    }
-
-    .trending-items {
-        grid-template-columns: 1fr;
-    }
-}
-
-.user-dropdown-container {
-    position: relative;
-}
-
-#profileTrigger {
-    cursor: pointer;
-    user-select: none;
-    padding: 5px 10px;
-    border-radius: 20px;
-    transition: background 0.2s;
-}
-
-    #profileTrigger:hover {
-        background: rgba(255, 255, 255, 0.1);
-    }
-
+/* User Profile Dropdown (Top Bar) */
 .profile-dropdown {
     display: none;
     position: absolute;
-    top: 120%;
+    top: 50px;
     right: 0;
     width: 280px;
     border-radius: 16px;
@@ -740,6 +638,9 @@ header {
     z-index: 1000;
     overflow: hidden;
     animation: fadeIn 0.2s ease-out;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-body);
 }
 
 .dropdown-header {
@@ -763,11 +664,13 @@ header {
     margin: 0;
     font-weight: bold;
     font-size: 18px;
+    color: var(--text-main);
 }
 
 .dropdown-email {
     margin: 2px 0 0;
     font-size: 13px;
+    color: var(--text-light);
 }
 
 .dropdown-actions {
@@ -788,12 +691,52 @@ header {
     transition: all 0.2s;
 }
 
-.btn-manage:hover {
-    background: rgba(102, 126, 238, 0.8);
-    color: white;
+.btn-manage {
+    background: var(--bg-card);
+    color: var(--text-body);
+    border: 1px solid var(--border-color);
 }
 
-.btn-logout:hover {
-    background: #ff4757;
-    color: white;
+    .btn-manage:hover {
+        background: rgba(102, 126, 238, 0.8);
+        color: white;
+        border-color: transparent;
+    }
+
+.btn-logout {
+    background: var(--bg-body);
+    color: var(--text-body);
+    border: 1px solid var(--border-color);
+}
+
+    .btn-logout:hover {
+        background: #ff4757;
+        color: white;
+        border-color: transparent;
+    }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .top-bar, nav, .hero, .features, .trending {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .origin-destination {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .swap-btn {
+        transform: rotate(90deg);
+        margin: 0 auto;
+    }
+
+    .features, .trending-items {
+        grid-template-columns: 1fr;
+    }
+
+    .nav-links {
+        gap: 15px;
+    }
 }

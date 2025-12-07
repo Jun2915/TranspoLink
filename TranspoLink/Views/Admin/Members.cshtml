@@ -7,25 +7,32 @@
 @section head {
     <link rel="stylesheet" href="/css/admin.css" asp-append-version="true" />
     <link rel="stylesheet" href="/css/member.css" asp-append-version="true" />
-    <script src="/js/admin.js" asp-append-version="true" defer></script>
+
+    @* NOTE: user.js is already in _Layout, but we include it here if needed for versioning/defer order.
+       We DO NOT include admin.js to prevent conflicts. *@
+    <script src="/js/user.js" asp-append-version="true" defer></script>
 }
 
-<div class="admin-container">
+@* Added class 'member-bg-page' for custom background *@
+<div class="admin-container member-bg-page">
     <div class="admin-header">
         <h1>👥 Member Management</h1>
         <p>View and manage registered members.</p>
     </div>
 
-    <form method="get" class="search-container" id="searchForm">
+    @* Search Form *@
+    <form method="get" class="search-container" id="searchForm" onsubmit="event.preventDefault();">
         <input type="text" id="searchInput" name="search" value="@ViewBag.Search" placeholder="Search by ID, name, email..." autocomplete="off">
-        <a href="/Admin/Members" id="clearSearchBtn" class="btn-clear" style="display: none;">✕ Clear</a>
-        <button type="submit">Search</button>
+        <a href="javascript:void(0)" id="clearSearchBtn" class="btn-clear" style="display: none;">✕ Clear</a>
+        <button type="submit" onclick="loadTable(1)">Search</button>
     </form>
 
+    @* Table Container *@
     <div id="tableContainer" class="recent-section">
         <partial name="_MemberTable" model="Model" />
     </div>
 
+    @* Pagination *@
     <div class="pagination-container" style="margin-top: 20px; text-align: center;">
         <ul class="pagination">
             @for (int i = 1; i <= ViewBag.TotalPages; i++)
@@ -38,6 +45,7 @@
     </div>
 </div>
 
+@* Delete Confirmation Modal (Simple) *@
 <div id="confirmModal" class="confirm-overlay">
     <div class="confirm-box">
         <span class="confirm-icon">⚠️</span>

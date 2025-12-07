@@ -7,13 +7,13 @@
 @section head {
     <link rel="stylesheet" href="/css/admin.css" asp-append-version="true" />
     <link rel="stylesheet" href="/css/member.css" asp-append-version="true" />
-    <script src="/js/user.js" defer></script>
     <script src="/js/admin.js" asp-append-version="true" defer></script>
 }
 
-<div class="admin-container">
-    <div class="admin-header admin-header-row">
-        <div>
+@* Added class 'admin-bg-page' for transparent fixed background *@
+<div class="admin-container admin-bg-page">
+    <div class="admin-header">
+        <div class="admin-header-text">
             <h1>🛡️ Admin Management</h1>
             <p>Manage system administrators and access.</p>
         </div>
@@ -25,10 +25,10 @@
     </div>
 
     <div class="search-section">
-        <form method="get" class="search-container" id="searchForm">
+        <form method="get" class="search-container" id="searchForm" onsubmit="event.preventDefault();">
             <input type="text" id="searchInput" name="search" value="@ViewBag.Search" placeholder="Search by ID, name, email..." autocomplete="off">
-            <a href="/Admin/Admins" id="clearSearchBtn" class="btn-clear" style="display: none;">✕ Clear</a>
-            <button type="submit">Search</button>
+            <a href="javascript:void(0)" id="clearSearchBtn" class="btn-clear" style="display: none;">✕ Clear</a>
+            <button type="submit" onclick="loadTable(1)">Search</button>
         </form>
     </div>
 

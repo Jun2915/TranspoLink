@@ -2,7 +2,6 @@
 
 @{
     ViewBag.Title += " | Admin Details";
-    // Get the timeline data from Controller
     var timeline = ViewBag.Timeline as List<TimelineItemVM>;
 }
 
@@ -12,15 +11,16 @@
     <script src="/js/admin.js" defer></script>
 }
 
-<div class="admin-container">
+@* Added class 'admin-bg-page' *@
+<div class="admin-container admin-bg-page">
 
-    <div style="margin-bottom: 20px;">
+    @* Reduced bottom margin to move button closer *@
+    <div style="margin-bottom: 5px;">
         <a href="/Admin/Admins" class="btn-back">← Back to Admins</a>
     </div>
 
     <div class="details-grid">
 
-        <!-- LEFT: PROFILE CARD -->
         <div class="profile-card">
             <div class="profile-header-img">
                 <img src="@(Model.PhotoURL != null && Model.PhotoURL.StartsWith("/images/") ? Model.PhotoURL : "/images/" + Model.PhotoURL)"
@@ -61,7 +61,6 @@
                 </div>
             </div>
 
-            <!-- ACTION BUTTONS -->
             <div class="profile-btn-group">
                 @if (Model.Id != "A001")
                 {
@@ -75,11 +74,6 @@
                             <button type="submit" class="btn-block">Block Account</button>
                         }
                     </form>
-
-                    <button type="button" class="btn-delete-action"
-                            onclick="openConfirmModal('/Admin/DeleteAdmin/@Model.Id', '@Model.Name')">
-                        Delete Account
-                    </button>
                 }
                 else
                 {
@@ -87,7 +81,9 @@
                 }
             </div>
 
-        </div> <div class="timeline-section">
+        </div>
+
+        <div class="timeline-section">
             <div class="timeline-header">
                 <h3>🧭 Action Trajectory <span style="font-size:12px; color:#999; margin-left:10px;">(Recent Activity)</span></h3>
             </div>
@@ -108,29 +104,12 @@
                 }
                 else
                 {
-                    <p style="text-align:center; color:#999; padding:20px;">No activity recorded.</p>
+                    <div class="empty-state">
+                        <p>No activity recorded for this admin.</p>
+                    </div>
                 }
             </ul>
         </div>
 
-    </div>
-</div> 
-<!-- Reusing the Modal from Admins page (Ensure admin.js includes openConfirmModal logic) -->
-<div id="confirmModal" class="confirm-overlay">
-    <div class="confirm-box">
-        <span class="confirm-icon">⚠️</span>
-        <h3 class="confirm-title">Delete Admin?</h3>
-        <p class="confirm-text">
-            Are you sure you want to remove <b id="deleteNameDisplay" style="color:#ff4757;"></b>?<br>
-            This action cannot be undone.
-        </p>
-
-        <div class="confirm-actions">
-            <button onclick="closeConfirmModal()" class="btn-confirm-cancel">Cancel</button>
-
-            <form method="post" id="deleteConfirmForm">
-                <button type="submit" class="btn-confirm-delete">Yes, Delete</button>
-            </form>
-        </div>
     </div>
 </div>

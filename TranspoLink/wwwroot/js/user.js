@@ -1,25 +1,52 @@
 ﻿// ============================================================================
-// DELETE MODAL LOGIC
+// GLOBAL HELPERS (Available everywhere)
 // ============================================================================
+
+// 1. DELETE MODAL (Complex - Type Name to Confirm)
+// Used in: MemberDetails, AdminDetails
 let expectedName = "";
 
 function openDeleteModal(name) {
     expectedName = name;
     const input = document.getElementById("deleteInput");
     const btn = document.getElementById("confirmDeleteBtn");
+    const modal = document.getElementById("deleteModal");
 
-    input.value = "";
-    btn.disabled = true;
-    btn.classList.remove("active");
-    document.getElementById("deleteModal").style.display = "flex";
-    input.focus();
+    if (input) {
+        input.value = "";
+        // Reset button state
+        if (btn) {
+            btn.disabled = true;
+            btn.classList.remove("active");
+        }
+    }
+
+    if (modal) {
+        modal.style.display = "flex";
+        if (input) setTimeout(() => input.focus(), 100);
+    }
 }
 
 function closeDeleteModal() {
-    document.getElementById("deleteModal").style.display = "none";
+    const modal = document.getElementById("deleteModal");
+    if (modal) modal.style.display = "none";
 }
 
+// 2. CONFIRM MODAL (Simple - Yes/No)
+// Used in: Member Table, Admin Table
+function openConfirmModal(url, name) {
+    $('#deleteNameDisplay').text(name);
+    $('#deleteConfirmForm').attr('action', url);
+    $('#confirmModal').css('display', 'flex');
+}
+
+function closeConfirmModal() {
+    $('#confirmModal').hide();
+}
+
+// Global Event Listeners for Modals
 document.addEventListener("DOMContentLoaded", function () {
+    // Delete Input Logic
     const input = document.getElementById("deleteInput");
     const btn = document.getElementById("confirmDeleteBtn");
 
@@ -35,80 +62,114 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    // Close on Escape key
     document.addEventListener("keydown", function (event) {
         if (event.key === "Escape") {
+            closeDeleteModal();
+            closeConfirmModal();
+        }
+    });
+
+    // Close on clicking outside
+    $(window).on('click', function (e) {
+        if ($(e.target).is('.confirm-overlay')) {
+            closeConfirmModal();
+        }
+        if ($(e.target).is('#deleteModal')) {
             closeDeleteModal();
         }
     });
 });
 
+
 // ============================================================================
-// SEARCH CLEAR BUTTON LOGIC
+// MEMBER MANAGEMENT PAGE LOGIC
+// Only runs on /Admin/Members to avoid conflicts with Admin/Vehicles pages
 // ============================================================================
+$(document).ready(function () {
+
+    // Check if we are on the Members page
+    const isMemberPage = window.location.pathname.toLowerCase().includes('/admin/members');
+
+    if (isMemberPage) {
+
+        // 1. Define loadTable specifically for Members
+        window.loadTable = function (page) {
+            const search = $('#searchInput').val();
+            const sort = $('#partialSort').val() || "Id";
+            const dir = $('#partialDir').val() || "asc";
+
+            $('#tableContainer').css('opacity', '0.6');
+
+            $.ajax({
+                url: '/Admin/Members', // Points correctly to Members
+                type: 'GET',
+                data: { search: search, page: page, sort: sort, dir: dir },
+                success: function (result) {
+                    $('#tableContainer').html(result);
+                    $('#tableContainer').css('opacity', '1');
+                    updateSortIcons();
+                    toggleClearButton(); // Re-check button state
+                },
+                error: function () {
+                    alert("Error loading data.");
+                    $('#tableContainer').css('opacity', '1');
+                }
+            });
+        };
+
+        // 2. Search Input Handler
+        $('#searchInput').on('input', function () {
+            toggleClearButton();
+            loadTable(1);
+        });
+
+        // 3. Clear Button Handler
+        $('#clearSearchBtn').on('click', function (e) {
+            e.preventDefault();
+            $('#searchInput').val('');
+            toggleClearButton();
+            loadTable(1);
+        });
+
+        // 4. Sort Click Handler
+        $(document).on('click', '.sortable', function () {
+            const column = $(this).data('col');
+            let currentSort = $('#partialSort').val();
+            let currentDir = $('#partialDir').val();
+
+            let newDir = 'asc';
+            if (currentSort === column) {
+                newDir = (currentDir === 'asc') ? 'desc' : 'asc';
+            }
+
+            // Update hidden inputs
+            $('#partialSort').val(column);
+            $('#partialDir').val(newDir);
+
+            loadTable(1);
+        });
+
+        // Initialize icons
+        updateSortIcons();
+        toggleClearButton();
+    }
+});
+
+// Helper: Toggle Search Clear Button
 function toggleClearButton() {
     const inputVal = $('#searchInput').val();
     const $btn = $('#clearSearchBtn');
-
-    if (inputVal && inputVal.trim() !== '') {
-        $btn.css('display', 'inline-flex');
-    } else {
-        $btn.hide();
-    }
-}
-
-$(document).ready(function () {
-    toggleClearButton();
-    $('#searchInput').on('input', function () {
-        toggleClearButton();
-    });
-});
-
-// ============================================================================
-// AJAX TABLE SORTING LOGIC
-// ============================================================================
-window.loadTable = function (page) {
-    const search = $('#searchInput').val();
-    const sort = $('#partialSort').val() || "Id";
-    const dir = $('#partialDir').val() || "asc";
-
-    $('#tableContainer').css('opacity', '0.6');
-
-    $.ajax({
-        url: '/Admin/Members',
-        type: 'GET',
-        data: { search: search, page: page, sort: sort, dir: dir },
-        success: function (result) {
-            $('#tableContainer').html(result);
-            $('#tableContainer').css('opacity', '1');
-            updateSortIcons();
-        },
-        error: function () {
-            alert("Error loading data. Please try again.");
-            $('#tableContainer').css('opacity', '1');
+    if ($btn.length) {
+        if (inputVal && inputVal.trim() !== '') {
+            $btn.css('display', 'inline-flex');
+        } else {
+            $btn.hide();
         }
-    });
+    }
 }
 
-$(document).on('click', '.sortable', function () {
-    const column = $(this).data('col');
-    let currentSort = $('#partialSort').val();
-    let currentDir = $('#partialDir').val();
-
-    let newDir = 'asc';
-    if (currentSort === column) {
-        newDir = (currentDir === 'asc') ? 'desc' : 'asc';
-    }
-
-    $('#partialSort').val(column);
-    $('#partialDir').val(newDir);
-    loadTable(1);
-});
-
-$(document).on('submit', '#searchForm', function (e) {
-    e.preventDefault();
-    loadTable(1);
-});
-
+// Helper: Update Sort Icons
 function updateSortIcons() {
     const sort = $('#partialSort').val();
     const dir = $('#partialDir').val();
@@ -118,17 +179,11 @@ function updateSortIcons() {
     }
 }
 
-$(document).ready(function () {
-    updateSortIcons();
-});
-
 // ============================================================================
-// PROFILE PAGE LOGIC (PREVIEW & EDIT)
+// PROFILE EDIT LOGIC (Existing code preserved)
 // ============================================================================
-
 $(document).ready(function () {
     const $profileForm = $('#profileForm');
-
     if ($profileForm.length) {
         const $btnEdit = $('#btnEditProfile');
         const $editActions = $('#editActions');
@@ -138,47 +193,28 @@ $(document).ready(function () {
         const $previewModal = $('#imagePreviewModal');
         const $previewTarget = $('#previewImgTarget');
 
-        // 1. PHOTO CLICK LOGIC (Dual Mode)
         $photoContainer.on('click', function (e) {
-            // Check if we are in EDIT mode
             const isEditMode = !$inputs.first().prop('readonly');
-
             if (!isEditMode) {
-                // VIEW MODE: Show Preview Modal
                 const currentSrc = $('#profileImagePreview').attr('src');
                 $previewTarget.attr('src', currentSrc);
                 $previewModal.fadeIn(200).css('display', 'flex');
             }
-            else {
-                // EDIT MODE: Trigger file input (Handled by photo-tools.js usually, but we ensure it works here)
-                // If photo-tools.js handles it, we let it bubble. 
-                // But typically photo-tools checks for .disabled-upload class.
-            }
         });
 
-        // 2. Handle "Edit User Profile" Click
         $btnEdit.on('click', function () {
-            // Enable Inputs
             $inputs.prop('readonly', false);
-
-            // Enable Photo Upload
             $photoInput.prop('disabled', false);
-
-            // Visual feedback
-            $photoContainer.removeClass('disabled-upload'); // Enables click in photo-tools.js
+            $photoContainer.removeClass('disabled-upload');
             $photoContainer.css('border-color', '#667eea');
-
-            // UI Changes
             $(this).hide();
             $editActions.css('display', 'flex');
-            $('.btn-download-icon').hide(); // Hide download button while editing
-
+            $('.btn-download-icon').hide();
             $inputs.first().focus();
         });
     }
 });
 
-// Close Preview Function (Global scope)
 window.closePreview = function () {
     $('#imagePreviewModal').fadeOut(200);
 }

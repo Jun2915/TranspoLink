@@ -20,6 +20,15 @@
     <div class="info">@TempData["Info"]</div>
 
     <div class="top-bar">
+        <div class="logo top-bar-logo">
+            <a href="/Home/Index">
+                <img src="/images/shortcut_icon.png" alt="TranspoLink Logo" />
+            </a>
+            <a href="/Home/Index" class="brand-text"><span>TranspoLink</span></a>
+        </div>
+
+        <div style="flex: 1;"></div>
+
         <div class="top-bar-item" id="themeToggle" title="Switch Theme" style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
             <span id="themeIcon">☀️</span>
             <span id="themeText">Light</span>
@@ -56,8 +65,8 @@
             <div class="user-dropdown-container">
                 <div class="top-bar-item user-profile-display" id="profileTrigger">
                     <img src="@photoUrl" class="nav-user-photo" alt="Profile" onerror="this.src='/images/default_photo.png'">
-                    <span>👋 Welcome, <b>@(currentUser?.Name ?? User.Identity.Name)</b></span>
-                    <span style="font-size: 10px; margin-left: 5px;">▼</span>
+                    <span class="user-welcome-text">@(currentUser?.Name ?? User.Identity.Name)</span>
+                    <span style="font-size: 10px; margin-left: 3px;">▼</span>
                 </div>
 
                 <div class="profile-dropdown" id="profileDropdown">
@@ -83,10 +92,6 @@
     </div>
 
     <nav>
-        <div class="logo">
-            <a href="/Home/Index"><img src="/images/shortcut_icon.png" alt="TranspoLink Logo" style="width:50px; height:50px;" /></a>
-            <a href="/Home/Index"><span>TranspoLink</span></a>
-        </div>
         <ul class="nav-links">
             @if (User.IsInRole("Admin"))
             {
@@ -153,13 +158,10 @@
     <script>
         function toggleNavDropdown(e, id) {
             e.stopPropagation();
-            // Close all others
             $('.nav-dropdown-content').not('#' + id).removeClass('show-nav-dropdown');
-            // Toggle current
             $('#' + id).toggleClass('show-nav-dropdown');
         }
 
-        // Close when clicking outside (Global)
         $(document).on('click', function () {
             $('.nav-dropdown-content').removeClass('show-nav-dropdown');
         });
