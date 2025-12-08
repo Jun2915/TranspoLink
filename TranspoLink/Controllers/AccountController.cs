@@ -193,7 +193,6 @@ public class AccountController(DB db,
         else
         {
             // --- EXISTING USER UPDATE (Fix for your issue) ---
-            // If the user exists but has the default photo, try to update it from Google
             if ((string.IsNullOrEmpty(u.Role) || u.Role == "Member") && // Only update Members
                 (string.IsNullOrEmpty(u.Name) || u.Name == "Google User" || u is Member m && m.PhotoURL == "default_photo.png"))
             {
@@ -203,7 +202,6 @@ public class AccountController(DB db,
                     if (u is Member member)
                     {
                         member.PhotoURL = hp.SavePhotoFromUrl(photoUrl, "images");
-                        // Optional: Update name if it was generic
                         if (member.Name == "Google User" && !string.IsNullOrEmpty(name)) member.Name = name;
 
                         db.SaveChanges();

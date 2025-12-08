@@ -134,7 +134,7 @@ public class AdminController(DB db, Helper hp) : Controller
                 Email = vm.Email,
                 Phone = vm.Phone,
                 Hash = hp.HashPassword(vm.Password),
-                PhotoURL = vm.Photo != null ? hp.SavePhoto(vm.Photo, "images") : "beauty_admin.png",
+                PhotoURL = vm.Photo != null ? hp.SavePhoto(vm.Photo, "images") : "default_photo.png",
                 IsBlocked = false
             };
 
@@ -188,7 +188,7 @@ public class AdminController(DB db, Helper hp) : Controller
         return View(admin);
     }
 
-    // POST: Admin/ToggleBlockAdmin/A002 (NEW)
+    // POST: Admin/ToggleBlockAdmin/A002
     [HttpPost]
     public IActionResult ToggleBlockAdmin(string id)
     {
