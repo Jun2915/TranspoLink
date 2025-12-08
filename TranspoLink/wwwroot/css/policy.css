@@ -2,20 +2,19 @@
    POLICY PAGES (Terms & Privacy) - NO CARD STYLE
    ========================================================= */
 
-/* 1. Full Page Wrapper with Fixed Background */
+/*  Full Page Wrapper with Fixed Background */
 .policy-page-wrapper {
     position: relative;
-    /* Use the same image as About Us */
     background: url('/images/about_background.png') no-repeat center center fixed;
     background-size: cover;
-    min-height: 100vh; /* Full screen height */
+    min-height: 100vh; 
     width: 100%;
-    padding: 80px 20px; /* Spacing top/bottom */
+    padding: 80px 20px; 
     font-family: 'Roboto', sans-serif;
     color: var(--text-main);
 }
 
-    /* 2. Half-Transparent White Overlay (Fixed, No Blur) */
+    /* Half-Transparent White Overlay (Fixed, No Blur) */
     .policy-page-wrapper::before {
         content: "";
         position: absolute;
@@ -23,9 +22,8 @@
         left: 0;
         width: 100%;
         height: 100%;
-        /* 85% White overlay so text is readable on the map background */
         background: rgba(255, 255, 255, 0.85);
-        z-index: 0; /* Behind the text */
+        z-index: 0;
     }
 
 /* Dark Mode Overlay Support */
@@ -33,22 +31,21 @@
     background: rgba(0, 0, 0, 0.85);
 }
 
-/* 3. Content Container (No Card, No Border, No Shadow) */
+/* Content Container (No Card, No Border, No Shadow) */
 .policy-content-container {
-    position: relative; /* Sits on top of overlay */
+    position: relative; 
     z-index: 1;
     max-width: 900px;
     margin: 0 auto;
-    text-align: left; /* Reading mode */
+    text-align: left;
 }
 
-/* 4. Typography & Styling */
+/*  Typography & Styling */
 .policy-title {
     font-size: 42px;
     font-weight: 800;
     margin-bottom: 5px;
     text-align: center;
-    /* Gradient Text */
     background: linear-gradient(135deg, #0f1b3d 0%, #667eea 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -76,7 +73,7 @@
     font-weight: 700;
     margin-top: 40px;
     margin-bottom: 15px;
-    color: #0f1b3d; /* Strong dark color */
+    color: #0f1b3d; 
     display: flex;
     align-items: center;
     gap: 10px;

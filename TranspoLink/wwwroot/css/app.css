@@ -425,7 +425,7 @@ input, select, textarea {
     border-radius: 30px;
     padding: 5px;
     gap: 5px;
-    margin-bottom: -20px; /* Overlap the search bar */
+    margin-bottom: -20px; 
     position: relative;
     z-index: 10;
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
@@ -434,7 +434,7 @@ input, select, textarea {
 .transport-tab {
     background: transparent;
     border: none;
-    color: #cbd5e1; /* Light grey */
+    color: #cbd5e1; 
     padding: 10px 25px;
     border-radius: 25px;
     font-weight: 600;
@@ -530,7 +530,7 @@ input, select, textarea {
         color: var(--text-main);
         width: 100%;
         outline: none;
-        box-shadow: none; /* Remove default shadow */
+        box-shadow: none; 
     }
 
         .input-text-wrapper input::placeholder {
@@ -538,7 +538,7 @@ input, select, textarea {
             font-weight: 400;
         }
 
-/* --- 3. Swap Button (Centered on border) --- */
+/* ---  Swap Button (Centered on border) --- */
 .btn-swap {
     width: 35px;
     height: 35px;
@@ -551,7 +551,7 @@ input, select, textarea {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    margin: 0 -18px; /* Negative margin to float on border */
+    margin: 0 -18px; 
     z-index: 20;
     transition: all 0.3s ease;
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
@@ -564,7 +564,7 @@ input, select, textarea {
         border-color: #f59e0b;
     }
 
-/* --- 4. Search Submit Button --- */
+/* --- Search Submit Button --- */
 .btn-search-trip {
     background: #f59e0b;
     color: #0f1b3d;
@@ -645,7 +645,7 @@ input, select, textarea {
     justify-content: center;
     margin: 0 auto 20px;
     box-shadow: 0 4px 15px rgba(102,126,234,0.3);
-    font-size: 32px; /* Adjusted for text icons if used */
+    font-size: 32px;
 }
 
 .feature h3 {

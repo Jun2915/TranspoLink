@@ -396,31 +396,31 @@
     text-transform: capitalize;
 }
 
-/* 1. Active (Green) */
+/* Active (Green) */
 .status-active, .status-confirmed {
     background: #d1fae5;
     color: #065f46;
 }
 
-/* 2. Blocked (Yellow) */
+/* Blocked (Yellow) */
 .status-blocked {
     background: #fef3c7;
     color: #b45309;
 }
 
-/* 3. Disabled (Red) - Used for cancelled or inactive items */
+/* Disabled (Red) - Used for cancelled or inactive items */
 .status-disabled, .status-cancelled, .status-inactive {
     background: #fee2e2;
     color: #991b1b;
 }
 
-/* 4. Pending (Blue - Optional) */
+/* Pending (Blue - Optional) */
 .status-pending {
     background: #dbeafe;
     color: #1e40af;
 }
 
-/* Text Colors for Details Page (No bg) */
+/* Text Colors for Details Page  */
 span.status-active {
     background: none;
     color: #2ed573;

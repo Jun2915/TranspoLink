@@ -7,7 +7,7 @@
 
     if (isAdminPage) {
 
-        // 1. Define loadTable specifically for Admins
+        //  Define loadTable specifically for Admins
         window.loadTable = function (page) {
             const search = $('#searchInput').val();
             const sort = $('#partialSort').val() || "Id";
@@ -16,14 +16,14 @@
             $('#tableContainer').css('opacity', '0.6');
 
             $.ajax({
-                url: '/Admin/Admins', // Target the Admin Controller
+                url: '/Admin/Admins',
                 type: 'GET',
                 data: { search: search, page: page, sort: sort, dir: dir },
                 success: function (result) {
                     $('#tableContainer').html(result);
                     $('#tableContainer').css('opacity', '1');
                     updateSortIcons();
-                    toggleClearButton(); // Ensure X button state matches input
+                    toggleClearButton(); 
                 },
                 error: function () {
                     alert("Error loading data.");
@@ -32,13 +32,13 @@
             });
         };
 
-        // 2. Search Input Handler
+        // Search Input Handler
         $('#searchInput').on('input', function () {
             toggleClearButton();
             loadTable(1);
         });
 
-        // 3. Clear Button Handler
+        // Clear Button Handler
         $('#clearSearchBtn').on('click', function (e) {
             e.preventDefault();
             $('#searchInput').val('');
@@ -46,7 +46,7 @@
             loadTable(1);
         });
 
-        // 4. Sort Click Handler
+        // Sort Click Handler
         $(document).on('click', '.sortable', function () {
             const column = $(this).data('col');
             let currentSort = $('#partialSort').val();
@@ -63,7 +63,6 @@
             loadTable(1);
         });
 
-        // Init
         updateSortIcons();
         toggleClearButton();
     }

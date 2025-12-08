@@ -70,7 +70,7 @@
     font-weight: 500;
 }
 
-/* --- LOGO SECTION STYLES (NEW) --- */
+/* --- LOGO SECTION STYLES --- */
 .logo-showcase {
     margin: 30px 0;
     position: relative;
@@ -78,15 +78,15 @@
 }
 
 .about-logo-large {
-    width: 180px; /* Big and clear */
+    width: 180px;
     height: 180px;
     object-fit: contain;
-    filter: drop-shadow(0 10px 20px rgba(102, 126, 234, 0.3)); /* Soft blue glow shadow */
+    filter: drop-shadow(0 10px 20px rgba(102, 126, 234, 0.3));
     transition: transform 0.3s ease;
 }
 
     .about-logo-large:hover {
-        transform: scale(1.05) rotate(5deg); /* Subtle interaction */
+        transform: scale(1.05) rotate(5deg); 
     }
 
 /* --- CONTENT SECTIONS --- */

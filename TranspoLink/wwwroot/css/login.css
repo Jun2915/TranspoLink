@@ -22,7 +22,7 @@
     max-width: 450px;
     overflow: hidden;
     animation: slideUp 0.5s ease-out;
-    position: relative; /* Context for absolute positioning of popups */
+    position: relative; 
 }
 
     .auth-card.landscape-mode {

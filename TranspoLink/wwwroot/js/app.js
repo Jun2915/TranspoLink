@@ -131,7 +131,7 @@ $(document).ready(function () {
     // C. HOME PAGE SEARCH LOGIC (TRANSPORT, AUTOCOMPLETE, SWAP)
     // ------------------------------------------------------------------------
 
-    // 1. Fetch Locations for Autocomplete
+    // Fetch Locations for Autocomplete
     if ($('#locationList').length) {
         $.ajax({
             url: '/RouteNTrip/GetLocations',
@@ -149,7 +149,7 @@ $(document).ready(function () {
         });
     }
 
-    // 2. Transport Tab Switching
+    //  Transport Tab Switching
     const heroImages = {
         'Bus': '/images/bustrip_background.png',
         'Train': '/images/traintrip_background.png',
@@ -182,7 +182,7 @@ $(document).ready(function () {
         setTimeout(() => { $(this).css('transform', ''); }, 100);
     });
 
-    // 3. Swap Origin/Destination
+    // Swap Origin/Destination
     $('.btn-swap').on('click', function () {
         const $origin = $('#origin');
         const $dest = $('#destination');
@@ -196,7 +196,7 @@ $(document).ready(function () {
         setTimeout(() => { $(this).css('transform', ''); }, 300);
     });
 
-    // 4. Calendar (Flatpickr)
+    // Calendar (Flatpickr)
     if ($('#departDate').length) {
         flatpickr("#departDate", {
             dateFormat: "Y-m-d",
@@ -219,7 +219,7 @@ $(document).ready(function () {
         });
     }
 
-    // 5. Form Validation
+    // Form Validation
     $('.search-form-row').on('submit', function (e) {
         const origin = $('#origin').val().trim();
         const destination = $('#destination').val().trim();

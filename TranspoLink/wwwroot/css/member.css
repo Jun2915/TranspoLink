@@ -159,25 +159,25 @@
 .btn-back {
     display: inline-flex;
     align-items: center;
-    gap: 8px; /* Space between arrow and text */
+    gap: 8px; 
     padding: 12px 25px;
-    background-color: var(--bg-card); /* White background */
+    background-color: var(--bg-card); 
     color: var(--text-main);
     border: 1px solid var(--border-color);
-    border-radius: 50px; /* Pill shape */
+    border-radius: 50px; 
     text-decoration: none;
     font-weight: 600;
     font-size: 14px;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Bouncy effect */
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    margin-bottom: 25px; /* Spacing below button */
+    margin-bottom: 25px; 
 }
 
 .btn-back:hover {
-    transform: translateX(-5px); /* Slide left on hover */
+    transform: translateX(-5px); 
     border-color: #667eea;
     color: #667eea;
-    box-shadow: 0 8px 20px rgba(102, 126, 238, 0.2); /* Glow effect */
+    box-shadow: 0 8px 20px rgba(102, 126, 238, 0.2); 
 }
 
 /* Dark Mode Hover Adjustment */
@@ -483,7 +483,7 @@ th[data-dir="desc"] .sort-arrow {
     font-family: 'Roboto', sans-serif;
 }
 
-/* --- 2-COLUMN LAYOUT WRAPPERS --- */
+/* --- -COLUMN LAYOUT WRAPPERS --- */
 .profile-layout-wrapper {
     display: flex;
     gap: 40px;
@@ -522,7 +522,7 @@ th[data-dir="desc"] .sort-arrow {
     }
 }
 
-/* --- 1. USER HEADER BANNER & PROFILE PIC WRAPPER --- */
+/* --- USER HEADER BANNER & PROFILE PIC WRAPPER --- */
 .user-header-banner {
     background: #202225;
     padding: 30px;
@@ -560,7 +560,7 @@ th[data-dir="desc"] .sort-arrow {
 .btn-download-icon {
     position: absolute;
     bottom: 5px;
-    right: 0px; /* Aligned to right of photo */
+    right: 0px; 
     width: 32px;
     height: 32px;
     background: white;
