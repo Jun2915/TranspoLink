@@ -122,7 +122,8 @@ public class AdminController(DB db, Helper hp) : Controller
         if (vm.Photo != null)
         {
             var err = hp.ValidatePhoto(vm.Photo);
-            if (err != "") ModelState.AddModelError("Photo", err);
+            if (err != "")
+                ModelState.AddModelError("Photo", err);
         }
 
         if (ModelState.IsValid)
@@ -245,7 +246,8 @@ public class AdminController(DB db, Helper hp) : Controller
         }
 
         var admin = db.Admins.Find(id);
-        if (admin == null) return RedirectToAction("Admins");
+        if (admin == null)
+            return RedirectToAction("Admins");
 
         var vm = new AdminVM
         {
@@ -265,10 +267,12 @@ public class AdminController(DB db, Helper hp) : Controller
     public IActionResult ModifyAdmin(AdminVM vm)
     {
         var currentUser = db.Users.FirstOrDefault(u => u.Email == User.Identity.Name || u.Phone == User.Identity.Name);
-        if (currentUser?.Id != "A001") return RedirectToAction("Admins");
+        if (currentUser?.Id != "A001")
+            return RedirectToAction("Admins");
 
         var admin = db.Admins.Find(vm.Id);
-        if (admin == null) return RedirectToAction("Admins");
+        if (admin == null)
+            return RedirectToAction("Admins");
 
         if (db.Users.Any(u => u.Email == vm.Email && u.Id != vm.Id))
             ModelState.AddModelError("Email", "Email already in use.");
@@ -279,7 +283,8 @@ public class AdminController(DB db, Helper hp) : Controller
         if (vm.Photo != null)
         {
             var err = hp.ValidatePhoto(vm.Photo);
-            if (err != "") ModelState.AddModelError("Photo", err);
+            if (err != "")
+                ModelState.AddModelError("Photo", err);
         }
 
         if (ModelState.IsValid)
@@ -610,47 +615,6 @@ public class AdminController(DB db, Helper hp) : Controller
             .ToList();
 
         ViewBag.MonthlyRevenue = monthlyRevenue;
-
-        return View();
-    }
-
-    // Add this AJAX Action
-    [HttpGet]
-    public IActionResult GetChatHistory(string userId)
-    {
-        // Fetch conversation between Admin and specific User
-        var messages = db.ChatMessages
-            .Where(m => (m.SenderId == userId && m.ReceiverId == "Admin") ||
-                        (m.SenderId == "Admin" && m.ReceiverId == userId))
-            .OrderBy(m => m.Timestamp)
-            .Select(m => new {
-                sender = m.SenderId == "Admin" ? "Me" : "User",
-                name = m.SenderName, // The stored real name
-                text = m.Message,
-                time = m.Timestamp.ToString("HH:mm")
-            })
-            .ToList();
-
-        return Json(messages);
-    }
-
-    // Update the Support Action
-    public IActionResult Support()
-    {
-        // Get unique users who have messaged Admin
-        var userIds = db.ChatMessages
-            .Where(m => m.ReceiverId == "Admin")
-            .Select(m => m.SenderId)
-            .Distinct()
-            .ToList();
-
-        // Fetch details to display names in the sidebar
-        var users = db.Users
-            .Where(u => userIds.Contains(u.Email) || userIds.Contains(u.Phone))
-            .Select(u => new { Id = u.Email ?? u.Phone, u.Name })
-            .ToList();
-
-        ViewBag.ActiveUsers = users; // Pass to view
 
         return View();
     }

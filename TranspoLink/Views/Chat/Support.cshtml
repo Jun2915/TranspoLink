@@ -1,0 +1,92 @@
+﻿@{
+    ViewBag.Title += " | Support Chat";
+    var activeUsers = ViewBag.ActiveUsers as IEnumerable<dynamic>;
+}
+
+@section head {
+    <link rel="stylesheet" href="/css/admin.css" />
+    <link rel="stylesheet" href="/css/chat.css" asp-append-version="true" />
+}
+
+<div class="admin-container admin-bg-fixed">
+    <div class="admin-header" style="margin-bottom: 20px; padding: 15px 25px;">
+        <h1 style="font-size: 20px;">💬 Live Support Dashboard</h1>
+    </div>
+
+    <div class="admin-chat-layout">
+        <div class="user-list-panel" id="userList">
+            <div class="user-list-header">
+                <span>Inbox</span>
+                <span style="font-size:12px; color:#999; font-weight:normal;">
+                    @(activeUsers != null ? activeUsers.Count() : 0) Active
+                </span>
+            </div>
+
+            @if (activeUsers != null)
+            {
+                foreach (var u in activeUsers)
+                {
+                    <div class="chat-user-item" data-user="@u.Id" onclick="loadChatHistory('@u.Id', '@u.Name')">
+                        <div>
+                            <div style="font-weight:bold; font-size:14px;">@u.Name</div>
+                            <div style="font-size:12px; color:#666;">@u.Id</div>
+                        </div>
+                        <button class="btn-delete-chat" title="Delete Conversation" onclick="openDeleteChatModal(event, '@u.Id')">
+                            🗑️
+                        </button>
+                    </div>
+                }
+            }
+        </div>
+
+        <div class="chat-main-panel">
+            <div class="chat-header-bar">
+                <span id="chatTitle" style="font-weight:800; font-size:16px;">Select a user</span>
+                <button id="btnEndChat" class="btn-end-chat" onclick="openEndChatModal()" disabled>End Chat & Save</button>
+            </div>
+
+            <div class="chat-messages" id="adminMessagesArea">
+                <div class="empty-chat-state">Select a conversation from the left to start chatting.</div>
+            </div>
+
+            <div class="chat-input-area">
+                <input type="text" id="adminInput" class="chat-input" placeholder="Type a reply..." disabled autocomplete="off">
+                <button id="adminSendBtn" class="chat-send-btn" disabled>➤</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="chatDeleteModal" class="confirm-overlay" style="display:none;">
+    <div class="confirm-box">
+        <span class="confirm-icon">🗑️</span>
+        <h3 class="confirm-title">Delete Conversation?</h3>
+        <p class="confirm-text">
+            Are you sure you want to delete this conversation history?<br>
+            <span style="color:#ff4757; font-size:12px;">This action cannot be undone.</span>
+        </p>
+        <div class="confirm-actions">
+            <button onclick="closeDeleteChatModal()" class="btn-confirm-cancel">Cancel</button>
+            <button onclick="executeChatDelete()" class="btn-confirm-delete">Yes, Delete</button>
+        </div>
+    </div>
+</div>
+
+<div id="chatEndModal" class="confirm-overlay" style="display:none;">
+    <div class="confirm-box">
+        <span class="confirm-icon" style="background:#e0e7ff; color:#667eea;">💾</span>
+        <h3 class="confirm-title">End & Save Chat?</h3>
+        <p class="confirm-text">
+            This will mark the session as ended.<br>
+            The user will be notified, and you won't be able to reply until they message again.
+        </p>
+        <div class="confirm-actions">
+            <button onclick="closeEndChatModal()" class="btn-confirm-cancel">Cancel</button>
+            <button onclick="executeEndChat()" class="btn-confirm-delete" style="background:#667eea;">Confirm End</button>
+        </div>
+    </div>
+</div>
+
+@section foot {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+    <script src="/js/chat.js" asp-append-version="true"></script>
+}

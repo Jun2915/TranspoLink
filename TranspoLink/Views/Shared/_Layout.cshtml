@@ -7,7 +7,6 @@
     {
         var identifier = User.Identity.Name;
         currentUser = db.Users.FirstOrDefault(u => u.Email == identifier || u.Phone == identifier);
-
         if (currentUser == null || currentUser.IsBlocked)
         {
             Context.SignOutAsync("Cookies");
@@ -121,7 +120,7 @@
                     </div>
                 </li>
                 <li><a href="/Home/Reports">📊 Reports</a></li>
-                <li><a href="/Admin/Support">💬 Support</a></li>
+                <li><a href="/Chat/Support">💬 Support</a></li>
                 <li><a href="/Home/AboutUs">About Us</a></li>
             }
             else
@@ -143,24 +142,45 @@
         Developed by <b>BMIT 2023 Web And Mobile System</b> &middot;
         Copyrighted &copy; @DateTime.Today.Year
     </footer>
-
-    @if (User.Identity.IsAuthenticated && currentUser != null)
+    @if (User.Identity.IsAuthenticated && currentUser != null && !User.IsInRole("Admin"))
     {
         <button class="chat-btn-float" onclick="toggleChat()" title="Chat with Support">💬</button>
 
         <div class="chat-box-container">
             <div class="chat-header">
-                <span>💬 TranspoLink Live</span>
+                <span>💬 TranspoLink Customer Service</span>
                 <span style="cursor:pointer;" onclick="toggleChat()">✖</span>
             </div>
+
             <div class="chat-messages">
-                <div style="text-align:center; color:#999; font-size:12px; margin-top:10px;">
-                    Welcome, @currentUser.Name!<br>
-                    How can we help you today?
+                <div style="text-align:center; color:#999; font-size:12px; margin-top:10px;" class="loading-msg">
+                    Loading history...
                 </div>
             </div>
+
+            @* 1. Reply Context Bar *@
+            <div id="replyPreviewBar" style="display:none;">
+                <span id="replyTextTarget">Replying...</span>
+                <span style="cursor:pointer; font-weight:bold;" onclick="cancelReply()">✕</span>
+            </div>
+
+            @* 2. Image Preview Bar *@
+            <div id="imagePreviewBar" style="display:none;">
+                <img id="imagePreviewSrc" src="" alt="Preview" />
+                <div style="flex:1; font-size:12px; color:#666; margin-left:10px;">Image selected</div>
+                <span style="cursor:pointer; font-weight:bold; color:#ff4757;" onclick="cancelImage()">✕</span>
+            </div>
+
             <div class="chat-input-area">
+                @* Camera Button *@
+                <button class="btn-tool-chat" onclick="triggerPhotoUpload()" title="Select Photo">📷</button>
+                @* Hidden File Input *@
+                <input type="file" id="chatPhotoInput" accept="image/*" style="display:none;" onchange="previewPhoto(this)">
+
+                @* Text Input *@
                 <input type="text" id="chatInput" class="chat-input" placeholder="Type a message..." autocomplete="off">
+
+                @* Send Button *@
                 <button id="btnSendChat" class="chat-send-btn">➤</button>
             </div>
         </div>

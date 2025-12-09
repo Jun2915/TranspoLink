@@ -13,6 +13,7 @@ public class ChatMessage
     [MaxLength(100)] public string ReceiverId { get; set; } 
     [MaxLength(100)] public string SenderName { get; set; } 
     public string Message { get; set; }
+    [MaxLength(200)] public string? PhotoUrl { get; set; }
     public DateTime Timestamp { get; set; } = DateTime.Now;
     public bool IsRead { get; set; } = false;
 }
