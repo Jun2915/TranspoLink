@@ -614,9 +614,44 @@ public class AdminController(DB db, Helper hp) : Controller
         return View();
     }
 
-    // GET: Admin/Support
+    // Add this AJAX Action
+    [HttpGet]
+    public IActionResult GetChatHistory(string userId)
+    {
+        // Fetch conversation between Admin and specific User
+        var messages = db.ChatMessages
+            .Where(m => (m.SenderId == userId && m.ReceiverId == "Admin") ||
+                        (m.SenderId == "Admin" && m.ReceiverId == userId))
+            .OrderBy(m => m.Timestamp)
+            .Select(m => new {
+                sender = m.SenderId == "Admin" ? "Me" : "User",
+                name = m.SenderName, // The stored real name
+                text = m.Message,
+                time = m.Timestamp.ToString("HH:mm")
+            })
+            .ToList();
+
+        return Json(messages);
+    }
+
+    // Update the Support Action
     public IActionResult Support()
     {
+        // Get unique users who have messaged Admin
+        var userIds = db.ChatMessages
+            .Where(m => m.ReceiverId == "Admin")
+            .Select(m => m.SenderId)
+            .Distinct()
+            .ToList();
+
+        // Fetch details to display names in the sidebar
+        var users = db.Users
+            .Where(u => userIds.Contains(u.Email) || userIds.Contains(u.Phone))
+            .Select(u => new { Id = u.Email ?? u.Phone, u.Name })
+            .ToList();
+
+        ViewBag.ActiveUsers = users; // Pass to view
+
         return View();
     }
 }
