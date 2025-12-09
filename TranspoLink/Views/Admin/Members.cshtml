@@ -7,13 +7,8 @@
 @section head {
     <link rel="stylesheet" href="/css/admin.css" asp-append-version="true" />
     <link rel="stylesheet" href="/css/member.css" asp-append-version="true" />
-
-    @* NOTE: user.js is already in _Layout, but we include it here if needed for versioning/defer order.
-       We DO NOT include admin.js to prevent conflicts. *@
     <script src="/js/user.js" asp-append-version="true" defer></script>
 }
-
-@* Added class 'member-bg-page' for custom background *@
 <div class="admin-container member-bg-page">
     <div class="admin-header">
         <h1>👥 Member Management</h1>
@@ -45,7 +40,6 @@
     </div>
 </div>
 
-@* Delete Confirmation Modal (Simple) *@
 <div id="confirmModal" class="confirm-overlay">
     <div class="confirm-box">
         <span class="confirm-icon">⚠️</span>
