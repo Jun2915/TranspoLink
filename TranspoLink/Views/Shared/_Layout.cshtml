@@ -1,6 +1,22 @@
 ﻿@inject DB db
 @using Microsoft.AspNetCore.Authentication
 
+@{
+    User? currentUser = null;
+    if (User.Identity.IsAuthenticated)
+    {
+        var identifier = User.Identity.Name;
+        currentUser = db.Users.FirstOrDefault(u => u.Email == identifier || u.Phone == identifier);
+
+        if (currentUser == null || currentUser.IsBlocked)
+        {
+            Context.SignOutAsync("Cookies");
+            Context.Response.Redirect("/Account/Login");
+            return;
+        }
+    }
+}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,10 +29,10 @@
     <link rel="stylesheet" href="/css/app.css" asp-append-version="true">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
     <link rel="stylesheet" href="/css/photo-tools.css" asp-append-version="true" />
+    <link rel="stylesheet" href="/css/chat.css" asp-append-version="true" />
     @RenderSection("head", false)
 </head>
 <body>
-    @* Flash Message Container *@
     <div class="info">@TempData["Info"]</div>
 
     <div class="top-bar">
@@ -38,42 +54,30 @@
             🌐 Language
         </div>
 
-        @if (User.Identity.IsAuthenticated)
+        @if (User.Identity.IsAuthenticated && currentUser != null)
         {
-            var identifier = User.Identity.Name;
-            var currentUser = db.Users.FirstOrDefault(u => u.Email == identifier || u.Phone == identifier);
-
-            if (currentUser == null || currentUser.IsBlocked)
-            {
-                Context.SignOutAsync("Cookies");
-                Context.Response.Redirect("/Account/Login");
-                return;
-            }
-
             string photoUrl = "/images/default_photo.png";
             if (currentUser is Member m && !string.IsNullOrEmpty(m.PhotoURL))
             {
-                if (m.PhotoURL == "default_photo.png") { photoUrl = "/images/default_photo.png"; }
-                else { photoUrl = "/images/" + m.PhotoURL; }
+                photoUrl = m.PhotoURL == "default_photo.png" ? "/images/default_photo.png" : "/images/" + m.PhotoURL;
             }
             else if (currentUser is Admin a && !string.IsNullOrEmpty(a.PhotoURL))
             {
-                if (a.PhotoURL.StartsWith("/images/")) { photoUrl = a.PhotoURL; }
-                else { photoUrl = "/images/" + a.PhotoURL; }
+                photoUrl = a.PhotoURL.StartsWith("/images/") ? a.PhotoURL : "/images/" + a.PhotoURL;
             }
 
             <div class="user-dropdown-container">
                 <div class="top-bar-item user-profile-display" id="profileTrigger">
                     <img src="@photoUrl" class="nav-user-photo" alt="Profile" onerror="this.src='/images/default_photo.png'">
-                    <span class="user-welcome-text">@(currentUser?.Name ?? User.Identity.Name)</span>
+                    <span class="user-welcome-text">@currentUser.Name</span>
                     <span style="font-size: 10px; margin-left: 3px;">▼</span>
                 </div>
 
                 <div class="profile-dropdown" id="profileDropdown">
                     <div class="dropdown-header">
                         <img src="@photoUrl" class="dropdown-big-photo" onerror="this.src='/images/default_photo.png'">
-                        <p class="dropdown-name">@(currentUser?.Name ?? User.Identity.Name)</p>
-                        <p class="dropdown-email">@(currentUser?.Email ?? currentUser?.Phone)</p>
+                        <p class="dropdown-name">@currentUser.Name</p>
+                        <p class="dropdown-email">@(currentUser.Email ?? currentUser.Phone)</p>
                     </div>
 
                     <div class="dropdown-actions">
@@ -96,7 +100,6 @@
             @if (User.IsInRole("Admin"))
             {
                 <li><a href="/Admin">Dashboard</a></li>
-
                 <li class="nav-item-dropdown" onclick="toggleNavDropdown(event, 'navUserContent')">
                     <a href="javascript:void(0)" style="display:flex; align-items:center; gap:5px;">
                         User Management <span style="font-size:10px;">▼</span>
@@ -106,7 +109,6 @@
                         <a href="/Admin/Members">👥 Members</a>
                     </div>
                 </li>
-
                 <li class="nav-item-dropdown" onclick="toggleNavDropdown(event, 'navOpsContent')">
                     <a href="javascript:void(0)" style="display:flex; align-items:center; gap:5px;">
                         Operations <span style="font-size:10px;">▼</span>
@@ -118,16 +120,8 @@
                         <a href="/Admin/Bookings">📋 Bookings</a>
                     </div>
                 </li>
-
                 <li><a href="/Home/Reports">📊 Reports</a></li>
-                <li><a href="/Home/AboutUs">About Us</a></li>
-            }
-            else if (User.IsInRole("Member"))
-            {
-                <li><a href="/">Home</a></li>
-                <li><a href="/#features">Features</a></li>
-                <li><a href="/#trending">News & Offers</a></li>
-                <li><a href="/#contact">Contact</a></li>
+                <li><a href="/Admin/Support">💬 Support</a></li>
                 <li><a href="/Home/AboutUs">About Us</a></li>
             }
             else
@@ -146,8 +140,31 @@
     </main>
 
     <footer>
-        Developed by <b>BMIT 2023 Web And Mobile System</b> &middot; Copyrighted &copy; @DateTime.Today.Year
+        Developed by <b>BMIT 2023 Web And Mobile System</b> &middot;
+        Copyrighted &copy; @DateTime.Today.Year
     </footer>
+
+    @if (User.Identity.IsAuthenticated && currentUser != null)
+    {
+        <button class="chat-btn-float" onclick="toggleChat()" title="Chat with Support">💬</button>
+
+        <div class="chat-box-container">
+            <div class="chat-header">
+                <span>💬 TranspoLink Live</span>
+                <span style="cursor:pointer;" onclick="toggleChat()">✖</span>
+            </div>
+            <div class="chat-messages">
+                <div style="text-align:center; color:#999; font-size:12px; margin-top:10px;">
+                    Welcome, @currentUser.Name!<br>
+                    How can we help you today?
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" id="chatInput" class="chat-input" placeholder="Type a message..." autocomplete="off">
+                <button id="btnSendChat" class="chat-send-btn">➤</button>
+            </div>
+        </div>
+    }
 
     <script src="/js/jquery.min.js"></script>
     <script src="/js/jquery.unobtrusive-ajax.min.js"></script>
@@ -157,6 +174,15 @@
     <script src="/js/user.js" asp-append-version="true"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <script src="/js/photo-tools.js" asp-append-version="true"></script>
+
+    @if (User.Identity.IsAuthenticated && currentUser != null)
+    {
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+        <script>
+            var currentUserDisplayName = "@currentUser.Name";
+        </script>
+        <script src="/js/chat.js" asp-append-version="true"></script>
+    }
 
     <script>
         function toggleNavDropdown(e, id) {

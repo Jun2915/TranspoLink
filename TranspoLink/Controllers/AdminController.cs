@@ -613,4 +613,10 @@ public class AdminController(DB db, Helper hp) : Controller
 
         return View();
     }
+
+    // GET: Admin/Support
+    public IActionResult Support()
+    {
+        return View();
+    }
 }

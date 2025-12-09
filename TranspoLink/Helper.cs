@@ -214,6 +214,7 @@ public class Helper(IWebHostEnvironment en,
         List<Claim> claims =
         [
             new(ClaimTypes.Name, email),
+            new(ClaimTypes.NameIdentifier, email),
             new(ClaimTypes.Role, role),
         ];
 
