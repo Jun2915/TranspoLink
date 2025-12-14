@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TranspoLink.Models;
 
@@ -11,9 +12,11 @@ using TranspoLink.Models;
 namespace TranspoLink.Migrations
 {
     [DbContext(typeof(DB))]
-    partial class DBModelSnapshot : ModelSnapshot
+    [Migration("20251209142334_DB3")]
+    partial class DB3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -260,8 +263,8 @@ namespace TranspoLink.Migrations
             modelBuilder.Entity("TranspoLink.Models.TripStop", b =>
                 {
                     b.Property<string>("Id")
-                        .HasMaxLength(7)
-                        .HasColumnType("nvarchar(7)");
+                        .HasMaxLength(6)
+                        .HasColumnType("nvarchar(6)");
 
                     b.Property<DateTime?>("ActualArrival")
                         .HasColumnType("datetime2");
@@ -490,7 +493,7 @@ namespace TranspoLink.Migrations
                     b.HasOne("TranspoLink.Models.RouteStop", "RouteStop")
                         .WithMany()
                         .HasForeignKey("RouteStopId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("TranspoLink.Models.Trip", "Trip")

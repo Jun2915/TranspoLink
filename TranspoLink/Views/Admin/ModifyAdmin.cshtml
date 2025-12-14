@@ -1,152 +1,90 @@
-﻿@model TranspoLink.Models.DriverVM
+﻿@model AdminVM
+
 @{
-    ViewBag.Title += " | Edit Driver";
-    var photoUrl = Model.ExistingPhotoURL != null && Model.ExistingPhotoURL.StartsWith("/images/") ? Model.ExistingPhotoURL : "/images/" + Model.ExistingPhotoURL;
+    ViewBag.Title += " | Modify Admin";
 }
 
 @section head {
     <link rel="stylesheet" href="/css/admin.css" asp-append-version="true" />
     <link rel="stylesheet" href="/css/member.css" asp-append-version="true" />
     <link rel="stylesheet" href="/css/photo-tools.css" asp-append-version="true" />
-    <link rel="stylesheet" href="/css/vehicle.css" asp-append-version="true" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <script src="/js/photo-tools.js" asp-append-version="true" defer></script>
+    <script src="/js/admin.js" asp-append-version="true" defer></script>
 }
 
-@* NEW LAYOUT: Use admin-glass-card and edit-layout-grid for Admin-like appearance *@
-<div class="admin-container admin-bg-page" style="display:flex; justify-content:center; align-items:center;">
-    <div class="admin-glass-card landscape-mode">
+<div class="admin-container admin-bg-page">
+    <div style="margin-bottom: 20px;">
+        <a href="/Admin/Admins" class="btn-back">← Back to Admins</a>
+    </div>
 
-        <div class="edit-card-top">
-            <a href="/RouteNTrip/DriverDetails/@Model.Id" class="btn-back-link">← Back to Driver Details</a>
-        </div>
-
+    @* The Glass Card Wrapper *@
+    <div class="admin-glass-card">
         <form method="post" enctype="multipart/form-data" class="edit-admin-form">
-            @Html.AntiForgeryToken()
             <input type="hidden" asp-for="Id" />
             <input type="hidden" asp-for="ExistingPhotoURL" />
-
-            @* Input for file selection (hidden) *@
             <input asp-for="Photo" type="file" accept="image/jpeg,image/png" hidden>
-
             <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
 
+            @* LANDSCAPE GRID: Photo Left | Details Right *@
             <div class="edit-layout-grid">
 
-                @* === LEFT COLUMN: PHOTO === *@
+                @* --- LEFT SIDE --- *@
                 <div class="edit-col-left">
-                    <div id="photoContainer" class="edit-photo-container large" title="Click to change photo">
-                        <img src="@photoUrl"
-                             id="profileImagePreview"
-                             class="edit-profile-img"
+                    <div id="photoContainer" class="edit-photo-container">
+                        <img src="@(Model.ExistingPhotoURL != null && Model.ExistingPhotoURL.StartsWith("/images/") ? Model.ExistingPhotoURL : "/images/" + Model.ExistingPhotoURL)"
+                             id="adminPhotoPreview"
                              alt="Profile Photo"
-                             onerror="this.src='/images/default_photo.png'">
-
+                             onerror="this.src='/images/beauty_admin.png'">
                         <div class="edit-photo-overlay">
-                            <span style="margin-top:5px; font-size:12px;">Change</span>
+                            <span>Change</span>
                         </div>
                     </div>
-
-                    <div class="id-badge">
-                        Driver ID: <b>@Model.Id</b>
-                    </div>
-                    <div class="id-badge" style="margin-top: 5px;">
-                        Vehicle: <b>@(ViewBag.VehicleNumber ?? "None")</b>
+                    <div style="margin-top:15px; font-size:14px; color:#666;">
+                        Admin ID: <b>@Model.Id</b>
                     </div>
                 </div>
 
-                @* === RIGHT COLUMN: FORM FIELDS === *@
+                @* --- RIGHT SIDE --- *@
                 <div class="edit-col-right">
-
-                    <h2 class="edit-title-landscape">Edit Driver Profile</h2>
-                    <hr class="edit-divider">
+                    <h2 class="edit-title-landscape">Edit Profile: @Model.Name</h2>
 
                     <div class="form-grid-layout">
-
-                        @* --- NAME & LICENSE --- *@
-                        <div class="form-item">
-                            <label asp-for="Name" class="form-label">Full Name</label>
-                            <div class="admin-input-group">
-                                <span class="input-icon">👤</span>
-                                <input asp-for="Name" placeholder="Enter full name">
-                            </div>
-                            <span asp-validation-for="Name" class="field-validation-error"></span>
+                        <div class="admin-input-group">
+                            <span class="input-icon">👤</span>
+                            <input asp-for="Name" placeholder="Full Name">
                         </div>
-
-                        <div class="form-item">
-                            <label asp-for="LicenseNumber" class="form-label">License Number</label>
-                            <div class="admin-input-group">
-                                <span class="input-icon">📜</span>
-                                <input asp-for="LicenseNumber" placeholder="Enter license number">
-                            </div>
-                            <span asp-validation-for="LicenseNumber" class="field-validation-error"></span>
-                        </div>
-
-                        @* --- EMAIL & PHONE --- *@
-                        <div class="form-item">
-                            <label asp-for="Email" class="form-label">Email Address</label>
-                            <div class="admin-input-group">
-                                <span class="input-icon">📧</span>
-                                <input asp-for="Email" placeholder="Enter email address">
-                            </div>
-                            <span asp-validation-for="Email" class="field-validation-error"></span>
-                        </div>
-
-                        <div class="form-item">
-                            <label asp-for="Phone" class="form-label">Phone Number</label>
-                            <div class="admin-input-group">
-                                <span class="input-icon">📞</span>
-                                <input asp-for="Phone" placeholder="e.g. 012-3456789">
-                            </div>
-                            <span asp-validation-for="Phone" class="field-validation-error"></span>
-                        </div>
-
-                        @* --- PASSWORD RESET (Optional) --- *@
-                        <div class="form-item">
-                            <label asp-for="Password" class="form-label">New Password <span class="sub-label">(Optional)</span></label>
-                            <div class="admin-input-group">
-                                <span class="input-icon">🔒</span>
-                                <input asp-for="Password" type="password" placeholder="Leave blank to keep existing">
-                                <button type="button" class="toggle-password-btn">
-                                    <span class="password-toggle-icon">👁️</span>
-                                </button>
-                            </div>
-                            <span asp-validation-for="Password" class="field-validation-error"></span>
-                        </div>
-
-                        <div class="form-item">
-                            <label asp-for="ConfirmPassword" class="form-label">Confirm Password</label>
-                            <div class="admin-input-group">
-                                <span class="input-icon">🔒</span>
-                                <input asp-for="ConfirmPassword" type="password" placeholder="Confirm new password">
-                                <button type="button" class="toggle-password-btn">
-                                    <span class="password-toggle-icon">👁️</span>
-                                </button>
-                            </div>
-                            <span asp-validation-for="ConfirmPassword" class="field-validation-error"></span>
-                        </div>
-
-                    </div>
-
-                    @* --- BLOCK ACCESS TOGGLE --- *@
-                    <div class="form-item" style="margin-top: 15px;">
-                        <div class="block-toggle-card">
-                            <div class="toggle-info">
-                                <span class="toggle-title">Block Access</span>
-                                <span class="toggle-desc">Prevent this driver from logging in to the system.</span>
-                            </div>
-                            <label class="switch">
-                                <input asp-for="IsBlocked" type="checkbox">
-                                <span class="slider round slider-red"></span>
-                            </label>
+                        <div class="admin-input-group">
+                            <span class="input-icon">📧</span>
+                            <input asp-for="Email" placeholder="Email Address">
                         </div>
                     </div>
+                    <span asp-validation-for="Name" style="color:red; font-size:12px;"></span>
+                    <span asp-validation-for="Email" style="color:red; font-size:12px;"></span>
 
-                    <button type="submit" class="btn-save-changes">
-                        💾 Save Driver Changes
-                    </button>
+                    <div class="admin-input-group">
+                        <span class="input-icon">📞</span>
+                        <input asp-for="Phone" placeholder="Phone Number">
+                    </div>
+                    <span asp-validation-for="Phone" style="color:red; font-size:12px;"></span>
+
+                    <div class="admin-input-group">
+                        <span class="input-icon">🔒</span>
+                        <input asp-for="Password" type="password" placeholder="New Password (Optional)">
+                        <button type="button" class="toggle-password-btn">👁️</button>
+                    </div>
+                    <span asp-validation-for="Password" style="color:red; font-size:12px;"></span>
+
+                    <div style="margin-top: 15px; padding: 15px; background: rgba(0,0,0,0.03); border-radius: 10px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong>Block Access</strong>
+                            <p style="font-size:12px; margin:0; color:#666;">Prevent login to system.</p>
+                        </div>
+                        <input asp-for="IsBlocked" type="checkbox" style="width: 20px; height: 20px;">
+                    </div>
+
+                    <button type="submit" class="btn-save-changes">💾 Save Changes</button>
                 </div>
-
             </div>
         </form>
     </div>

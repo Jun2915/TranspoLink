@@ -1,39 +1,65 @@
-﻿@model AdminVM
+﻿@* @model: Defines the data structure this page expects. 
+   AdminVM is the "ViewModel" containing fields like Name, Email, Password.
+*@
+@model AdminVM
 
 @{
+    // Sets the title that appears in the browser tab
     ViewBag.Title += " | Create Admin";
 }
 
 @section head {
+    @* Loads your CSS files for styling *@
     <link rel="stylesheet" href="/css/admin.css" asp-append-version="true" />
     <link rel="stylesheet" href="/css/member.css" asp-append-version="true" />
     <link rel="stylesheet" href="/css/photo-tools.css" asp-append-version="true" />
+
+    @* Loads JavaScript libraries for the photo cropper and page logic *@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <script src="/js/photo-tools.js" asp-append-version="true" defer></script>
     <script src="/js/admin.js" asp-append-version="true" defer></script>
 }
 
-<div class="admin-container">
+@* Container Div:
+   'admin-container': Basic layout spacing.
+   'admin-bg-page': Applies your specific 'about_background.png' image fixed to the screen.
+*@
+<div class="admin-container admin-bg-page">
+
+    @* Back Button to return to the list *@
     <div style="margin-bottom: 20px;">
         <a href="/Admin/Admins" class="btn-back">← Back to Admins</a>
     </div>
 
-    <div class="profile-card admin-form-card">
+    @* THE GLASS CARD:
+       We use the NEW class 'create-admin-glass-card' here.
+       This applies the blur, transparency, and glass border defined in Step 1.
+    *@
+    <div class="create-admin-glass-card">
 
+        @* <form>: The start of the input form.
+           method="post": Sends data securely to the server.
+           enctype="multipart/form-data": Required because we are uploading a file (Photo).
+        *@
         <form method="post" enctype="multipart/form-data" class="admin-create-form">
+
+            @* Displays a list of error messages if validation fails (e.g., "Email is required") *@
             <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
 
             <div class="admin-form-layout">
 
+                @* --- LEFT COLUMN: PHOTO UPLOAD --- *@
                 <div class="admin-form-left">
-                    <div class="form-header" style="width: 100%; text-align: center; border:none;">
+                    <div class="form-header">
                         <h2>Profile Photo</h2>
-                        <p>Click to choose file or camera</p>
+                        <p style="color: #666;">Click to choose file or camera</p>
                     </div>
 
+                    @* The circular photo area *@
                     <div id="photoContainer" title="Click to upload or take photo">
                         <img src="/images/add_photo.png" id="profileImagePreview" alt="Upload Photo">
 
+                        @* The overlay that appears when you hover over the image *@
                         <div class="upload-overlay">
                             <svg width="40" height="40" viewBox="0 0 24 24" fill="white">
                                 <path d="M4,4H7L9,2H15L17,4H20A2,2 0 0,1 22,6V18A2,2 0 0,1 20,20H4A2,2 0 0,1 2,18V6A2,2 0 0,1 4,4M12,7A5,5 0 1,0 17,12A5,5 0 0,0 12,7M12,9A3,3 0 1,1 9,12A3,3 0 0,1 12,9Z" />
@@ -42,23 +68,27 @@
                         </div>
                     </div>
 
+                    @* asp-for="Photo": Binds this input to the 'Photo' property in your AdminVM.
+                       hidden: Keeps the ugly file input button invisible.
+                    *@
                     <input asp-for="Photo" type="file" accept="image/jpeg,image/png" hidden>
                     <span asp-validation-for="Photo" class="field-validation-error" style="margin-top:15px;"></span>
                 </div>
 
+                @* --- RIGHT COLUMN: INPUT FIELDS --- *@
                 <div class="admin-form-right">
 
                     <div class="form-header">
                         <h2>Account Details</h2>
-                        <p>Create a new administrator account.</p>
+                        <p style="color: #666;">Create a new administrator account.</p>
                     </div>
 
+                    @* Row 1: Name and Email *@
                     <div class="input-grid-row">
                         <div>
                             <div class="admin-input-group">
-                                <span class="input-icon">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z" /></svg>
-                                </span>
+                                <span class="input-icon">👤</span>
+                                @* asp-for="Name": Binds to AdminVM.Name *@
                                 <input asp-for="Name" placeholder="Full Name">
                             </div>
                             <span asp-validation-for="Name" class="field-validation-error"></span>
@@ -66,32 +96,32 @@
 
                         <div>
                             <div class="admin-input-group">
-                                <span class="input-icon">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20,8L12,13L4,8V6L12,11L20,6M20,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6C22,4.89 21.1,4 20,4Z" /></svg>
-                                </span>
+                                <span class="input-icon">📧</span>
+                                @* asp-for="Email": Binds to AdminVM.Email *@
                                 <input asp-for="Email" placeholder="Email Address">
                             </div>
                             <span asp-validation-for="Email" class="field-validation-error"></span>
                         </div>
                     </div>
 
+                    @* Row 2: Phone *@
                     <div class="admin-input-group">
-                        <span class="input-icon">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62,10.79C8.06,13.62 10.38,15.94 13.21,17.38L15.41,15.18C15.69,14.9 16.08,14.82 16.43,14.93C17.55,15.3 18.75,15.5 20,15.5A1,1 0 0,1 21,16.5V20A1,1 0 0,1 20,21A17,17 0 0,1 3,4A1,1 0 0,1 4,3H7.5A1,1 0 0,1 8.5,4C8.5,5.25 8.7,6.45 9.07,7.57C9.18,7.92 9.1,8.31 8.82,8.59L6.62,10.79Z" /></svg>
-                        </span>
+                        <span class="input-icon">📞</span>
+                        @* asp-for="Phone": Binds to AdminVM.Phone *@
                         <input asp-for="Phone" placeholder="Phone Number (e.g., 012-3456789)">
                     </div>
                     <span asp-validation-for="Phone" class="field-validation-error"></span>
 
+                    @* Row 3: Passwords *@
                     <div class="input-grid-row">
                         <div>
                             <div class="admin-input-group">
-                                <span class="input-icon">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z" /></svg>
-                                </span>
+                                <span class="input-icon">🔒</span>
+                                @* asp-for="Password": Binds to AdminVM.Password *@
                                 <input asp-for="Password" type="password" placeholder="Password">
                                 <button type="button" class="toggle-password-btn">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z" /></svg>
+                                    @* Eye Icon SVG for showing/hiding password *@
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="#999"><path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z" /></svg>
                                 </button>
                             </div>
                             <span asp-validation-for="Password" class="field-validation-error"></span>
@@ -99,18 +129,18 @@
 
                         <div>
                             <div class="admin-input-group">
-                                <span class="input-icon">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z" /></svg>
-                                </span>
+                                <span class="input-icon">🔒</span>
+                                @* asp-for="ConfirmPassword": Binds to AdminVM.ConfirmPassword *@
                                 <input asp-for="ConfirmPassword" type="password" placeholder="Confirm Password">
                                 <button type="button" class="toggle-password-btn">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z" /></svg>
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="#999"><path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z" /></svg>
                                 </button>
                             </div>
                             <span asp-validation-for="ConfirmPassword" class="field-validation-error"></span>
                         </div>
                     </div>
 
+                    @* Submit Button *@
                     <button type="submit" class="btn-create-admin">
                         ✨ Create Admin Account
                     </button>

@@ -122,7 +122,8 @@ public class AdminController(DB db, Helper hp) : Controller
         if (vm.Photo != null)
         {
             var err = hp.ValidatePhoto(vm.Photo);
-            if (err != "") ModelState.AddModelError("Photo", err);
+            if (err != "")
+                ModelState.AddModelError("Photo", err);
         }
 
         if (ModelState.IsValid)
@@ -245,7 +246,8 @@ public class AdminController(DB db, Helper hp) : Controller
         }
 
         var admin = db.Admins.Find(id);
-        if (admin == null) return RedirectToAction("Admins");
+        if (admin == null)
+            return RedirectToAction("Admins");
 
         var vm = new AdminVM
         {
@@ -265,10 +267,12 @@ public class AdminController(DB db, Helper hp) : Controller
     public IActionResult ModifyAdmin(AdminVM vm)
     {
         var currentUser = db.Users.FirstOrDefault(u => u.Email == User.Identity.Name || u.Phone == User.Identity.Name);
-        if (currentUser?.Id != "A001") return RedirectToAction("Admins");
+        if (currentUser?.Id != "A001")
+            return RedirectToAction("Admins");
 
         var admin = db.Admins.Find(vm.Id);
-        if (admin == null) return RedirectToAction("Admins");
+        if (admin == null)
+            return RedirectToAction("Admins");
 
         if (db.Users.Any(u => u.Email == vm.Email && u.Id != vm.Id))
             ModelState.AddModelError("Email", "Email already in use.");
@@ -279,7 +283,8 @@ public class AdminController(DB db, Helper hp) : Controller
         if (vm.Photo != null)
         {
             var err = hp.ValidatePhoto(vm.Photo);
-            if (err != "") ModelState.AddModelError("Photo", err);
+            if (err != "")
+                ModelState.AddModelError("Photo", err);
         }
 
         if (ModelState.IsValid)

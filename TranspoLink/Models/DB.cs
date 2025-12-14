@@ -6,6 +6,18 @@ namespace TranspoLink.Models;
 
 #nullable disable warnings
 
+public class ChatMessage
+{
+    public int Id { get; set; }
+    [MaxLength(100)] public string SenderId { get; set; }   
+    [MaxLength(100)] public string ReceiverId { get; set; } 
+    [MaxLength(100)] public string SenderName { get; set; } 
+    public string Message { get; set; }
+    [MaxLength(200)] public string? PhotoUrl { get; set; }
+    public DateTime Timestamp { get; set; } = DateTime.Now;
+    public bool IsRead { get; set; } = false;
+}
+
 public class DB(DbContextOptions options) : DbContext(options)
 {
     public DbSet<User> Users { get; set; }
@@ -19,7 +31,8 @@ public class DB(DbContextOptions options) : DbContext(options)
     public DbSet<TripStop> TripStops { get; set; }
     public DbSet<Vehicle> Vehicles { get; set; }
     public DbSet<Booking> Bookings { get; set; }
-    public DbSet<AuditLog> AuditLogs { get; set; }
+    public DbSet<AuditLog> AuditLogs { get; set; }  
+    public DbSet<ChatMessage> ChatMessages { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

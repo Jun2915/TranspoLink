@@ -1,6 +1,7 @@
 ﻿global using TranspoLink;
 global using TranspoLink.Models;
 using Microsoft.AspNetCore.Authentication;
+using TranspoLink.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,6 +57,8 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
+
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -118,5 +121,7 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.MapHub<ChatHub>("/chathub");
 
 app.Run();
