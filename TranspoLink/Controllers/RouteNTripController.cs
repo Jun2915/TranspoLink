@@ -23,7 +23,8 @@ public class RouteNTripController(DB db, Helper hp) : Controller
             .Where(id => id.StartsWith("T") && id.Length == 5)
             .OrderByDescending(id => id)
             .FirstOrDefault();
-        if (string.IsNullOrEmpty(lastId)) return "T0001";
+        if (string.IsNullOrEmpty(lastId))
+            return "T0001";
         if (lastId.Length == 5 && int.TryParse(lastId.Substring(1), out int num))
             return "T" + (num + 1).ToString("D4");
         return "T0001";
@@ -36,7 +37,8 @@ public class RouteNTripController(DB db, Helper hp) : Controller
             .Where(id => id.StartsWith("S") && id.Length == 6)
             .OrderByDescending(id => id)
             .FirstOrDefault();
-        if (string.IsNullOrEmpty(lastId)) return "S00001";
+        if (string.IsNullOrEmpty(lastId))
+            return "S00001";
         if (lastId.Length == 6 && int.TryParse(lastId.Substring(1), out int num))
             return "S" + (num + 1).ToString("D5");
         return "S00001";
@@ -50,7 +52,8 @@ public class RouteNTripController(DB db, Helper hp) : Controller
             .Where(id => id.StartsWith("TS") && id.Length == 7)
             .OrderByDescending(id => id)
             .FirstOrDefault();
-        if (string.IsNullOrEmpty(lastId)) return "TS00001";
+        if (string.IsNullOrEmpty(lastId))
+            return "TS00001";
         if (lastId.Length == 7 && int.TryParse(lastId.Substring(2), out int num))
             return "TS" + (num + 1).ToString("D5");
         return "TS00001";
@@ -60,7 +63,8 @@ public class RouteNTripController(DB db, Helper hp) : Controller
     private string GetNextDriverId(DB db)
     {
         var lastId = db.Drivers.OrderByDescending(d => d.Id).Select(d => d.Id).FirstOrDefault();
-        if (string.IsNullOrEmpty(lastId)) return "D001";
+        if (string.IsNullOrEmpty(lastId))
+            return "D001";
         if (int.TryParse(lastId.Substring(1), out int num))
             return "D" + (num + 1).ToString("D3");
         return "D001";
@@ -367,7 +371,8 @@ public class RouteNTripController(DB db, Helper hp) : Controller
             .Include(t => t.Vehicle)
             .FirstOrDefault(t => t.Id == id);
 
-        if (trip == null) return RedirectToAction("Trips");
+        if (trip == null)
+            return RedirectToAction("Trips");
 
         // Fix CS8602: Safely access Route properties using ?. to remove warnings
         ViewBag.TripInfo = $"Trip {trip.Id} ({trip.Route?.Origin ?? "N/A"} ➝ {trip.Route?.Destination ?? "N/A"})";
@@ -394,7 +399,7 @@ public class RouteNTripController(DB db, Helper hp) : Controller
             db.SaveChanges();
             TempData["Success"] = $"Trip {id} status updated to {status} successfully.";
 
-            return RedirectToAction("Trips"); 
+            return RedirectToAction("Trips");
         }
         catch (Exception ex)
         {
@@ -604,7 +609,8 @@ public class RouteNTripController(DB db, Helper hp) : Controller
     public IActionResult ModifyDriver(DriverVM vm)
     {
         var driver = db.Drivers.Find(vm.Id);
-        if (driver == null) return RedirectToAction("Drivers");
+        if (driver == null)
+            return RedirectToAction("Drivers");
 
         // 1. Validation Checks (Email/Phone uniqueness)
         if (db.Users.Any(u => u.Email == vm.Email && u.Id != vm.Id))
@@ -617,7 +623,8 @@ public class RouteNTripController(DB db, Helper hp) : Controller
         if (vm.Photo != null)
         {
             var err = hp.ValidatePhoto(vm.Photo); // Assumes helper method exists
-            if (err != "") ModelState.AddModelError("Photo", err);
+            if (err != "")
+                ModelState.AddModelError("Photo", err);
         }
 
         if (ModelState.IsValid)

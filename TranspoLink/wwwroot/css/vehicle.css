@@ -156,9 +156,9 @@ input:checked + .slider:before {
     border-radius: 34px;
 }
 
-.slider.round:before {
-    border-radius: 50%;
-}
+    .slider.round:before {
+        border-radius: 50%;
+    }
 
 
 .vehicle-icon-large {

@@ -61,7 +61,7 @@ $(function () {
     });
 
     $('.rnt-tab').on('click', function (e) {
-        e.preventDefault(); 
+        e.preventDefault();
 
         const url = $(this).attr('href');
         const type = $(this).text().trim();

@@ -15,7 +15,8 @@ public class VehicleController(DB db, Helper hp) : Controller
     private string GetNextVehicleNumber(DB db)
     {
         var lastId = db.Vehicles.OrderByDescending(v => v.Id).Select(v => v.VehicleNumber).FirstOrDefault();
-        if (string.IsNullOrEmpty(lastId)) return "V001";
+        if (string.IsNullOrEmpty(lastId))
+            return "V001";
 
         if (lastId.Length > 1 && int.TryParse(lastId.Substring(1), out int num))
         {
