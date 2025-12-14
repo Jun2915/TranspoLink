@@ -156,9 +156,9 @@ input:checked + .slider:before {
     border-radius: 34px;
 }
 
-    .slider.round:before {
-        border-radius: 50%;
-    }
+.slider.round:before {
+    border-radius: 50%;
+}
 
 
 .vehicle-icon-large {
@@ -188,3 +188,43 @@ input:checked + .slider:before {
     color: #000;
     font-weight: bold;
 }
+
+.btn-rnt {
+    display: inline-block;
+    padding: 8px 15px;
+    line-height: 1.5;
+}
+
+/* Filter Tabs (Pill Shape) */
+.rnt-tabs {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+}
+
+.rnt-tab {
+    padding: 10px 24px;
+    border-radius: 50px;
+    background: rgba(255, 255, 255, 0.6);
+    color: #555;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    border: 1px solid rgba(0,0,0,0.05);
+    backdrop-filter: blur(5px);
+}
+
+    .rnt-tab:hover {
+        background: rgba(102, 126, 238, 0.1);
+        color: #667eea;
+        transform: translateY(-2px);
+    }
+
+    .rnt-tab.active {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        border-color: transparent;
+    }

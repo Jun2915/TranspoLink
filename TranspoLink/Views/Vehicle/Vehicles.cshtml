@@ -7,6 +7,9 @@
 @section head {
     <link rel="stylesheet" href="/css/admin.css" asp-append-version="true" />
     <link rel="stylesheet" href="/css/vehicle.css" asp-append-version="true" />
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
     <script src="/js/vehicle.js" defer></script>
 }
 
@@ -19,19 +22,59 @@
         <a href="/Vehicle/CreateVehicle" class="btn-view btn-add">+ Add New Vehicle</a>
     </div>
 
-    <div class="search-section">
-        <form id="vehicleSearchForm" class="search-container">
-            <input type="text" id="searchInput" placeholder="Search by Vehicle No. or Operator..." autocomplete="off">
-            <button type="submit" style="display:none;">Search</button>
+    <div class="search-container" style="margin-bottom: 20px;">
+        <form method="get" action="/Vehicle/Vehicles" style="width: 100%; display: flex; gap: 10px; align-items: center;">
+
+            <input type="text"
+                   class="rnt-input"
+                   name="search"
+                   id="searchInput" 
+                   value="@ViewBag.Search"
+                   placeholder="Search by Vehicle Number, Type, or Driver..."
+                   style="flex-grow: 1;">
+
+                <button type="submit" class="btn-rnt btn-rnt-primary" style="width: auto;">Search</button>
+
+            @if (!string.IsNullOrEmpty(ViewBag.Search))
+            {
+                <a href="/Vehicle/Vehicles"
+                   class="btn-rnt btn-rnt-danger"
+                   style="width: auto; height: 40px; line-height: 40px; text-align: center; padding: 0 15px; text-decoration: none;">
+                    Clear
+                </a>
+            }
         </form>
     </div>
 
-    <div class="tabs" style="justify-content: flex-start; margin-bottom: 20px;">
-        <a href="javascript:void(0)" onclick="filterType('')" class="tab active" data-type="">All</a>
-        <a href="javascript:void(0)" onclick="filterType('Bus')" class="tab" data-type="Bus">🚌 Buses</a>
-        <a href="javascript:void(0)" onclick="filterType('Train')" class="tab" data-type="Train">🚄 Trains</a>
-        <a href="javascript:void(0)" onclick="filterType('Ferry')" class="tab" data-type="Ferry">🚢 Ferries</a>
+    <div class="transport-filters" style="display:flex; gap: 10px; margin-top: 20px; position: relative; z-index: 100;">
+
+
+        <a href="#"
+           class="rnt-tab @(ViewBag.SelectedType == "" ? "active" : "")"
+           data-type="">
+            All 🚌
+        </a>
+
+        <a href="#"
+           class="rnt-tab @(ViewBag.SelectedType == "Bus" ? "active" : "")"
+           data-type="Bus">
+            Buses 🚌
+        </a>
+
+        <a href="#"
+           class="rnt-tab @(ViewBag.SelectedType == "Train" ? "active" : "")"
+           data-type="Train">
+            Trains 🚄
+        </a>
+
+        <a href="#"
+           class="rnt-tab @(ViewBag.SelectedType == "Ferry" ? "active" : "")"
+           data-type="Ferry">
+            Ferries 🚢
+        </a>
     </div>
+
+    <br>
 
     <div id="tableContainer" class="recent-section">
         <partial name="_VehicleTable" model="Model" />

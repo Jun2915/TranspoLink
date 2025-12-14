@@ -45,12 +45,7 @@ public class DB(DbContextOptions options) : DbContext(options)
         modelBuilder.Entity<RouteStop>()
             .HasOne(rs => rs.Route).WithMany(r => r.RouteStops).HasForeignKey(rs => rs.RouteId).OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<TripStop>()
-            .HasOne(ts => ts.Trip).WithMany(t => t.TripStops).HasForeignKey(ts => ts.TripId).OnDelete(DeleteBehavior.Cascade);
-
-        modelBuilder.Entity<TripStop>()
-            .HasOne(ts => ts.RouteStop).WithMany().HasForeignKey(ts => ts.RouteStopId).OnDelete(DeleteBehavior.Restrict);
-
+        
         modelBuilder.Entity<Vehicle>()
             .HasOne(v => v.Driver)
             .WithOne(d => d.Vehicle)
@@ -96,8 +91,8 @@ public class Route
     [MaxLength(20)] public string TransportType { get; set; }
     public bool IsActive { get; set; } = true;
 
-    public virtual ICollection<Trip> Trips { get; set; }
-    public virtual ICollection<RouteStop> RouteStops { get; set; }
+    public virtual ICollection<Trip> Trips { get; set; } = new List<Trip>();
+    public virtual ICollection<RouteStop> RouteStops { get; set; } = new List<RouteStop>();
 }
 
 public class RouteStop
@@ -127,17 +122,23 @@ public class Trip
     public DateTime ArrivalTime { get; set; }
     public int AvailableSeats { get; set; }
     [Column(TypeName = ("decimal(10,2)"))] public decimal Price { get; set; }
-    [MaxLength(20)] public string Status { get; set; }
 
-    public virtual Route Route { get; set; }
-    public virtual Vehicle Vehicle { get; set; }
-    public virtual ICollection<Booking> Bookings { get; set; }
-    public virtual ICollection<TripStop> TripStops { get; set; }
-}
+    
+        [MaxLength(20)]
+        public string Status { get; set; } = "Scheduled";
+
+        public virtual Route? Route { get; set; }
+        public virtual Vehicle? Vehicle { get; set; } 
+
+        public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
+        public virtual ICollection<TripStop> TripStops { get; set; } = new List<TripStop>();
+    }
+
+// DB.cs
 
 public class TripStop
 {
-    [Key, MaxLength(6)]
+    [Key, MaxLength(7)]
     [DatabaseGenerated(DatabaseGeneratedOption.None)]
     public string Id { get; set; }
 
@@ -164,7 +165,7 @@ public class Vehicle
 
     public bool IsActive { get; set; } = true;
 
-    public virtual ICollection<Trip> Trips { get; set; }
+    public virtual ICollection<Trip> Trips { get; set; } = new List<Trip>();
     public virtual Driver? Driver { get; set; }
 }
 
@@ -192,4 +193,36 @@ public class AuditLog
     public DateTime Timestamp { get; set; } = DateTime.Now;
     [MaxLength(10)] public string Icon { get; set; }
     [MaxLength(20)] public string CssClass { get; set; }
+}
+
+
+public class DriverVM
+{
+    public string Id { get; set; }
+
+    [Required, MaxLength(100)]
+    public string Name { get; set; }
+
+    [MaxLength(100), EmailAddress]
+    public string? Email { get; set; }
+
+    [MaxLength(20), Phone]
+    public string? Phone { get; set; }
+
+    [Required, MaxLength(20)]
+    [Display(Name = "License Number")]
+    public string LicenseNumber { get; set; }
+
+    [DataType(DataType.Password)]
+    public string? Password { get; set; }
+
+    [DataType(DataType.Password)]
+    [Compare("Password", ErrorMessage = "The passwords do not match.")]
+    public string? ConfirmPassword { get; set; }
+
+    public bool IsBlocked { get; set; } = false;
+
+    [Display(Name = "Profile Photo")]
+    public IFormFile? Photo { get; set; }
+    public string? ExistingPhotoURL { get; set; }
 }

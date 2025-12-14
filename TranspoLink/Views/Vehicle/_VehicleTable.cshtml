@@ -57,6 +57,7 @@
                         <a href="/Vehicle/EditVehicle/@v.Id" class="btn-view" style="background-color: #f59e0b;">Edit</a>
 
                         <form method="post" action="/Vehicle/ToggleVehicleStatus/@v.Id" style="display:inline;">
+                            @Html.AntiForgeryToken() 
                             <button class="btn-delete" style="background-color: @(v.IsActive ? "#57606f" : "#2ed573");">
                                 @(v.IsActive ? "Deactivate" : "Activate")
                             </button>

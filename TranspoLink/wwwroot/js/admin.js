@@ -1,29 +1,47 @@
 ﻿$(document).ready(function () {
 
+    // admin.js (Find the block that starts checking the URL includes, e.g., line 5)
+
     // ============================================================================
     // ADMIN MANAGEMENT PAGE LOGIC (Search, Sort, AJAX)
     // ============================================================================
-    const isAdminPage = window.location.pathname.toLowerCase().includes('/admin/admins');
 
-    if (isAdminPage) {
+    // Check if we are on a table page that needs AJAX loading
+    const isDynamicTablePage = window.location.pathname.toLowerCase().includes('/admin/admins') ||
+        window.location.pathname.toLowerCase().includes('/admin/members') ||
+        window.location.pathname.toLowerCase().includes('/routentrip/drivers'); // <-- CRITICAL FIX ADDED HERE
 
-        //  Define loadTable specifically for Admins
+    if (isDynamicTablePage) {
+
+        // Helper to determine the correct AJAX URL for the current page
+        function getAjaxUrl() {
+            if (window.location.pathname.toLowerCase().includes('/admin/admins')) return '/Admin/Admins';
+            if (window.location.pathname.toLowerCase().includes('/admin/members')) return '/Admin/Members';
+            if (window.location.pathname.toLowerCase().includes('/routentrip/drivers')) return '/RouteNTrip/Drivers'; // <-- NEW DRIVERS URL
+            return '';
+        }
+
+        // Define loadTable specifically for the current dynamic page
         window.loadTable = function (page) {
             const search = $('#searchInput').val();
             const sort = $('#partialSort').val() || "Id";
             const dir = $('#partialDir').val() || "asc";
+            const ajaxUrl = getAjaxUrl();
+
+            if (!ajaxUrl) return; // Exit if URL not determined
 
             $('#tableContainer').css('opacity', '0.6');
 
             $.ajax({
-                url: '/Admin/Admins',
+                url: ajaxUrl, // USE THE DYNAMIC URL
                 type: 'GET',
+                // Data parameters must match the Controller's action parameters
                 data: { search: search, page: page, sort: sort, dir: dir },
                 success: function (result) {
                     $('#tableContainer').html(result);
                     $('#tableContainer').css('opacity', '1');
                     updateSortIcons();
-                    toggleClearButton(); 
+                    toggleClearButton();
                 },
                 error: function () {
                     alert("Error loading data.");
@@ -32,7 +50,7 @@
             });
         };
 
-        // Search Input Handler
+        // Search Input Handler (This triggers loadTable)
         $('#searchInput').on('input', function () {
             toggleClearButton();
             loadTable(1);
@@ -66,6 +84,12 @@
         updateSortIcons();
         toggleClearButton();
     }
+
+
+    // ... (rest of admin.js code remains unchanged) ...
+
+
+    // ... (rest of admin.js code remains unchanged) ...
 
     // ============================================================================
     // DASHBOARD DROPDOWNS

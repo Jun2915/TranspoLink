@@ -1,0 +1,164 @@
+﻿@model TranspoLink.Models.Driver
+@{
+    ViewBag.Title += " | Driver Details";
+    // Assuming PhotoURL is relative to /images/
+    var photoUrl = Model.PhotoURL != null && Model.PhotoURL.StartsWith("/images/") ? Model.PhotoURL : "/images/" + Model.PhotoURL;
+    var assignedVehicle = Model.Vehicle;
+
+    // Assuming ViewBag.RecentTrips is set in the Controller (for the Activity Section)
+    // The controller logic should fetch trips where Vehicle.DriverId == Model.Id
+    var recentTrips = ViewBag.RecentTrips as List<TranspoLink.Models.Trip> ?? new List<TranspoLink.Models.Trip>();
+}
+
+@section head {
+    <link rel="stylesheet" href="/css/admin.css" asp-append-version="true" />
+    <link rel="stylesheet" href="/css/member.css" asp-append-version="true" />
+    <link rel="stylesheet" href="/css/vehicle.css" asp-append-version="true" />
+}
+
+<div class="admin-container admin-bg-page">
+
+    @* Message Display Block (Ensures success/error messages show up) *@
+    @if (TempData["Success"] != null)
+    {
+        <div class="rnt-alert rnt-alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="rnt-alert rnt-alert-danger">@TempData["Error"]</div>
+    }
+
+    <div style="margin-bottom: 20px;">
+        <a href="/RouteNTrip/Drivers" class="btn-back">← Back to Drivers</a>
+    </div>
+
+    <div class="details-grid">
+        <div class="profile-card">
+            <div class="profile-header-img">
+                <img src="@photoUrl"
+                     onerror="this.src='/images/default_photo.png'"
+                     alt="Profile Photo">
+            </div>
+            <h2 class="profile-name">@Model.Name</h2>
+            <p class="profile-id">Driver ID: <b>@Model.Id</b></p>
+
+            <div class="profile-info-list">
+                <div class="info-item">
+                    <span class="label">📜 License No.</span>
+                    <span class="value">@Model.LicenseNumber</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">📧 Email</span>
+                    <span class="value">@(Model.Email ?? "-")</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">📞 Phone</span>
+                    <span class="value">@(Model.Phone ?? "-")</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">🚌 Assigned Vehicle</span>
+                    <span class="value">
+                        @if (assignedVehicle != null)
+                        {
+                            <a href="/Vehicle/VehicleDetails/@assignedVehicle.Id">@assignedVehicle.VehicleNumber</a>
+                        }
+                        else
+                        {
+                            <span>Unassigned</span>
+                        }
+                    </span>
+                </div>
+                <div class="info-item">
+                    <span class="label">🔒 Role</span>
+                    <span class="value">Driver</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">🚦 Status</span>
+                    <span class="value">
+                        @if (Model.IsBlocked)
+                        {
+                            <span class="status-badge status-cancelled">Blocked</span>
+                        }
+                        else
+                        {
+                            <span class="status-badge status-confirmed">Active</span>
+                        }
+                    </span>
+                </div>
+            </div>
+
+            <div class="profile-actions" style="display: flex; flex-direction:column; gap: 10px;">
+
+                @* 1. EDIT BUTTON *@
+                <a href="/RouteNTrip/ModifyDriver/@Model.Id" class="btn-tool" style="width:100%; background-color: #f59e0b;">
+                    ✍️ Edit Profile
+                </a>
+
+                @* 2. PASSWORD RESET BUTTON *@
+                @if (!string.IsNullOrEmpty(Model.Email))
+                {
+                    <form method="post" action="/RouteNTrip/InitiateDriverPasswordReset/@Model.Id" style="width:100%;">
+                        @* Ensure form takes 100% width *@
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn-tool" style="width:100%; background-color: #667eea;">
+                            📧 Send Password Reset Link
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <p style="font-size:12px; color:#888; text-align: center;">Add an email address to enable password reset.</p>
+                }
+
+                @* 3. BLOCK/UNBLOCK TOGGLE *@
+                <form method="post" action="/RouteNTrip/ToggleBlockDriver/@Model.Id" style="width:100%;">
+                    @* Ensure form takes 100% width *@
+                    @Html.AntiForgeryToken()
+                    @if (Model.IsBlocked)
+                    {
+                        <button type="submit" class="btn-tool" style="width:100%; background-color: #2ed573;">🔓 Unblock Account</button>
+                    }
+                    else
+                    {
+                        <button type="submit" class="btn-tool" style="width:100%; background-color: #ff4757;">🔒 Block Account</button>
+                    }
+                </form>
+            </div>
+        </div>
+
+        <div class="activity-section">
+            <h3>📅 Recent Trips Assigned</h3>
+
+            @if (recentTrips.Any())
+            {
+                <table class="booking-table">
+                    <thead>
+                        <tr>
+                            <th>Trip ID</th>
+                            <th>Route</th>
+                            <th>Departure</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var trip in recentTrips)
+                        {
+                            <tr>
+                                <td>@trip.Id</td>
+                                <td>@trip.Route?.Origin → @trip.Route?.Destination</td>
+                                <td>@trip.DepartureTime.ToString("dd MMM HH:mm")</td>
+                                <td><span class="status-badge status-@trip.Status.ToLower()">@trip.Status</span></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="empty-state">
+                    <p>No recent trips found for this driver.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>

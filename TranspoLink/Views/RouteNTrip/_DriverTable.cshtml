@@ -1,0 +1,68 @@
+﻿@model IEnumerable<TranspoLink.Models.Driver>
+
+<table class="booking-table">
+    <thead>
+        <tr>
+            <th>Photo</th>
+            <th class="sortable" data-col="Id">ID <span class="sort-arrow"></span></th>
+            <th class="sortable" data-col="Name">Name <span class="sort-arrow"></span></th>
+            <th class="sortable" data-col="LicenseNumber">License No. <span class="sort-arrow"></span></th>
+            <th class="sortable" data-col="Vehicle">Assigned Vehicle <span class="sort-arrow"></span></th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Any())
+        {
+            foreach (var d in Model)
+            {
+                <tr>
+                    <td>
+                        <img src="@(d.PhotoURL != null && d.PhotoURL.StartsWith("/images/") ? d.PhotoURL : "/images/default_photo.png")"
+                             class="member-photo"
+                             onerror="this.src='/images/default_photo.png'">
+                    </td>
+                    <td>@d.Id</td>
+                    <td>@d.Name</td>
+                    <td>@d.LicenseNumber</td>
+                    <td>
+                        @if (d.Vehicle != null)
+                        {
+                            <span class="status-badge status-confirmed">@d.Vehicle.VehicleNumber</span>
+                        }
+                        else
+                        {
+                            <span class="status-badge status-pending">Unassigned</span>
+                        }
+                    </td>
+                    <td>
+                        @if (d.IsBlocked)
+                        {
+                            <span class="status-badge status-cancelled">Blocked</span>
+                        }
+                        else
+                        {
+                            <span class="status-badge status-confirmed">Active</span>
+                        }
+                    </td>
+                    <td class="action-links">
+                        <a href="/RouteNTrip/DriverDetails/@d.Id" class="btn-view">Details</a>
+
+                        <form method="post" action="/RouteNTrip/DeleteDriver/@d.Id"
+                              onsubmit="return confirm('Are you sure you want to delete Driver @d.Id?');"
+                              style="display:inline;">
+                            <button class="btn-delete">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="7" style="text-align:center; padding: 20px;">No drivers found.</td>
+            </tr>
+        }
+    </tbody>
+</table>

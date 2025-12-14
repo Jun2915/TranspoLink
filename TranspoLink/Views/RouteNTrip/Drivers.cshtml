@@ -1,0 +1,65 @@
+﻿@model IEnumerable<TranspoLink.Models.Driver>
+@{
+    ViewBag.Title += " | Driver Management";
+}
+
+@section head {
+    <link rel="stylesheet" href="/css/admin.css" asp-append-version="true" />
+    <link rel="stylesheet" href="/css/member.css" asp-append-version="true" />
+    @* Use admin.js or user.js logic for search/sort/pagination *@
+    <script src="/js/admin.js" asp-append-version="true" defer></script>
+}
+
+<div class="admin-container member-bg-page">
+    <div class="admin-header">
+        <div class="admin-header-text">
+            <h1>👨‍✈️ Driver Management</h1>
+            <p>View and manage registered drivers and their assigned vehicles.</p>
+        </div>
+        <a href="/RouteNTrip/CreateDriver" class="btn-view btn-add">+ Register New Driver</a>
+    </div>
+
+    @* Search Form *@
+    <form method="get" class="search-container" id="searchForm" onsubmit="event.preventDefault();">
+        <input type="text" id="searchInput" name="search" value="@ViewBag.Search" placeholder="Search by ID, name, license..." autocomplete="off">
+        <a href="javascript:void(0)" id="clearSearchBtn" class="btn-clear" style="display: none;">✕ Clear</a>
+        <button type="submit" onclick="loadTable(1)">Search</button>
+    </form>
+
+    @* Table Container (Loads the partial view) *@
+    <div id="tableContainer" class="recent-section">
+        <partial name="_DriverTable" model="Model" />
+    </div>
+
+    @* Pagination *@
+    <div class="pagination-container" style="margin-top: 20px; text-align: center;">
+        <ul class="pagination">
+            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+            {
+                <li class="@(i == ViewBag.CurrentPage ? "active" : "")">
+                    <a href="javascript:void(0)" onclick="loadTable(@i)">@i</a>
+                </li>
+            }
+        </ul>
+    </div>
+</div>
+
+@* Modal for Delete Confirmation (Assuming shared logic for openConfirmModal exists) *@
+<div id="confirmModal" class="confirm-overlay">
+    <div class="confirm-box">
+        <span class="confirm-icon">⚠️</span>
+        <h3 class="confirm-title">Delete Driver?</h3>
+        <p class="confirm-text">
+            Are you sure you want to remove <b id="deleteNameDisplay" style="color:#ff4757;"></b>?<br>
+            This action cannot be undone.
+        </p>
+
+        <div class="confirm-actions">
+            <button onclick="closeConfirmModal()" class="btn-confirm-cancel">Cancel</button>
+
+            <form method="post" id="deleteConfirmForm">
+                <button type="submit" class="btn-confirm-delete">Yes, Delete</button>
+            </form>
+        </div>
+    </div>
+</div>

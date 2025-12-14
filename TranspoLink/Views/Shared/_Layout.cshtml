@@ -6,7 +6,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title</title>
+    <title>@ViewBag.Title | TranspoLink</title>
     <link rel="shortcut icon" href="/images/shortcut_icon.png">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
     <link rel="stylesheet" href="/css/pager.css">
@@ -53,13 +53,11 @@
             string photoUrl = "/images/default_photo.png";
             if (currentUser is Member m && !string.IsNullOrEmpty(m.PhotoURL))
             {
-                if (m.PhotoURL == "default_photo.png") { photoUrl = "/images/default_photo.png"; }
-                else { photoUrl = "/images/" + m.PhotoURL; }
+                photoUrl = (m.PhotoURL == "default_photo.png") ? "/images/default_photo.png" : "/images/" + m.PhotoURL;
             }
             else if (currentUser is Admin a && !string.IsNullOrEmpty(a.PhotoURL))
             {
-                if (a.PhotoURL.StartsWith("/images/")) { photoUrl = a.PhotoURL; }
-                else { photoUrl = "/images/" + a.PhotoURL; }
+                photoUrl = a.PhotoURL.StartsWith("/images/") ? a.PhotoURL : "/images/" + a.PhotoURL;
             }
 
             <div class="user-dropdown-container">
@@ -104,6 +102,7 @@
                     <div class="nav-dropdown-content" id="navUserContent">
                         <a href="/Admin/Admins">🛡️ Admins</a>
                         <a href="/Admin/Members">👥 Members</a>
+                        <a href="/RouteNTrip/Drivers">👨‍✈️ Drivers List</a>
                     </div>
                 </li>
 
@@ -114,7 +113,8 @@
                     <div class="nav-dropdown-content" id="navOpsContent">
                         <a href="/RouteNTrip/Routes">🗺️ Routes</a>
                         <a href="/Vehicle/Vehicles">🚌 Vehicles</a>
-                        <a href="/RouteNTrip/Trips">🎫 Trips</a>
+                        @* CRITICAL FIX: Ensures this link hits the unified 'Trips' action *@
+                        <a href="/RouteNTrip/Trips">🎫 Trip Management</a>
                         <a href="/Admin/Bookings">📋 Bookings</a>
                     </div>
                 </li>
@@ -122,16 +122,9 @@
                 <li><a href="/Home/Reports">📊 Reports</a></li>
                 <li><a href="/Home/AboutUs">About Us</a></li>
             }
-            else if (User.IsInRole("Member"))
-            {
-                <li><a href="/">Home</a></li>
-                <li><a href="/#features">Features</a></li>
-                <li><a href="/#trending">News & Offers</a></li>
-                <li><a href="/#contact">Contact</a></li>
-                <li><a href="/Home/AboutUs">About Us</a></li>
-            }
             else
             {
+                @* Non-Admin Navigation *@
                 <li><a href="/">Home</a></li>
                 <li><a href="/#features">Features</a></li>
                 <li><a href="/#trending">News & Offers</a></li>
@@ -149,6 +142,7 @@
         Developed by <b>BMIT 2023 Web And Mobile System</b> &middot; Copyrighted &copy; @DateTime.Today.Year
     </footer>
 
+    @* SCRIPTS SECTION *@
     <script src="/js/jquery.min.js"></script>
     <script src="/js/jquery.unobtrusive-ajax.min.js"></script>
     <script src="/js/jquery.validate.min.js"></script>
@@ -158,9 +152,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <script src="/js/photo-tools.js" asp-append-version="true"></script>
 
+    @* CRITICAL FIX: Only call RenderSection once to resolve syntax errors *@
+    @RenderSection("scripts", required: false)
+
     <script>
         function toggleNavDropdown(e, id) {
-            e.stopPropagation();
+            if (e) e.stopPropagation();
             $('.nav-dropdown-content').not('#' + id).removeClass('show-nav-dropdown');
             $('#' + id).toggleClass('show-nav-dropdown');
         }

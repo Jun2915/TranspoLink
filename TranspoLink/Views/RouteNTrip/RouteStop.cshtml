@@ -30,6 +30,7 @@
                                 <div style="font-size:12px; color:#666;">+@s.MinutesFromStart mins from start</div>
                             </div>
                             <form action="/RouteNTrip/DeleteRouteStop" method="post">
+                                @Html.AntiForgeryToken()
                                 <input type="hidden" name="id" value="@s.Id" />
                                 <button class="btn-rnt btn-rnt-danger">Remove</button>
                             </form>
@@ -46,6 +47,7 @@
         <div style="background:white; padding:20px; border-radius:12px; height:fit-content; border:1px solid #ddd;">
             <h3>Add New Stop</h3>
             <form action="/RouteNTrip/AddRouteStop" method="post">
+                @Html.AntiForgeryToken()
                 <input type="hidden" name="routeId" value="@ViewBag.RouteId" />
 
                 <label style="display:block; margin-bottom:5px;">Stop Name</label>
