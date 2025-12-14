@@ -2,15 +2,12 @@
 @using Microsoft.AspNetCore.Authentication
 
 @{
-    // 1. GLOBAL USER FETCHING
-    // We fetch the user here so it is available for both the Top Bar AND the Chat System
     User? currentUser = null;
     if (User.Identity.IsAuthenticated)
     {
         var identifier = User.Identity.Name;
         currentUser = db.Users.FirstOrDefault(u => u.Email == identifier || u.Phone == identifier);
 
-        // Security check: Force logout if user is blocked or deleted
         if (currentUser == null || currentUser.IsBlocked)
         {
             Context.SignOutAsync("Cookies");
@@ -32,7 +29,6 @@
     <link rel="stylesheet" href="/css/app.css" asp-append-version="true">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
     <link rel="stylesheet" href="/css/photo-tools.css" asp-append-version="true" />
-    @* Added Chat CSS from Old Layout *@
     <link rel="stylesheet" href="/css/chat.css" asp-append-version="true" />
     @RenderSection("head", false)
 </head>
@@ -124,7 +120,6 @@
                     <div class="nav-dropdown-content" id="navOpsContent">
                         <a href="/RouteNTrip/Routes">🗺️ Routes</a>
                         <a href="/Vehicle/Vehicles">🚌 Vehicles</a>
-                        @* CRITICAL FIX: Ensures this link hits the unified 'Trips' action *@
                         <a href="/RouteNTrip/Trips">🎫 Trip Management</a>
                         <a href="/Admin/Bookings">📋 Bookings</a>
                     </div>
@@ -156,7 +151,7 @@
     </footer>
 
     @* ================================================================= *@
-    @* CHAT UI SECTION (Restored from Old Layout) *@
+    @* CHAT UI SECTION ) *@
     @* ================================================================= *@
     @if (User.Identity.IsAuthenticated && currentUser != null && !User.IsInRole("Admin"))
     {
@@ -202,7 +197,6 @@
         </div>
     }
 
-    @* SCRIPTS SECTION *@
     <script src="/js/jquery.min.js"></script>
     <script src="/js/jquery.unobtrusive-ajax.min.js"></script>
     <script src="/js/jquery.validate.min.js"></script>
@@ -211,8 +205,6 @@
     <script src="/js/user.js" asp-append-version="true"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <script src="/js/photo-tools.js" asp-append-version="true"></script>
-
-    @* Chat Scripts (Restored from Old Layout) *@
     @if (User.Identity.IsAuthenticated && currentUser != null)
     {
         <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
@@ -222,7 +214,6 @@
         <script src="/js/chat.js" asp-append-version="true"></script>
     }
 
-    @* CRITICAL FIX: Only call RenderSection once to resolve syntax errors *@
     @RenderSection("scripts", required: false)
 
     <script>
