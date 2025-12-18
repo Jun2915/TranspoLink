@@ -52,7 +52,7 @@ builder.Services.AddAuthentication("Cookies").AddCookie("Cookies", options =>
 
 builder.Services.AddAuthorization();
 
-// Session
+// Session Configuration
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);

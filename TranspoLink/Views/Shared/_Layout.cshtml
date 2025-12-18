@@ -33,7 +33,6 @@
     @RenderSection("head", false)
 </head>
 <body>
-    @* Flash Message Container *@
     <div class="info">@TempData["Info"]</div>
 
     <div class="top-bar">
@@ -121,26 +120,22 @@
                         <a href="/RouteNTrip/Routes">🗺️ Routes</a>
                         <a href="/Vehicle/Vehicles">🚌 Vehicles</a>
                         <a href="/RouteNTrip/Trips">🎫 Trip Management</a>
-                        <a href="/Booking/">📋 Bookings</a>
+                        <a href="/Admin/Bookings">📋 Bookings</a>
                     </div>
                 </li>
 
                 <li><a href="/Home/Reports">📊 Reports</a></li>
-                @* Added Support Chat Link for Admins *@
                 <li><a href="/Chat/Support">💬 Support</a></li>
                 <li><a href="/Home/AboutUs">About Us</a></li>
             }
             else
             {
-                @* Non-Admin Navigation *@
                 <li><a href="/">Home</a></li>
                 <li><a href="/Booking/Index">My Bookings</a></li>
                 <li><a href="/#features">Features</a></li>
                 <li><a href="/#trending">News & Offers</a></li>
                 <li><a href="/#contact">Contact</a></li>
                 <li><a href="/Home/AboutUs">About Us</a></li>
-                <li> <a asp-controller="Booking" asp-action="BookingList" 
-               style= font-weight: bold; Booking List </a> </li>
             }
         </ul>
     </nav>
@@ -153,9 +148,7 @@
         Developed by <b>BMIT 2023 Web And Mobile System</b> &middot; Copyrighted &copy; @DateTime.Today.Year
     </footer>
 
-    @* ================================================================= *@
-    @* CHAT UI SECTION ) *@
-    @* ================================================================= *@
+    @* CHAT UI SECTION *@
     @if (User.Identity.IsAuthenticated && currentUser != null && !User.IsInRole("Admin"))
     {
         <button class="chat-btn-float" onclick="toggleChat()" title="Chat with Support">💬</button>
@@ -172,13 +165,11 @@
                 </div>
             </div>
 
-            @* 1. Reply Context Bar *@
             <div id="replyPreviewBar" style="display:none;">
                 <span id="replyTextTarget">Replying...</span>
                 <span style="cursor:pointer; font-weight:bold;" onclick="cancelReply()">✕</span>
             </div>
 
-            @* 2. Image Preview Bar *@
             <div id="imagePreviewBar" style="display:none;">
                 <img id="imagePreviewSrc" src="" alt="Preview" />
                 <div style="flex:1; font-size:12px; color:#666; margin-left:10px;">Image selected</div>
@@ -186,15 +177,9 @@
             </div>
 
             <div class="chat-input-area">
-                @* Camera Button *@
                 <button class="btn-tool-chat" onclick="triggerPhotoUpload()" title="Select Photo">📷</button>
-                @* Hidden File Input *@
                 <input type="file" id="chatPhotoInput" accept="image/*" style="display:none;" onchange="previewPhoto(this)">
-
-                @* Text Input *@
                 <input type="text" id="chatInput" class="chat-input" placeholder="Type a message..." autocomplete="off">
-
-                @* Send Button *@
                 <button id="btnSendChat" class="chat-send-btn">➤</button>
             </div>
         </div>
@@ -208,6 +193,7 @@
     <script src="/js/user.js" asp-append-version="true"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <script src="/js/photo-tools.js" asp-append-version="true"></script>
+    
     @if (User.Identity.IsAuthenticated && currentUser != null)
     {
         <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>

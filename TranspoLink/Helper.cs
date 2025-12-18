@@ -19,14 +19,11 @@ public class Helper(IWebHostEnvironment en,
     public string GetNextId(DB db, string role)
     {
         string prefix = role == "Admin" ? "A" : "C";
-
         var existingIds = db.Users
             .Where(u => u.Id.StartsWith(prefix))
-            .Select(u => u.Id)
-            .ToList()
+            .Select(u => u.Id).ToList()
             .Select(id => int.TryParse(id.Substring(1), out int n) ? n : 0)
-            .OrderBy(n => n)
-            .ToList();
+            .OrderBy(n => n).ToList();
 
         return prefix + GetNextNumber(existingIds).ToString("D3");
     }
@@ -71,11 +68,9 @@ public class Helper(IWebHostEnvironment en,
     {
         var existingIds = db.Vehicles
             .Where(v => v.VehicleNumber.StartsWith("V"))
-            .Select(v => v.VehicleNumber)
-            .ToList()
+            .Select(v => v.VehicleNumber).ToList()
             .Select(id => int.TryParse(id.Substring(1), out int n) ? n : 0)
-            .OrderBy(n => n)
-            .ToList();
+            .OrderBy(n => n).ToList();
 
         return "V" + GetNextNumber(existingIds).ToString("D3");
     }
@@ -98,16 +93,13 @@ public class Helper(IWebHostEnvironment en,
     {
         if (f == null || f.Length == 0)
             return "Please select a photo.";
-
         var reType = new Regex(@"^image\/(jpeg|png)$", RegexOptions.IgnoreCase);
         var reName = new Regex(@"^.+\.(jpeg|jpg|png)$", RegexOptions.IgnoreCase);
 
         if (!reType.IsMatch(f.ContentType) || !reName.IsMatch(f.FileName))
             return "Only JPG and PNG photos are allowed.";
-
         if (f.Length > 1 * 1024 * 1024)
             return "Photo size cannot exceed 1MB.";
-
         return "";
     }
 
@@ -115,12 +107,10 @@ public class Helper(IWebHostEnvironment en,
     {
         var file = Guid.NewGuid().ToString("n") + ".jpg";
         var path = Path.Combine(en.WebRootPath, folder, file);
-
         using var stream = f.OpenReadStream();
         using var img = Image.Load(stream);
         img.Mutate(x => x.Resize(new ResizeOptions { Size = new(200, 200), Mode = ResizeMode.Crop }));
         img.Save(path);
-
         return file;
     }
 
@@ -164,9 +154,7 @@ public class Helper(IWebHostEnvironment en,
 
     // --- Security & Auth Helpers ---
     private readonly PasswordHasher<object> ph = new();
-
     public string HashPassword(string password) => ph.HashPassword(0, password);
-
     public bool VerifyPassword(string hash, string password) =>
         ph.VerifyHashedPassword(0, hash, password) == PasswordVerificationResult.Success;
 
@@ -177,7 +165,6 @@ public class Helper(IWebHostEnvironment en,
             new(ClaimTypes.NameIdentifier, email),
             new(ClaimTypes.Role, role),
         ];
-
         ClaimsIdentity identity = new(claims, "Cookies");
         ClaimsPrincipal principal = new(identity);
         AuthenticationProperties properties = new()
@@ -185,7 +172,6 @@ public class Helper(IWebHostEnvironment en,
             IsPersistent = rememberMe,
             ExpiresUtc = rememberMe ? DateTime.UtcNow.AddDays(7) : null
         };
-
         ct.HttpContext!.SignInAsync(principal, properties);
     }
 
@@ -263,7 +249,6 @@ public class Helper(IWebHostEnvironment en,
         return doc.RootElement.GetProperty("success").GetBoolean();
     }
 
-    // --- Booking & Cart Helpers ---
     public Dictionary<string, int> GetCart() => ct.HttpContext!.Session.Get<Dictionary<string, int>>("Cart") ?? [];
 
     public void SetCart(Dictionary<string, int>? dict = null)
@@ -275,7 +260,6 @@ public class Helper(IWebHostEnvironment en,
     }
 
     public List<string> GetSeatsForBooking(int bookingId) => [];
-
     public List<string> GetBookedSeatsForTrip(string tripId) => [""];
 
     public List<string> GenerateSeatLayout(int totalSeats)
@@ -297,58 +281,4 @@ public class Helper(IWebHostEnvironment en,
         Random r = new();
         return new string(Enumerable.Repeat(s, 10).Select(st => st[r.Next(st.Length)]).ToArray());
     }
-    // ------------------------------------------------------------------------
-    // Booking Helper Functions
-    // ------------------------------------------------------------------------
-    public List<string> GetSeatsForBooking(int bookingId)
-    {
-        // Fetch seat numbers from the database for a confirmed/pending booking.
-        // Since we don't have a dedicated Seat table, this is simulated:
-        // This assumes seat numbers are stored in a comma-separated format in the Booking model 
-        // or a related table (which we need to add later for full functionality). 
-        // For now, we simulate finding the booked seats via the bookingId, which is not ideal.
-
-        // **FIX: We will assume there is a BookingSeat table to fetch this data later, 
-        // and for this helper, we'll return an empty list as we don't know the booking details yet.**
-        return new List<string>();
-    }
-
-    public List<string> GetBookedSeatsForTrip(string tripId)
-    {
-
-
-        // In a real application, you would query the DB
-        return new List<string> { "" }; // General busy seats
-    }
-
-
-    public List<string> GenerateSeatLayout(int totalSeats)
-    {
-        // Generates a simulated 2+1 layout (A, B, C) for demonstration (10 rows max).
-        List<string> seats = new List<string>();
-        int rows = Math.Min(10, totalSeats / 3);
-        for (int r = 1; r <= rows; r++)
-        {
-            // FIX: Ensure seat labels are correct (e.g., 1A, 1B, 1C)
-            seats.Add(r + "A"); // Pair
-            seats.Add(r + "B"); // Pair
-            seats.Add(r + "C"); // Single
-        }
-        return seats;
-    }
-
-
-    public string GenerateBookingRef()
-    {
-        // Generates a 10-character reference number
-        string s = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        Random r = new();
-        string reference = "";
-        for (int i = 0; i < 10; i++)
-        {
-            reference += s[r.Next(s.Length)];
-        }
-        return reference;
-    }
 }
-

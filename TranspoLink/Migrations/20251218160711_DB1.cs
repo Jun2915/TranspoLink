@@ -175,7 +175,9 @@ namespace TranspoLink.Migrations
                     TotalPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     IsPaid = table.Column<bool>(type: "bit", nullable: false),
-                    BookingReference = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true)
+                    BookingReference = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
