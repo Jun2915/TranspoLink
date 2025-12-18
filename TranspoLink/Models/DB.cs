@@ -248,3 +248,14 @@ public class DriverVM
     public IFormFile? Photo { get; set; }
     public string? ExistingPhotoURL { get; set; }
 }
+
+public class Passenger //
+{
+    public int Id { get; set; }
+    public int BookingId { get; set; }
+    public Booking Booking { get; set; }
+    public string Name { get; set; }
+    public int Age { get; set; }
+    public string SeatNumber { get; set; }
+    public string TicketType { get; set; }
+}

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using System.Text.Json;
 
 namespace TranspoLink;
@@ -57,4 +58,6 @@ public static class Extensions
         var value = session.GetString(key);
         return value == null ? default : JsonSerializer.Deserialize<T>(value);
     }
+
+
 }

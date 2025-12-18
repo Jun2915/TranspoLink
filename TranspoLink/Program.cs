@@ -51,6 +51,7 @@ builder.Services.AddAuthorization();
 
 //Session & Http Context
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);
@@ -110,6 +111,8 @@ app.UseStaticFiles();
 //Localization
 app.UseRequestLocalization("en-MY");
 
+app.UseRouting();
+
 // Session before authentication
 app.UseSession();
 
@@ -125,3 +128,4 @@ app.MapControllerRoute(
 app.MapHub<ChatHub>("/chathub");
 
 app.Run();
+

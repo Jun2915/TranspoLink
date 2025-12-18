@@ -1,0 +1,217 @@
+﻿@model TranspoLink.Models.SeatSelectionVM
+@{
+    ViewBag.Title = "Select Seats | " + (Model.Trip?.Route?.Origin ?? "N/A") + " ➝ " + (Model.Trip?.Route?.Destination ?? "N/A");
+    var trip = Model.Trip;
+}
+
+@section head {
+    <link rel="stylesheet" href="/css/RNT.css" asp-append-version="true" />
+    <link rel="stylesheet" href="/css/booking.css" asp-append-version="true" />
+}
+
+<div class="alert alert-danger" role="alert">
+    @Html.ValidationSummary(false, "提交失败，请检查以下问题：", new { @class = "text-danger" })
+</div>
+
+<div class="booking-container">
+    <div class="main-content">
+
+        <div class="seat-map-card">
+            <div class="trip-header">
+                <div class="trip-header-content">
+                    <span class="company-name">@trip.Vehicle.Driver?.Name (Pvt)</span>
+                    <h2 class="trip-route">@(trip.Route?.Origin ?? "N/A") → @(trip.Route?.Destination ?? "N/A")</h2>
+                </div>
+            </div>
+
+            <h3>Select Your Seat(s)</h3>
+
+            <form method="post" id="seatForm" asp-controller="Booking" asp-action="Book">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="TripId" />
+                <input type="hidden" id="formSelectedSeats" name="SelectedSeats" />
+
+                <!-- 🛠️ 添加调试输出 -->
+                <div id="debugOutput" style="display: none;"></div>
+
+                <input type="hidden" asp-for="MemberId" value="@User.Identity.Name" />
+
+
+            <div class="seat-map-diagram">
+                @{
+                    var allSeats = Model.AvailableSeats?.Keys?.ToList() ?? new List<string>();
+
+                    var columnA = new List<string>();
+                    var columnB = new List<string>();
+                    var columnC = new List<string>();
+                    // 拆分座位到各自的列... (代码省略，保持原有逻辑)
+                    foreach (var seat in allSeats)
+                    {
+                        if (string.IsNullOrEmpty(seat)) continue;
+                        if (seat.EndsWith("A", StringComparison.OrdinalIgnoreCase))
+                        {
+                            columnA.Add(seat);
+                        }
+                        else if (seat.EndsWith("B", StringComparison.OrdinalIgnoreCase))
+                        {
+                            columnB.Add(seat);
+                        }
+                        else if (seat.EndsWith("C", StringComparison.OrdinalIgnoreCase))
+                        {
+                            columnC.Add(seat);
+                        }
+                    }
+                    // 排序逻辑... (代码省略，保持原有逻辑)
+                    columnA = columnA.OrderBy(s =>
+                    {
+                        var number = new string(s.Where(char.IsDigit).ToArray());
+                        return int.TryParse(number, out int num) ? num : 0;
+                    }).ToList();
+                    columnB = columnB.OrderBy(s =>
+                    {
+                        var number = new string(s.Where(char.IsDigit).ToArray());
+                        return int.TryParse(number, out int num) ? num : 0;
+                    }).ToList();
+                    columnC = columnC.OrderBy(s =>
+                    {
+                        var number = new string(s.Where(char.IsDigit).ToArray());
+                        return int.TryParse(number, out int num) ? num : 0;
+                    }).ToList();
+                }
+
+                <div class="seat-column column-a">
+                    @foreach (var seat in columnA)
+                    {
+                        var isAvailable = Model.AvailableSeats != null &&
+                            Model.AvailableSeats.ContainsKey(seat) &&
+                            Model.AvailableSeats[seat];
+                        var isSelected = Model.SelectedSeats != null &&
+                            Model.SelectedSeats.Contains(seat);
+                        <div class="seat-row">
+                            <div class="seat-item @(isAvailable ? "seat-available" : "booked") @(isSelected ? "selected" : "")"
+                                 data-seat="@seat"
+                                 data-available="@isAvailable.ToString().ToLower()">@seat
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="seat-column column-b">
+                    @foreach (var seat in columnB)
+                    {
+                        var isAvailable = Model.AvailableSeats != null &&
+                            Model.AvailableSeats.ContainsKey(seat) &&
+                            Model.AvailableSeats[seat];
+                        var isSelected = Model.SelectedSeats != null &&
+                            Model.SelectedSeats.Contains(seat);
+                        <div class="seat-row">
+                            <div class="seat-item @(isAvailable ? "seat-available" : "booked") @(isSelected ? "selected" : "")"
+                                 data-seat="@seat"
+                                 data-available="@isAvailable.ToString().ToLower()">
+                                @seat
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="seat-column column-c">
+                    @foreach (var seat in columnC)
+                    {
+                        var isAvailable = Model.AvailableSeats != null &&
+                            Model.AvailableSeats.ContainsKey(seat) &&
+                            Model.AvailableSeats[seat];
+                        var isSelected = Model.SelectedSeats != null &&
+                            Model.SelectedSeats.Contains(seat);
+                        <div class="seat-row">
+                            <div class="seat-item @(isAvailable ? "seat-available" : "booked") @(isSelected ? "selected" : "")"
+                                 data-seat="@seat"
+                                 data-available="@isAvailable.ToString().ToLower()">
+                                @seat
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="seat-legends">
+                <div class="legend-item">
+                    <div class="legend-seat selected"></div>
+                    <span>Selected</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-seat available"></div>
+                    <span>Available</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-seat booked"></div>
+                    <span>Booked</span>
+                </div>
+            </div>
+
+            <div class="checkout-actions">
+                <span class="text-danger" id="seatError" style="display:block; text-align:center; margin-top: 10px;">@Html.ValidationMessage("SelectedSeats")</span>
+
+                <button type="submit" form="seatForm" class="btn-rnt btn-rnt-success" style="width:100%; padding: 15px; margin-top: 20px;">
+                    Proceed to Passenger Details
+                </button>
+            </div>
+            </form>
+        </div>
+        
+    </div>
+
+    <div class="sidebar">
+        <div class="payment-section">
+            <h3>Trip Summary</h3>
+            <div class="fare-breakup">
+                <p>
+                    <span>Route:</span>
+                    <span>@(trip.Route?.Origin ?? "N/A") → @(trip.Route?.Destination ?? "N/A")</span>
+                </p>
+                <p>
+                    <span>Date:</span>
+                    <span>@trip.DepartureTime.ToString("dd MMM yyyy")</span>
+                </p>
+                <p>
+                    <span>Departure:</span>
+                    <span>@trip.DepartureTime.ToString("HH:mm")</span>
+                </p>
+                <p>
+                    <span>Price/Seat:</span>
+                    <span class="price-per-seat" data-price="@trip.Price.ToString("F2")">
+                        MYR @trip.Price.ToString("N2")
+                    </span>
+                </p>
+                <p>
+                    <span>Selected Seats:</span>
+                    <span id="selectedSeatsDisplay">
+                        @(Model.SelectedSeats != null ? string.Join(", ", Model.SelectedSeats) : "")
+                    </span>
+                </p>
+                <p>
+                    <span>Total Seats:</span>
+                    <span id="numSeats">
+                        @(Model.SelectedSeats?.Count ?? 0)
+                    </span>
+                </p>
+                <div class="total-fare">
+                    <span>Estimated Total:</span>
+                    <span id="estimatedTotal" data-price="@trip.Price.ToString("F2")" class="total-value">
+                        MYR @(((Model.SelectedSeats?.Count ?? 0) * trip.Price).ToString("N2"))
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/booking.js"></script>
+
+    <script>
+        // 初始化选座数据供 booking.js 使用
+        window.selectedSeats = @Html.Raw(Json.Serialize(Model.SelectedSeats ?? new List<string>()));
+    </script>
+
+}

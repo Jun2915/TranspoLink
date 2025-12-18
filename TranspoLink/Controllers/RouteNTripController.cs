@@ -302,64 +302,75 @@ public class RouteNTripController(DB db, Helper hp) : Controller
 
 
     [Authorize(Roles = "Admin")]
-    [HttpPost]
-    public IActionResult CreateTrip(Trip trip)
+[HttpPost]
+public IActionResult CreateTrip(Trip trip)
+{
+    if (!ModelState.IsValid)
     {
-        if (!ModelState.IsValid)
-        {
-            TempData["Error"] = "Invalid trip data.";
-            return RedirectToAction("Trips");
-        }
-
-        trip.Id = GetNextTripId(db);
-
-        // 1. Fetch stops for the route to calculate ArrivalTime and create TripStops
-        var routeStops = db.RouteStops
-            .Where(rs => rs.RouteId == trip.RouteId)
-            .OrderBy(rs => rs.Sequence)
-            .ToList();
-
-        // *** CRITICAL FIX: Use Max() to get the longest time offset (10 mins for R002). ***
-        int tripDurationMinutes = routeStops.Any()
-            ? routeStops.Max(rs => rs.MinutesFromStart)
-            : 0;
-
-        // 2. Set Arrival Time: This calculation is the MOST important part.
-        // It takes the precise DepartureTime and adds the total duration in minutes.
-        trip.ArrivalTime = trip.DepartureTime.AddMinutes(tripDurationMinutes);
-
-        // Ensure the initial status is correctly set
-        trip.Status = "Scheduled";
-
-        db.Trips.Add(trip);
-
-        // 3. Create all TripStops records (using the correct logic)
-        foreach (var rs in routeStops)
-        {
-            db.TripStops.Add(new TripStop
-            {
-                Id = GetNextTripStopId(db),
-                TripId = trip.Id,
-                RouteStopId = rs.Id,
-                // Scheduled Arrival is based on the trip's start time + stop offset
-                ScheduledArrival = trip.DepartureTime.AddMinutes(rs.MinutesFromStart),
-                Status = "Scheduled"
-            });
-        }
-
-        try
-        {
-            db.SaveChanges();
-            TempData["Success"] = $"Trip {trip.Id} scheduled successfully with {routeStops.Count} stops!";
-            return RedirectToAction("TripStop", new { id = trip.Id });
-        }
-        catch (Exception ex)
-        {
-            TempData["Error"] = "Error scheduling trip. Database exception occurred.";
-            // Log the full exception details here for real debugging: ex.ToString()
-            return RedirectToAction("Trips");
-        }
+        TempData["Error"] = "Invalid trip data.";
+        return RedirectToAction("Trips");
     }
+
+    // *********************
+    // FIX: FETCH VEHICLE CAPACITY AND SET AVAILABLE SEATS
+    // *********************
+    // 1. Fetch the Vehicle entity to get the TotalSeats property.
+    var vehicle = db.Vehicles.FirstOrDefault(v => v.Id == trip.VehicleId);
+
+    if (vehicle == null)
+    {
+        TempData["Error"] = $"Error: Could not find Vehicle with ID {trip.VehicleId}.";
+        return RedirectToAction("Trips");
+    }
+
+    // 2. CRITICAL: Initialize AvailableSeats with the Vehicle's total capacity.
+    trip.AvailableSeats = vehicle.TotalSeats; 
+    // *********************
+
+
+    trip.Id = GetNextTripId(db);
+
+    var routeStops = db.RouteStops
+        .Where(rs => rs.RouteId == trip.RouteId)
+        .OrderBy(rs => rs.Sequence)
+        .ToList();
+
+    int tripDurationMinutes = routeStops.Any()
+        ? routeStops.Max(rs => rs.MinutesFromStart)
+        : 0;
+
+    trip.ArrivalTime = trip.DepartureTime.AddMinutes(tripDurationMinutes);
+
+    trip.Status = "Scheduled";
+
+    db.Trips.Add(trip); // Now, trip.AvailableSeats is correctly set!
+
+    foreach (var rs in routeStops)
+    {
+        db.TripStops.Add(new TripStop
+        {
+            Id = GetNextTripStopId(db),
+            TripId = trip.Id,
+            RouteStopId = rs.Id,
+            // Scheduled Arrival is based on the trip's start time + stop offset
+            ScheduledArrival = trip.DepartureTime.AddMinutes(rs.MinutesFromStart),
+            Status = "Scheduled"
+        });
+    }
+
+    try
+    {
+        db.SaveChanges();
+        TempData["Success"] = $"Trip {trip.Id} scheduled successfully with {routeStops.Count} stops and {vehicle.TotalSeats} seats!";
+        return RedirectToAction("TripStop", new { id = trip.Id });
+    }
+    catch (Exception ex)
+    {
+        TempData["Error"] = "Error scheduling trip. Database exception occurred.";
+        // Log the full exception details here for real debugging: ex.ToString()
+        return RedirectToAction("Trips");
+    }
+}
 
 
     [Authorize(Roles = "Admin")]

@@ -1,0 +1,276 @@
+﻿/* RAP.css: Review & Pay 页面样式 */
+
+/* 步骤指示器 (Stepper) 样式 */
+.stepper-header-container {
+    margin: 20px auto;
+    max-width: 900px; /* 限制宽度以匹配截图 */
+    padding: 0 10px;
+}
+
+.stepper-header ol {
+    display: flex;
+    justify-content: space-between;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    position: relative;
+}
+
+.stepper-header li {
+    flex: 1;
+    text-align: center;
+    color: #999;
+    font-size: 14px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #ccc;
+    position: relative;
+    cursor: default;
+}
+
+    .stepper-header li.active-step {
+        color: #4CAF50; /* 已完成步骤颜色，例如绿色 */
+    }
+
+    .stepper-header li.current-step {
+        color: #FF4D4D; /* 当前步骤的红色强调色 */
+        font-weight: bold;
+        border-bottom: 3px solid #FF4D4D;
+    }
+
+/* 主要布局调整 */
+.rap-main-content {
+    display: flex;
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.rap-left-column {
+    flex: 2; /* 左侧内容区较宽 */
+}
+
+.rap-right-column {
+    flex: 1; /* 右侧价格摘要区 */
+}
+
+/* 卡片样式 */
+.rnt-card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.section-title {
+    font-size: 1.2em;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+/* 输入框和表单组 */
+.rnt-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box;
+    margin-bottom: 15px;
+}
+
+.input-group {
+    display: flex;
+    align-items: center;
+}
+
+.country-code {
+    padding: 12px;
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    border-right: none;
+    border-radius: 5px 0 0 5px;
+    color: #555;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.input-group .rnt-input {
+    flex-grow: 1;
+    margin-bottom: 0;
+    border-radius: 0 5px 5px 0;
+}
+
+/* 乘客详情卡片 header */
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.seat-info {
+    font-size: 0.9em;
+    color: #777;
+}
+
+/* --- Toggle (单选/复选) 样式 --- */
+
+/* 统一的切换选项容器 */
+.toggle-options {
+    display: flex;
+    flex-direction: column;
+}
+
+.toggle-option {
+    display: block;
+    cursor: pointer;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 10px;
+    transition: all 0.2s;
+}
+
+    .toggle-option input[type="radio"] {
+        display: none; /* 隐藏默认的 radio 按钮 */
+    }
+
+    .toggle-option .toggle-text {
+        position: relative;
+        padding-left: 30px;
+    }
+
+        .toggle-option .toggle-text::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            border: 2px solid #ccc;
+            border-radius: 50%;
+            background-color: #fff;
+        }
+
+    .toggle-option input[type="radio"]:checked + .toggle-text::before {
+        border-color: #FF4D4D;
+        background-color: #FF4D4D;
+    }
+
+    .toggle-option input[type="radio"]:checked + .toggle-text::after {
+        content: '';
+        position: absolute;
+        left: 5px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: #fff;
+    }
+
+    .toggle-option:hover {
+        box-shadow: 0 0 5px rgba(255, 77, 77, 0.3);
+    }
+
+/* --- Toggle Switch (开关) 样式 (用于登车费) --- */
+.toggle-switch-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 45px; /* 宽度 */
+    height: 25px; /* 高度 */
+}
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+}
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 17px; /* 滑块高度 */
+        width: 17px; /* 滑块宽度 */
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: .4s;
+    }
+
+input:checked + .slider {
+    background-color: #FF4D4D; /* 选中时的红色 */
+}
+
+    input:checked + .slider:before {
+        transform: translateX(20px);
+    }
+
+/* 圆形滑块 */
+.slider.round {
+    border-radius: 25px;
+}
+
+    .slider.round:before {
+        border-radius: 50%;
+    }
+
+
+/* --- 价格明细 (右侧栏) 样式 --- */
+.price-summary-card {
+    position: sticky;
+    top: 20px; /* 粘性定位 */
+}
+
+.pay-button-fixed {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.pay-now-btn {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    background-color: #FF4D4D;
+    color: white;
+    padding: 15px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.breakdown-total {
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+    margin-top: 15px;
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    font-size: 1.1em;
+}
