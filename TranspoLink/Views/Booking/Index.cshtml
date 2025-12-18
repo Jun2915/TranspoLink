@@ -1,0 +1,69 @@
+﻿@model IEnumerable<TranspoLink.Models.Booking>
+
+@{
+    ViewData["Title"] = "My Bookings";
+}
+
+@section head {
+    <link rel="stylesheet" href="~/css/booking.css" asp-append-version="true" />
+}
+
+<div class="my-bookings-container">
+    <h2 class="my-bookings-header">🎟️ My Booking History</h2>
+
+    @if (!Model.Any())
+    {
+        <div class="empty-booking-state">
+            <p>You haven't made any bookings yet.</p>
+            <a href="/Home/Index" class="btn-book-now">Start Your Journey</a>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="my-bookings-table">
+                <thead>
+                    <tr>
+                        <th>Ref No.</th>
+                        <th>Booking Date</th>
+                        <th>Journey Details</th>
+                        <th>Vehicle</th>
+                        <th>Seats</th>
+                        <th>Total Price</th>
+                        <th>Status</th>
+                        <th style="text-align: center;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td style="font-family: monospace; font-weight: bold; color: #667eea;">
+                                @item.BookingReference
+                            </td>
+                            <td>@item.BookingDate.ToString("dd MMM yyyy")</td>
+                            <td class="journey-info">
+                                <strong>@item.Trip.Route.Origin ➝ @item.Trip.Route.Destination</strong>
+                                <span class="journey-date">🕒 @item.Trip.DepartureTime.ToString("dd MMM, hh:mm tt")</span>
+                            </td>
+                            <td>
+                                <div>@item.Trip.Vehicle.Type</div>
+                                <div style="font-size: 12px; color: #888;">@item.Trip.Vehicle.VehicleNumber</div>
+                            </td>
+                            <td>@item.NumberOfSeats</td>
+                            <td style="font-weight: bold; color: #2c3e50;">RM @item.TotalPrice.ToString("N2")</td>
+                            <td>
+                                <span class="status-badge @(item.Status == "Confirmed" ? "status-confirmed" : "status-pending")">
+                                    @item.Status
+                                </span>
+                            </td>
+                            <td style="text-align: center;">
+                                <a href="/Booking/Confirmation?ref=@item.BookingReference" class="btn-view-booking">View Ticket</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
