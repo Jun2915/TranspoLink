@@ -1,0 +1,53 @@
+﻿@model List<TranspoLink.Models.Booking>
+@{
+    ViewBag.Title = "My Bookings";
+}
+
+<div class="container" style="padding-top: 50px;">
+    <h2>My Booking List</h2>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">You have no bookings yet.</div>
+    }
+    else
+    {
+        <table class="table table-hover mt-4">
+            <thead class="table-dark">
+                <tr>
+                    <th>Ref No</th>
+                    <th>Route</th>
+                    <th>Departure</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var b in Model)
+                {
+                    <tr>
+                        <td>@b.BookingReference</td>
+                        <td>@(b.Trip?.Route?.Origin) ➝ @(b.Trip?.Route?.Destination)</td>
+                        <td>@b.Trip?.DepartureTime.ToString("dd MMM yyyy, HH:mm")</td>
+                        <td>RM @b.TotalAmount.ToString("N2")</td>
+                        <td>
+                            <span class="badge @(b.Status == "Cancelled" ? "bg-danger" : "bg-success")">
+                                @b.Status
+                            </span>
+                        </td>
+                        <td>
+                            @if (b.Status != "Cancelled")
+                            {
+                                <form asp-action="CancelBooking" method="post" onsubmit="return confirm('Are you sure you want to cancel?');">
+                                    <input type="hidden" name="id" value="@b.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
