@@ -1,27 +1,23 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using System.Text.Json;
 
 namespace TranspoLink;
 
 public static class Extensions
 {
+    // --- Request Extensions ---
     public static bool IsAjax(this HttpRequest request)
     {
         return request.Headers.XRequestedWith == "XMLHttpRequest";
     }
 
+    // --- ModelState Extensions ---
     public static bool IsValid(this ModelStateDictionary ms, string key)
     {
         return ms.GetFieldValidationState(key) == ModelValidationState.Valid;
     }
 
-
-
-    // ------------------------------------------------------------------------
-    // Date and Time Extension Methods
-    // ------------------------------------------------------------------------
-
+    // --- Date and Time Extensions ---
     public static DateOnly ToDateOnly(this DateTime dt)
     {
         return DateOnly.FromDateTime(dt);
@@ -42,12 +38,7 @@ public static class Extensions
         return TimeOnly.FromDateTime(DateTime.Now);
     }
 
-
-
-    // ------------------------------------------------------------------------
-    // Session Extension Methods
-    // ------------------------------------------------------------------------
-
+    // --- Session Extensions ---
     public static void Set<T>(this ISession session, string key, T value)
     {
         session.SetString(key, JsonSerializer.Serialize(value));
@@ -58,6 +49,4 @@ public static class Extensions
         var value = session.GetString(key);
         return value == null ? default : JsonSerializer.Deserialize<T>(value);
     }
-
-
 }
