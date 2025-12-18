@@ -81,13 +81,27 @@ $(document).ready(function () {
     // 初始计算总额
     calculateFinalTotal();
 
-    // --- 表单验证示例 (仅针对必填字段) ---
+    // RAP.js 改进建议
     $form.on('submit', function (e) {
-        // 这是一个客户端验证的简化示例，服务器端验证更可靠。
-        // 由于您引入了 unobtrusive validation，这里通常不需要手动阻止提交。
+        // 1. 强制在提交前执行一次计算，确保金额同步
+        calculateFinalTotal();
 
-        // 如果需要更严格的客户端检查，可以在这里添加逻辑。
-        // For now, rely on Unobtrusive Validation and server-side checks.
+        // 2. 检查基本必填项（作为辅助）
+        let isValid = true;
+        $('.rnt-input[required]').each(function () {
+            if ($(this).val() === '') {
+                isValid = false;
+                $(this).addClass('is-invalid');
+            }
+        });
+
+        if (!isValid) {
+            alert("Please fill in all required passenger details.");
+            e.preventDefault(); // 如果不合法，阻止跳转
+            return false;
+        }
+
+        console.log("Form is valid, submitting to ReviewAndPay POST...");
         return true;
     });
 

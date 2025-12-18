@@ -74,6 +74,9 @@ namespace TranspoLink.Migrations
                     b.Property<DateTime>("BookingDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("BookingId")
+                        .HasColumnType("int");
+
                     b.Property<string>("BookingReference")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -103,6 +106,8 @@ namespace TranspoLink.Migrations
                         .HasColumnType("nvarchar(5)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("BookingId");
 
                     b.HasIndex("MemberId");
 
@@ -151,42 +156,6 @@ namespace TranspoLink.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ChatMessages");
-                });
-
-            modelBuilder.Entity("TranspoLink.Models.Passenger", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Age")
-                        .HasColumnType("int");
-
-                    b.Property<int>("BookingId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("SeatNumber")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<string>("TicketType")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BookingId");
-
-                    b.ToTable("Passengers");
                 });
 
             modelBuilder.Entity("TranspoLink.Models.Route", b =>
@@ -474,6 +443,10 @@ namespace TranspoLink.Migrations
 
             modelBuilder.Entity("TranspoLink.Models.Booking", b =>
                 {
+                    b.HasOne("TranspoLink.Models.Booking", null)
+                        .WithMany("Bookings")
+                        .HasForeignKey("BookingId");
+
                     b.HasOne("TranspoLink.Models.Member", "Member")
                         .WithMany("Bookings")
                         .HasForeignKey("MemberId")
@@ -489,17 +462,6 @@ namespace TranspoLink.Migrations
                     b.Navigation("Member");
 
                     b.Navigation("Trip");
-                });
-
-            modelBuilder.Entity("TranspoLink.Models.Passenger", b =>
-                {
-                    b.HasOne("TranspoLink.Models.Booking", "Booking")
-                        .WithMany("Passengers")
-                        .HasForeignKey("BookingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Booking");
                 });
 
             modelBuilder.Entity("TranspoLink.Models.RouteStop", b =>
@@ -563,7 +525,7 @@ namespace TranspoLink.Migrations
 
             modelBuilder.Entity("TranspoLink.Models.Booking", b =>
                 {
-                    b.Navigation("Passengers");
+                    b.Navigation("Bookings");
                 });
 
             modelBuilder.Entity("TranspoLink.Models.Route", b =>
