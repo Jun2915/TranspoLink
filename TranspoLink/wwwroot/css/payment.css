@@ -1,0 +1,102 @@
+﻿.payment-container {
+    padding: 50px 0;
+    background: #f4f4f4;
+    min-height: 80vh;
+}
+
+.payment-wrapper {
+    display: flex;
+    max-width: 1000px;
+    margin: auto;
+    gap: 30px;
+}
+
+.payment-left {
+    flex: 2;
+}
+
+.payment-right {
+    flex: 1;
+}
+
+.pay-method-box {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 2px solid transparent;
+    transition: 0.3s;
+}
+
+    .pay-method-box.active {
+        border-color: #d84e55;
+    }
+
+.pay-header {
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.pay-content {
+    margin-top: 20px;
+}
+
+.input-group {
+    margin-bottom: 15px;
+}
+
+    .input-group label {
+        display: block;
+        margin-bottom: 5px;
+        color: #666;
+    }
+
+    .input-group input {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+
+.input-row {
+    display: flex;
+    gap: 15px;
+}
+
+.mock-qr {
+    width: 200px;
+    height: 200px;
+    background: #222;
+    color: #00ff00;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 20px auto;
+    font-size: 24px;
+    border-radius: 10px;
+    border: 5px solid #fff;
+}
+
+.price-summary {
+    background: white;
+    padding: 25px;
+    border-radius: 8px;
+    position: sticky;
+    top: 20px;
+}
+
+.pay-btn {
+    width: 100%;
+    padding: 15px;
+    background: #d84e55;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 18px;
+    cursor: pointer;
+    margin-top: 20px;
+}

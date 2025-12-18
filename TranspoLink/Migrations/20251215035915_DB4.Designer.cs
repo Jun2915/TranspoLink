@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TranspoLink.Models;
 
@@ -11,9 +12,11 @@ using TranspoLink.Models;
 namespace TranspoLink.Migrations
 {
     [DbContext(typeof(DB))]
-    partial class DBModelSnapshot : ModelSnapshot
+    [Migration("20251215035915_DB4")]
+    partial class DB4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -74,9 +77,6 @@ namespace TranspoLink.Migrations
                     b.Property<DateTime>("BookingDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("BookingId")
-                        .HasColumnType("int");
-
                     b.Property<string>("BookingReference")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -106,8 +106,6 @@ namespace TranspoLink.Migrations
                         .HasColumnType("nvarchar(5)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("BookingId");
 
                     b.HasIndex("MemberId");
 
@@ -443,10 +441,6 @@ namespace TranspoLink.Migrations
 
             modelBuilder.Entity("TranspoLink.Models.Booking", b =>
                 {
-                    b.HasOne("TranspoLink.Models.Booking", null)
-                        .WithMany("Bookings")
-                        .HasForeignKey("BookingId");
-
                     b.HasOne("TranspoLink.Models.Member", "Member")
                         .WithMany("Bookings")
                         .HasForeignKey("MemberId")
@@ -521,11 +515,6 @@ namespace TranspoLink.Migrations
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Driver");
-                });
-
-            modelBuilder.Entity("TranspoLink.Models.Booking", b =>
-                {
-                    b.Navigation("Bookings");
                 });
 
             modelBuilder.Entity("TranspoLink.Models.Route", b =>

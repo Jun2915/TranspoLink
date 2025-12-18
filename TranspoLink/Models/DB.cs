@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -204,6 +205,10 @@ public class Booking
     [MaxLength(50)] public string? BookingReference { get; set; }
     public virtual Member Member { get; set; }
     public virtual Trip Trip { get; set; }
+    [DisplayName("Total Amount")]
+    public decimal TotalAmount { get; set; }    // 对应 sessionVm.FinalTotal
+
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
 }
 
 public class AuditLog
@@ -247,4 +252,15 @@ public class DriverVM
     [Display(Name = "Profile Photo")]
     public IFormFile? Photo { get; set; }
     public string? ExistingPhotoURL { get; set; }
+}
+
+public class Passenger //
+{
+    public int Id { get; set; }
+    public int BookingId { get; set; }
+    public Booking Booking { get; set; }
+    public string Name { get; set; }
+    public int Age { get; set; }
+    public string SeatNumber { get; set; }
+    public string TicketType { get; set; }
 }

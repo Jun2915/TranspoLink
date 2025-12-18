@@ -1,0 +1,87 @@
+﻿@model TranspoLink.Models.BookingVM
+@{
+    ViewBag.Title = "Payment";
+}
+@section head {
+    <link rel="stylesheet" href="/css/RNT.css" asp-append-version="true" />
+    <link rel="stylesheet" href="/css/RAP.css" asp-append-version="true" />
+    <link rel="stylesheet" href="/css/payment.css" asp-append-version="true" />
+}
+
+@* 步骤指示器：现在 3. Payment 是激活状态 *@
+<div class="stepper-header-container">
+    <div class="stepper-header">
+        <ol>
+            <li class="active-step">
+                @* 链接回第 1 步：选座 *@
+                <a asp-controller="Booking"
+                   asp-action="Book"
+                   asp-route-id="@Model.TripId"
+                   style="text-decoration: none; color: inherit;">
+                    1. Select seats
+                </a>
+            </li>
+            <li class="active-step">
+                @* 🛠️ 新增：链接回第 2 步：个人信息详情 *@
+                <a asp-controller="Booking"
+                   asp-action="ReviewAndPay"
+                   style="text-decoration: none; color: inherit;">
+                    2. Passenger Information
+                </a>
+            </li>
+            <li class="current-step">3. Payment</li>
+        </ol>
+    </div>
+</div>
+
+<div class="booking-container rap-main-content">
+    <div class="booking-left rap-left-column">
+        <h3 class="section-title card-title">Select Payment Method</h3>
+
+        @* --- Credit/Debit Card --- *@
+        <div class="rnt-card payment-card" id="card-option">
+            <div class="card-header">
+                <label><input type="radio" name="payMethod" value="Card" checked> Credit/Debit card</label>
+            </div>
+            <div id="card-fields" class="payment-fields">
+                <input type="text" id="cardNumber" class="rnt-input" placeholder="Card Number (16 digits)">
+                <div class="input-row" style="display:flex; gap:10px; margin-top:10px;">
+                    <input type="text" id="expiry" class="rnt-input" placeholder="MM/YY">
+                    <input type="password" id="cvv" class="rnt-input" placeholder="CVV">
+                </div>
+            </div>
+        </div>
+
+        @* --- TNG eWallet --- *@
+        <div class="rnt-card payment-card" id="tng-option" style="margin-top:20px;">
+            <div class="card-header">
+                <label><input type="radio" name="payMethod" value="TNG"> TNG eWallet</label>
+            </div>
+            <div id="tng-qr-section" class="payment-fields" style="display:none; text-align:center;">
+                <p>Scan this code to pay:</p>
+                <div class="mock-qr" style="background:#333; color:#0f0; padding:40px; margin:10px auto; width:150px; border-radius:10px;">
+                    @Guid.NewGuid().ToString().Substring(0, 8).ToUpper()
+                </div>
+                <p id="tng-status">Waiting for scan...</p>
+            </div>
+        </div>
+    </div>
+
+    @* --- 右侧价格汇总 (沿用你之前的逻辑) --- *@
+    <div class="booking-right rap-right-column">
+        <div class="rnt-card trip-summary-fixed price-summary-card">
+            <h4>Fare Breakdown</h4>
+            <div class="info-row">
+                <span>Total Amount</span>
+                <span style="font-size:24px; color:#d84e55; font-weight:bold;">RM @Model.FinalTotal.ToString("N2")</span>
+            </div>
+            <button type="button" id="finalPayBtn" class="btn-rnt btn-rnt-danger pay-now-btn" style="width:100%; margin-top:20px;">
+                Confirm Payment
+            </button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="/js/payment.js"></script>
+}
