@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace TranspoLink.Migrations
 {
     /// <inheritdoc />
-    public partial class CreateDB : Migration
+    public partial class DB1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -27,6 +27,25 @@ namespace TranspoLink.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AuditLogs", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ChatMessages",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SenderId = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    ReceiverId = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    SenderName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PhotoUrl = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: true),
+                    Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsRead = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ChatMessages", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -60,28 +79,13 @@ namespace TranspoLink.Migrations
                     IsBlocked = table.Column<bool>(type: "bit", nullable: false),
                     Discriminator = table.Column<string>(type: "nvarchar(8)", maxLength: 8, nullable: false),
                     Admin_PhotoURL = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    Driver_PhotoURL = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    LicenseNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
                     PhotoURL = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Vehicles",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    VehicleNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    Type = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    TotalSeats = table.Column<int>(type: "int", nullable: false),
-                    Operator = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Vehicles", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -103,6 +107,29 @@ namespace TranspoLink.Migrations
                         principalTable: "Routes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Vehicles",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    VehicleNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    TotalSeats = table.Column<int>(type: "int", nullable: false),
+                    DriverId = table.Column<string>(type: "nvarchar(5)", maxLength: 5, nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Vehicles", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Vehicles_Users_DriverId",
+                        column: x => x.DriverId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
@@ -171,7 +198,7 @@ namespace TranspoLink.Migrations
                 name: "TripStops",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(6)", maxLength: 6, nullable: false),
+                    Id = table.Column<string>(type: "nvarchar(7)", maxLength: 7, nullable: false),
                     TripId = table.Column<string>(type: "nvarchar(5)", maxLength: 5, nullable: false),
                     RouteStopId = table.Column<string>(type: "nvarchar(6)", maxLength: 6, nullable: false),
                     ScheduledArrival = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -195,6 +222,29 @@ namespace TranspoLink.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Passengers",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    BookingId = table.Column<int>(type: "int", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Age = table.Column<int>(type: "int", nullable: false),
+                    SeatNumber = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    TicketType = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Passengers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Passengers_Bookings_BookingId",
+                        column: x => x.BookingId,
+                        principalTable: "Bookings",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Bookings_MemberId",
                 table: "Bookings",
@@ -204,6 +254,11 @@ namespace TranspoLink.Migrations
                 name: "IX_Bookings_TripId",
                 table: "Bookings",
                 column: "TripId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Passengers_BookingId",
+                table: "Passengers",
+                column: "BookingId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RouteStops_RouteId",
@@ -243,6 +298,13 @@ namespace TranspoLink.Migrations
                 column: "Phone",
                 unique: true,
                 filter: "[Phone] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Vehicles_DriverId",
+                table: "Vehicles",
+                column: "DriverId",
+                unique: true,
+                filter: "[DriverId] IS NOT NULL");
         }
 
         /// <inheritdoc />
@@ -252,13 +314,16 @@ namespace TranspoLink.Migrations
                 name: "AuditLogs");
 
             migrationBuilder.DropTable(
-                name: "Bookings");
+                name: "ChatMessages");
+
+            migrationBuilder.DropTable(
+                name: "Passengers");
 
             migrationBuilder.DropTable(
                 name: "TripStops");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "Bookings");
 
             migrationBuilder.DropTable(
                 name: "RouteStops");
@@ -271,6 +336,9 @@ namespace TranspoLink.Migrations
 
             migrationBuilder.DropTable(
                 name: "Vehicles");
+
+            migrationBuilder.DropTable(
+                name: "Users");
         }
     }
 }

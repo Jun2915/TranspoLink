@@ -5,19 +5,21 @@ using TranspoLink.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add Services
+// --- 1. Add Services ---
 builder.Services.AddControllersWithViews();
 
-//Database
+// Database Configuration
 builder.Services.AddSqlServer<DB>($@"
     Data Source=(LocalDB)\MSSQLLocalDB;
     AttachDbFilename={builder.Environment.ContentRootPath}\DB.mdf;
 ");
 
-//Register custom services
+// Register Custom Services
 builder.Services.AddScoped<Helper>();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddDistributedMemoryCache();
 
-//Authentication & Cookies
+// Authentication & Cookies
 builder.Services.AddAuthentication("Cookies").AddCookie("Cookies", options =>
 {
     options.LoginPath = "/Account/Login";
@@ -26,32 +28,31 @@ builder.Services.AddAuthentication("Cookies").AddCookie("Cookies", options =>
     options.ExpireTimeSpan = TimeSpan.FromDays(7);
     options.SlidingExpiration = true;
 })
-    .AddGoogle(options =>
+.AddGoogle(options =>
+{
+    options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+    options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+    options.CallbackPath = "/signin-google";
+    options.ClaimActions.MapJsonKey("urn:google:picture", "picture", "url");
+    options.Events = new Microsoft.AspNetCore.Authentication.OAuth.OAuthEvents
     {
-        options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
-        options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
-        options.CallbackPath = "/signin-google";
-        options.ClaimActions.MapJsonKey("urn:google:picture", "picture", "url");
-        options.Events = new Microsoft.AspNetCore.Authentication.OAuth.OAuthEvents
+        OnRedirectToAuthorizationEndpoint = context =>
         {
-            OnRedirectToAuthorizationEndpoint = context =>
-            {
-                context.Response.Redirect(context.RedirectUri + "&prompt=select_account");
-                return Task.CompletedTask;
-            },
-            OnRemoteFailure = context =>
-            {
-                context.Response.Redirect("/Account/GoogleLogin");
-                context.HandleResponse();
-                return Task.CompletedTask;
-            }
-        };
-    });
+            context.Response.Redirect(context.RedirectUri + "&prompt=select_account");
+            return Task.CompletedTask;
+        },
+        OnRemoteFailure = context =>
+        {
+            context.Response.Redirect("/Account/GoogleLogin");
+            context.HandleResponse();
+            return Task.CompletedTask;
+        }
+    };
+});
+
 builder.Services.AddAuthorization();
 
-//Session & Http Context
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddDistributedMemoryCache();
+// Session
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);
@@ -59,11 +60,12 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
+// Real-time Communication
 builder.Services.AddSignalR();
 
 var app = builder.Build();
 
-// Auto-create admin if not exists
+// --- 2. Database Initialization (Seed Admin) ---
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<DB>();
@@ -94,7 +96,7 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-//Exception Handling
+// --- 3. Middleware Pipeline ---
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
@@ -107,20 +109,15 @@ else
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
-//Localization
 app.UseRequestLocalization("en-MY");
-
 app.UseRouting();
 
-// Session before authentication
+// Session must be called before Authentication
 app.UseSession();
-
-// Authentication & Authorization
 app.UseAuthentication();
 app.UseAuthorization();
 
-//Routes
+// --- 4. Route Mapping ---
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
@@ -128,4 +125,3 @@ app.MapControllerRoute(
 app.MapHub<ChatHub>("/chathub");
 
 app.Run();
-
