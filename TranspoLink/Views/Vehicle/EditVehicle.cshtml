@@ -1,76 +1,83 @@
 ﻿@model Vehicle
 @{
-    ViewBag.Title += " | Edit Vehicle";
+	ViewBag.Title += " | Edit Vehicle";
 }
 
 @section head {
-    <link rel="stylesheet" href="/css/admin.css" />
-    <link rel="stylesheet" href="/css/vehicle.css" />
-    <script src="/js/vehicle.js" defer></script>
+	<link rel="stylesheet" href="/css/admin.css" />
+	<link rel="stylesheet" href="/css/vehicle.css" />
+	<script src="/js/vehicle.js" defer></script>
 }
 
 <div class="admin-container">
-    <div style="margin-bottom: 20px;">
-        <a href="/Vehicle/Vehicles" class="btn-back">← Back to Fleet</a>
-    </div>
+	<div style="margin-bottom: 20px;">
+		<a href="/Vehicle/Vehicles" class="btn-back">← Back to Fleet</a>
+	</div>
 
-    <div class="vehicle-form-card">
-        <div class="form-header">
-            <h2>Edit Vehicle</h2>
-            <p>Update details for <b>@Model.VehicleNumber</b></p>
-        </div>
+	<div class="vehicle-form-card">
+		<div class="form-header">
+			<h2>Edit Vehicle</h2>
+			<p>Update details for <b>@Model.VehicleNumber</b></p>
+		</div>
 
-        <form method="post">
-            <input type="hidden" asp-for="Id" />
-            <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
+		<form method="post">
+			@Html.AntiForgeryToken()
+			<input type="hidden" asp-for="Id" />
 
-            <div class="form-group-row">
-                <div class="vehicle-input-group">
-                    <label asp-for="Type">Vehicle Type</label>
-                    <div class="input-with-icon">
-                        <span class="input-icon" id="typeIcon">🚌</span>
-                        <select asp-for="Type" asp-items="ViewBag.VehicleTypes" class="vehicle-select" id="vehicleTypeSelect"></select>
-                    </div>
-                    <span asp-validation-for="Type" class="field-validation-error"></span>
-                </div>
+			@* CRITICAL FIX: Keep this summary visible to diagnose future errors! *@
+			<div asp-validation-summary="All" class="validation-summary-errors"
+				 style="background-color: #ffebeb; border: 2px solid red; color: black; padding: 15px; margin-bottom: 20px;">
+			</div>
 
-                <div class="vehicle-input-group">
-                    <label asp-for="VehicleNumber">Vehicle Number</label>
-                    <input asp-for="VehicleNumber" class="vehicle-input">
-                    <span asp-validation-for="VehicleNumber" class="field-validation-error"></span>
-                </div>
-            </div>
+			@* --- REVERTED LAYOUT --- *@
+			<div class="form-group-row">
+				<div class="vehicle-input-group">
+					<label asp-for="Type">Vehicle Type</label>
+					<div class="input-with-icon">
+						<span class="input-icon" id="typeIcon">🚌</span>
+						<select asp-for="Type" asp-items="ViewBag.VehicleTypes" class="vehicle-select" id="vehicleTypeSelect"></select>
+					</div>
+					<span asp-validation-for="Type" class="field-validation-error"></span>
+				</div>
 
-            <div class="form-group-row">
-                <div class="vehicle-input-group">
-                    <label asp-for="DriverId">Assigned Driver</label>
-                    <div class="input-with-icon">
-                        <span class="input-icon">👤</span>
-                        <select asp-for="DriverId" asp-items="ViewBag.Drivers" class="vehicle-select">
-                            <option value="">-- No Driver --</option>
-                        </select>
-                    </div>
-                    <span asp-validation-for="DriverId" class="field-validation-error"></span>
-                </div>
+				<div class="vehicle-input-group">
+					<label asp-for="VehicleNumber">Vehicle Number</label>
+					<input asp-for="VehicleNumber" class="vehicle-input">
+					<span asp-validation-for="VehicleNumber" class="field-validation-error"></span>
+				</div>
+			</div>
 
-                <div class="vehicle-input-group">
-                    <label asp-for="TotalSeats">Total Seats</label>
-                    <input asp-for="TotalSeats" type="number" class="vehicle-input" min="1" max="500">
-                    <span asp-validation-for="TotalSeats" class="field-validation-error"></span>
-                </div>
-            </div>
+			<div class="form-group-row">
+				<div class="vehicle-input-group">
+					<label asp-for="DriverId">Assigned Driver</label>
+					<div class="input-with-icon">
+						<span class="input-icon">👤</span>
+						<select asp-for="DriverId" asp-items="ViewBag.Drivers" class="vehicle-select">
+							<option value="">-- No Driver --</option>
+						</select>
+					</div>
+					<span asp-validation-for="DriverId" class="field-validation-error"></span>
+				</div>
 
-            <div class="vehicle-status-group">
-                <label class="switch">
-                    <input asp-for="IsActive" type="checkbox">
-                    <span class="slider round"></span>
-                </label>
-                <span class="status-label">Vehicle Active Status</span>
-            </div>
+				<div class="vehicle-input-group">
+					<label asp-for="TotalSeats">Total Seats</label>
+					<input asp-for="TotalSeats" type="number" class="vehicle-input" min="1" max="500">
+					<span asp-validation-for="TotalSeats" class="field-validation-error"></span>
+				</div>
+			</div>
 
-            <button type="submit" class="btn-save-vehicle">
-                💾 Update Changes
-            </button>
-        </form>
-    </div>
+			<div class="vehicle-status-group">
+				<label class="switch">
+					<input asp-for="IsActive" type="checkbox">
+					<span class="slider round"></span>
+				</label>
+				<span class="status-label">Vehicle Active Status</span>
+			</div>
+			@* --- END REVERTED LAYOUT --- *@
+
+			<button type="submit" class="btn-save-vehicle">
+				💾 Update Changes
+			</button>
+		</form>
+	</div>
 </div>

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using TranspoLink.Models;
 
 namespace TranspoLink.Controllers;
 
@@ -9,14 +10,28 @@ namespace TranspoLink.Controllers;
 public class VehicleController(DB db, Helper hp) : Controller
 {
     // ============================================================================
-    // READ: List Vehicles (Updated for AJAX)
+    // PRIVATE ID GENERATION HELPER (Local implementation)
+    // ============================================================================
+    private string GetNextVehicleNumber(DB db)
+    {
+        var lastId = db.Vehicles.OrderByDescending(v => v.Id).Select(v => v.VehicleNumber).FirstOrDefault();
+        if (string.IsNullOrEmpty(lastId))
+            return "V001";
+
+        if (lastId.Length > 1 && int.TryParse(lastId.Substring(1), out int num))
+        {
+            return "V" + (num + 1).ToString("D3");
+        }
+        return "V001";
+    }
+
+    // ============================================================================
+    // READ: List Vehicles
     // ============================================================================
     public IActionResult Vehicles(string search = "", string type = "", string sort = "Id", string dir = "asc")
     {
-        // 1. Include Driver information
         var query = db.Vehicles.Include(v => v.Driver).AsQueryable();
 
-        // 2. Search Logic (Updated to search Driver Name)
         if (!string.IsNullOrEmpty(search))
         {
             query = query.Where(v =>
@@ -24,12 +39,6 @@ public class VehicleController(DB db, Helper hp) : Controller
                 (v.Driver != null && v.Driver.Name.Contains(search)));
         }
 
-        if (!string.IsNullOrEmpty(type))
-        {
-            query = query.Where(v => v.Type == type);
-        }
-
-        // 3. Sort Logic (Updated Operator -> Driver)
         query = sort switch
         {
             "VehicleNumber" => dir == "asc" ? query.OrderBy(v => v.VehicleNumber) : query.OrderByDescending(v => v.VehicleNumber),
@@ -80,23 +89,24 @@ public class VehicleController(DB db, Helper hp) : Controller
     // ============================================================================
     // CREATE
     // ============================================================================
-    public IActionResult CreateVehicle()
+    public IActionResult CreateVehicle(string driverId = null)
     {
         ViewBag.VehicleTypes = new SelectList(new[] { "Bus", "Train", "Ferry" });
 
-        // Populate Drivers Dropdown (Only those WITHOUT a vehicle)
         var availableDrivers = db.Drivers
             .Where(d => d.Vehicle == null && !d.IsBlocked)
             .Select(d => new { d.Id, Display = d.Name + " (" + d.Id + ")" })
             .ToList();
 
-        ViewBag.Drivers = new SelectList(availableDrivers, "Id", "Display");
+        ViewBag.Drivers = new SelectList(availableDrivers, "Id", "Display", driverId);
 
-        string nextId = hp.GetNextVehicleNumber(db);
-        return View(new Vehicle { VehicleNumber = nextId });
+        string nextId = GetNextVehicleNumber(db);
+
+        return View(new Vehicle { VehicleNumber = nextId, DriverId = driverId });
     }
 
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public IActionResult CreateVehicle(Vehicle vehicle)
     {
         // Unique Vehicle Number Check
@@ -105,7 +115,7 @@ public class VehicleController(DB db, Helper hp) : Controller
             ModelState.AddModelError("VehicleNumber", "This Vehicle Number already exists.");
         }
 
-        // 1:1 Constraint Check (Double check just in case)
+        // 1:1 Constraint Check (Driver assigned check)
         if (!string.IsNullOrEmpty(vehicle.DriverId) && db.Vehicles.Any(v => v.DriverId == vehicle.DriverId))
         {
             ModelState.AddModelError("DriverId", "This Driver is already assigned to another vehicle.");
@@ -113,28 +123,43 @@ public class VehicleController(DB db, Helper hp) : Controller
 
         if (ModelState.IsValid)
         {
-            vehicle.IsActive = true;
-            db.Vehicles.Add(vehicle);
-            db.SaveChanges();
+            try
+            {
+                vehicle.IsActive = true;
+                db.Vehicles.Add(vehicle);
+                db.SaveChanges();
 
-            TempData["Info"] = "✨ New vehicle added successfully!";
-            return RedirectToAction("Vehicles");
+                TempData["Info"] = "✨ New vehicle added successfully!";
+                return RedirectToAction("Vehicles");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Database Error: " + ex.InnerException?.Message ?? ex.Message);
+            }
         }
 
-        ViewBag.VehicleTypes = new SelectList(new[] { "Bus", "Train", "Ferry" });
+        // --- FAILURE PATH ---
 
-        // Re-populate dropdown
+        // Repopulate ViewBags
+        ViewBag.VehicleTypes = new SelectList(new[] { "Bus", "Train", "Ferry" }, vehicle.Type);
+
         var availableDrivers = db.Drivers
             .Where(d => d.Vehicle == null && !d.IsBlocked)
             .Select(d => new { d.Id, Display = d.Name + " (" + d.Id + ")" })
             .ToList();
         ViewBag.Drivers = new SelectList(availableDrivers, "Id", "Display", vehicle.DriverId);
 
+        // Regenerate Vehicle Number if lost
+        if (string.IsNullOrEmpty(vehicle.VehicleNumber))
+        {
+            vehicle.VehicleNumber = GetNextVehicleNumber(db);
+        }
+
         return View(vehicle);
     }
 
     // ============================================================================
-    // EDIT
+    // EDIT, DELETE, TOGGLE (Standard)
     // ============================================================================
     public IActionResult EditVehicle(int id)
     {
@@ -144,7 +169,6 @@ public class VehicleController(DB db, Helper hp) : Controller
 
         ViewBag.VehicleTypes = new SelectList(new[] { "Bus", "Train", "Ferry" }, vehicle.Type);
 
-        // Populate Drivers: Available Drivers + The Current Driver of this vehicle
         var drivers = db.Drivers
             .Where(d => (d.Vehicle == null || d.Vehicle.Id == id) && !d.IsBlocked)
             .Select(d => new { d.Id, Display = d.Name + " (" + d.Id + ")" })
@@ -163,7 +187,6 @@ public class VehicleController(DB db, Helper hp) : Controller
             ModelState.AddModelError("VehicleNumber", "This Vehicle Number is taken.");
         }
 
-        // 1:1 Constraint Check
         if (!string.IsNullOrEmpty(vehicle.DriverId) && db.Vehicles.Any(v => v.DriverId == vehicle.DriverId && v.Id != vehicle.Id))
         {
             ModelState.AddModelError("DriverId", "This Driver is already assigned to another vehicle.");
@@ -189,7 +212,6 @@ public class VehicleController(DB db, Helper hp) : Controller
         return View(vehicle);
     }
 
-    // DELETE & TOGGLE (Standard)
     [HttpPost]
     public IActionResult DeleteVehicle(int id)
     {

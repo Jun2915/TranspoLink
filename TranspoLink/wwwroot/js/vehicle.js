@@ -1,46 +1,15 @@
 ﻿/* =========================================================
-   VEHICLE AJAX SEARCH & SORT
+   VEHICLE AJAX SEARCH & SORT & INITIALIZATION (FINAL CHECK)
    ========================================================= */
 
 let currentType = "";
 
-// 1. Search Input Handler
-$('#searchInput').on('input', function () {
-    loadVehicleTable();
-});
-
-// 2. Tab Filter Handler
-window.filterType = function (type) {
-    currentType = type;
-
-    // Update visual tab state
-    $('.tab').removeClass('active');
-    $(`[data-type="${type}"]`).addClass('active');
-
-    loadVehicleTable();
-};
-
-// 3. Sort Click Handler
-$(document).on('click', '.sortable', function () {
-    const column = $(this).data('col');
-    let currentSort = $('#partialSort').val();
-    let currentDir = $('#partialDir').val();
-
-    let newDir = 'asc';
-    if (currentSort === column) {
-        newDir = (currentDir === 'asc') ? 'desc' : 'asc';
-    }
-
-    // Store new state temporarily to send
-    $('#partialSort').val(column);
-    $('#partialDir').val(newDir);
-
-    loadVehicleTable(column, newDir);
-});
-
-// 4. Main AJAX Loader
+// 1. Main AJAX Loader
 function loadVehicleTable(sortOverride, dirOverride) {
-    const search = $('#searchInput').val();
+    // CRITICAL: Check if searchInput exists before trying to get its value.
+    const searchInput = $('#searchInput');
+    const search = searchInput.length ? searchInput.val() : '';
+
     const sort = sortOverride || $('#partialSort').val() || "Id";
     const dir = dirOverride || $('#partialDir').val() || "asc";
 
@@ -55,6 +24,7 @@ function loadVehicleTable(sortOverride, dirOverride) {
             sort: sort,
             dir: dir
         },
+        // ... success and error handlers remain the same ...
         success: function (result) {
             $('#tableContainer').html(result);
             $('#tableContainer').css('opacity', '1');
@@ -67,7 +37,7 @@ function loadVehicleTable(sortOverride, dirOverride) {
     });
 }
 
-// 5. Update Sort Icons (Visual)
+// 2. Update Sort Icons (Visual) - stays the same
 function updateSortIcons() {
     const sort = $('#partialSort').val();
     const dir = $('#partialDir').val();
@@ -77,49 +47,74 @@ function updateSortIcons() {
     }
 }
 
-// Initialize on load
-$(document).ready(function () {
-    // Other vehicle specific logic (like the Create/Edit form icon)
-    const typeSelect = $('#vehicleTypeSelect');
-    const iconSpan = $('#typeIcon');
 
-    if (typeSelect.length) {
-        typeSelect.on('change', function () {
-            updateIcon($(this).val());
+// 3. Document Ready (Initialization and Event Binding)
+// Use the safer jQuery function closure
+(function ($) {
+    $(document).ready(function () {
+
+        // --- VEHICLE FILTER TAB HANDLER (FINAL FIX) ---
+        // Bind the click handler to the rnt-tab class
+        $('.rnt-tab').on('click', function (e) {
+            e.preventDefault();
+
+            const type = $(this).data('type');
+            currentType = type;
+
+            // Update visual tab state 
+            $('.rnt-tab').removeClass('active');
+            $(this).addClass('active');
+
+            loadVehicleTable();
         });
-        updateIcon(typeSelect.val());
-    }
 
-    function updateIcon(type) {
-        let icon = "🚌";
-        if (type === "Train") icon = "🚄";
-        if (type === "Ferry") icon = "🚢";
-        iconSpan.text(icon);
-    }
 
-    // Auto Uppercase
-    $('input[name="VehicleNumber"]').on('input', function () {
-        $(this).val($(this).val().toUpperCase());
-    });
-});
+        // --- SEARCH HANDLER ---
+        $('#searchInput').on('input', function () {
+            loadVehicleTable();
+        });
 
-document.addEventListener('DOMContentLoaded', function () {
-    // Parse the dates passed from Controller
-    var tripDates = @Html.Raw(activeDates);
+        // --- SORT HANDLER ---
+        $(document).on('click', '.sortable', function () {
+            const column = $(this).data('col');
+            let currentSort = $('#partialSort').val();
+            let currentDir = $('#partialDir').val();
 
-    flatpickr("#vehicleCalendar", {
-        inline: true,
-        dateFormat: "Y-m-d",
-        enable: tripDates, // Only enable dates with trips
-        locale: {
-            firstDayOfWeek: 1
-        },
-        onDayCreate: function (dObj, dStr, fp, dayElem) {
-            // Add a dot indicator for trip days
-            var dateStr = dayElem.dateObj.toISOString().split('T')[0];
-            if (tripDates.some(d => d.startsWith(dateStr))) {
-                dayElem.innerHTML += "<span class='calendar-dot'></span>";
+            let newDir = 'asc';
+            if (currentSort === column) {
+                newDir = (currentDir === 'asc') ? 'desc' : 'asc';
             }
+
+            $('#partialSort').val(column);
+            $('#partialDir').val(newDir);
+
+            loadVehicleTable(column, newDir);
+        });
+
+        // --- UTILITY/INITIALIZATION LOGIC ---
+        const typeSelect = $('#vehicleTypeSelect');
+        const iconSpan = $('#typeIcon');
+
+        if (typeSelect.length) {
+            typeSelect.on('change', function () {
+                updateIcon($(this).val());
+            });
+            updateIcon(typeSelect.val());
         }
+
+        function updateIcon(type) {
+            let icon = "🚌";
+            if (type === "Train") icon = "🚄";
+            if (type === "Ferry") icon = "🚢";
+            iconSpan.text(icon);
+        }
+
+        // Auto Uppercase
+        $('input[name="VehicleNumber"]').on('input', function () {
+            $(this).val($(this).val().toUpperCase());
+        });
+
+        // Initial run to set sort icons and display data
+        updateSortIcons();
     });
-});
+})(jQuery);

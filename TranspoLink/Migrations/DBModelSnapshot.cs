@@ -74,6 +74,9 @@ namespace TranspoLink.Migrations
                     b.Property<DateTime>("BookingDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("BookingId")
+                        .HasColumnType("int");
+
                     b.Property<string>("BookingReference")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -103,6 +106,8 @@ namespace TranspoLink.Migrations
                         .HasColumnType("nvarchar(5)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("BookingId");
 
                     b.HasIndex("MemberId");
 
@@ -260,8 +265,8 @@ namespace TranspoLink.Migrations
             modelBuilder.Entity("TranspoLink.Models.TripStop", b =>
                 {
                     b.Property<string>("Id")
-                        .HasMaxLength(6)
-                        .HasColumnType("nvarchar(6)");
+                        .HasMaxLength(7)
+                        .HasColumnType("nvarchar(7)");
 
                     b.Property<DateTime?>("ActualArrival")
                         .HasColumnType("datetime2");
@@ -438,6 +443,10 @@ namespace TranspoLink.Migrations
 
             modelBuilder.Entity("TranspoLink.Models.Booking", b =>
                 {
+                    b.HasOne("TranspoLink.Models.Booking", null)
+                        .WithMany("Bookings")
+                        .HasForeignKey("BookingId");
+
                     b.HasOne("TranspoLink.Models.Member", "Member")
                         .WithMany("Bookings")
                         .HasForeignKey("MemberId")
@@ -512,6 +521,11 @@ namespace TranspoLink.Migrations
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Driver");
+                });
+
+            modelBuilder.Entity("TranspoLink.Models.Booking", b =>
+                {
+                    b.Navigation("Bookings");
                 });
 
             modelBuilder.Entity("TranspoLink.Models.Route", b =>

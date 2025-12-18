@@ -7,6 +7,7 @@
     {
         var identifier = User.Identity.Name;
         currentUser = db.Users.FirstOrDefault(u => u.Email == identifier || u.Phone == identifier);
+
         if (currentUser == null || currentUser.IsBlocked)
         {
             Context.SignOutAsync("Cookies");
@@ -21,7 +22,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title</title>
+    <title>@ViewBag.Title | TranspoLink</title>
     <link rel="shortcut icon" href="/images/shortcut_icon.png">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
     <link rel="stylesheet" href="/css/pager.css">
@@ -32,6 +33,7 @@
     @RenderSection("head", false)
 </head>
 <body>
+    @* Flash Message Container *@
     <div class="info">@TempData["Info"]</div>
 
     <div class="top-bar">
@@ -58,7 +60,7 @@
             string photoUrl = "/images/default_photo.png";
             if (currentUser is Member m && !string.IsNullOrEmpty(m.PhotoURL))
             {
-                photoUrl = m.PhotoURL == "default_photo.png" ? "/images/default_photo.png" : "/images/" + m.PhotoURL;
+                photoUrl = (m.PhotoURL == "default_photo.png") ? "/images/default_photo.png" : "/images/" + m.PhotoURL;
             }
             else if (currentUser is Admin a && !string.IsNullOrEmpty(a.PhotoURL))
             {
@@ -99,6 +101,7 @@
             @if (User.IsInRole("Admin"))
             {
                 <li><a href="/Admin">Dashboard</a></li>
+
                 <li class="nav-item-dropdown" onclick="toggleNavDropdown(event, 'navUserContent')">
                     <a href="javascript:void(0)" style="display:flex; align-items:center; gap:5px;">
                         User Management <span style="font-size:10px;">▼</span>
@@ -106,8 +109,10 @@
                     <div class="nav-dropdown-content" id="navUserContent">
                         <a href="/Admin/Admins">🛡️ Admins</a>
                         <a href="/Admin/Members">👥 Members</a>
+                        <a href="/RouteNTrip/Drivers">👨‍✈️ Drivers List</a>
                     </div>
                 </li>
+
                 <li class="nav-item-dropdown" onclick="toggleNavDropdown(event, 'navOpsContent')">
                     <a href="javascript:void(0)" style="display:flex; align-items:center; gap:5px;">
                         Operations <span style="font-size:10px;">▼</span>
@@ -115,16 +120,19 @@
                     <div class="nav-dropdown-content" id="navOpsContent">
                         <a href="/RouteNTrip/Routes">🗺️ Routes</a>
                         <a href="/Vehicle/Vehicles">🚌 Vehicles</a>
-                        <a href="/RouteNTrip/Trips">🎫 Trips</a>
+                        <a href="/RouteNTrip/Trips">🎫 Trip Management</a>
                         <a href="/Admin/Bookings">📋 Bookings</a>
                     </div>
                 </li>
+
                 <li><a href="/Home/Reports">📊 Reports</a></li>
+                @* Added Support Chat Link for Admins *@
                 <li><a href="/Chat/Support">💬 Support</a></li>
                 <li><a href="/Home/AboutUs">About Us</a></li>
             }
             else
             {
+                @* Non-Admin Navigation *@
                 <li><a href="/">Home</a></li>
                 <li><a href="/#features">Features</a></li>
                 <li><a href="/#trending">News & Offers</a></li>
@@ -139,9 +147,12 @@
     </main>
 
     <footer>
-        Developed by <b>BMIT 2023 Web And Mobile System</b> &middot;
-        Copyrighted &copy; @DateTime.Today.Year
+        Developed by <b>BMIT 2023 Web And Mobile System</b> &middot; Copyrighted &copy; @DateTime.Today.Year
     </footer>
+
+    @* ================================================================= *@
+    @* CHAT UI SECTION ) *@
+    @* ================================================================= *@
     @if (User.Identity.IsAuthenticated && currentUser != null && !User.IsInRole("Admin"))
     {
         <button class="chat-btn-float" onclick="toggleChat()" title="Chat with Support">💬</button>
@@ -194,7 +205,6 @@
     <script src="/js/user.js" asp-append-version="true"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <script src="/js/photo-tools.js" asp-append-version="true"></script>
-
     @if (User.Identity.IsAuthenticated && currentUser != null)
     {
         <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
@@ -204,9 +214,11 @@
         <script src="/js/chat.js" asp-append-version="true"></script>
     }
 
+    @RenderSection("scripts", required: false)
+
     <script>
         function toggleNavDropdown(e, id) {
-            e.stopPropagation();
+            if (e) e.stopPropagation();
             $('.nav-dropdown-content').not('#' + id).removeClass('show-nav-dropdown');
             $('#' + id).toggleClass('show-nav-dropdown');
         }

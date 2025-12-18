@@ -44,7 +44,13 @@
                                 </div>
                                 <div class="path-details">
                                     <span class="loc">@trip.Route.Origin</span>
-                                    <span class="duration">@trip.Route.durationMinutes mins</span>
+
+                                    @{
+                                        var duration = trip.ArrivalTime - trip.DepartureTime;
+                                        var totalMinutes = (int)Math.Ceiling(duration.TotalMinutes);
+                                    }
+                                    <span class="duration">@totalMinutes mins</span>
+   
                                     <span class="loc">@trip.Route.Destination</span>
                                 </div>
                             </div>

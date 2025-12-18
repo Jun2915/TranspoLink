@@ -402,4 +402,58 @@ public class Helper(IWebHostEnvironment en,
         // Return format V001, V002, etc.
         return "V" + nextNum.ToString("D3");
     }
+    // ------------------------------------------------------------------------
+    // Booking Helper Functions
+    // ------------------------------------------------------------------------
+    public List<string> GetSeatsForBooking(int bookingId)
+    {
+        // Fetch seat numbers from the database for a confirmed/pending booking.
+        // Since we don't have a dedicated Seat table, this is simulated:
+        // This assumes seat numbers are stored in a comma-separated format in the Booking model 
+        // or a related table (which we need to add later for full functionality). 
+        // For now, we simulate finding the booked seats via the bookingId, which is not ideal.
+
+        // **FIX: We will assume there is a BookingSeat table to fetch this data later, 
+        // and for this helper, we'll return an empty list as we don't know the booking details yet.**
+        return new List<string>();
+    }
+
+    public List<string> GetBookedSeatsForTrip(string tripId)
+    {
+
+
+        // In a real application, you would query the DB
+        return new List<string> { "" }; // General busy seats
+    }
+
+
+    public List<string> GenerateSeatLayout(int totalSeats)
+    {
+        // Generates a simulated 2+1 layout (A, B, C) for demonstration (10 rows max).
+        List<string> seats = new List<string>();
+        int rows = Math.Min(10, totalSeats / 3);
+        for (int r = 1; r <= rows; r++)
+        {
+            // FIX: Ensure seat labels are correct (e.g., 1A, 1B, 1C)
+            seats.Add(r + "A"); // Pair
+            seats.Add(r + "B"); // Pair
+            seats.Add(r + "C"); // Single
+        }
+        return seats;
+    }
+
+
+    public string GenerateBookingRef()
+    {
+        // Generates a 10-character reference number
+        string s = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        Random r = new();
+        string reference = "";
+        for (int i = 0; i < 10; i++)
+        {
+            reference += s[r.Next(s.Length)];
+        }
+        return reference;
+    }
 }
+

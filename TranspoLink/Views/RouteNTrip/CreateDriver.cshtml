@@ -1,0 +1,55 @@
+﻿@model TranspoLink.Models.Driver
+@{
+    ViewBag.Title = " | Register New Driver";
+}
+
+@section head {
+    <link rel="stylesheet" href="/css/RNT.css" />
+}
+
+<div class="admin-container">
+    <div class="rnt-header">
+        <div class="rnt-title">
+            <h2>👤 Register New Driver</h2>
+            <p>Create a user account for the driver before assigning a vehicle.</p>
+        </div>
+        <a href="/RouteNTrip/Drivers" class="btn-rnt btn-rnt-primary">← Back to Admin</a>
+    </div>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="rnt-alert rnt-alert-danger">@TempData["Error"]</div>
+    }
+
+    <form method="post" style="background:white; padding:30px; border-radius:12px; max-width:600px; margin:0 auto;">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" style="color:red; margin-bottom:15px;"></div>
+
+        <label style="display:block; margin-bottom:5px;">Driver ID (Auto: @ViewBag.NextDriverId)</label>
+        <input asp-for="Id" type="hidden" value="@ViewBag.NextDriverId" />
+        <input value="@ViewBag.NextDriverId" class="rnt-input" readonly
+               style="background-color:#eee; color:#666; font-weight:bold; cursor:not-allowed; margin-bottom:15px;" />
+
+        <label style="display:block; margin-bottom:5px;">Full Name</label>
+        <input asp-for="Name" class="rnt-input" style="margin-bottom:15px;" required />
+        <span asp-validation-for="Name" class="text-danger"></span>
+
+        <label style="display:block; margin-bottom:5px;">License Number</label>
+        <input asp-for="LicenseNumber" class="rnt-input" style="margin-bottom:15px;" required />
+        <span asp-validation-for="LicenseNumber" class="text-danger"></span>
+
+        <label style="display:block; margin-bottom:5px;">Email (Optional)</label>
+        <input asp-for="Email" class="rnt-input" type="email" style="margin-bottom:15px;" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+
+        <label style="display:block; margin-bottom:5px;">Phone (Optional)</label>
+        <input asp-for="Phone" class="rnt-input" style="margin-bottom:15px;" />
+        <span asp-validation-for="Phone" class="text-danger"></span>
+
+        <label style="display:block; margin-bottom:5px;">Password (Set Initial)</label>
+        <input asp-for="Hash" class="rnt-input" type="password" style="margin-bottom:20px;" required />
+        <span asp-validation-for="Hash" class="text-danger"></span>
+
+        <button class="btn-rnt btn-rnt-success" style="width:100%; padding:15px;">Create Driver Account</button>
+    </form>
+</div>

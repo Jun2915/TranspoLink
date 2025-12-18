@@ -11,6 +11,21 @@
 <div class="rnt-page-container">
     <div class="rnt-content-wrapper">
 
+        @* START: MESSAGE DISPLAY BLOCK (Added for error/success reporting) *@
+        @if (TempData["Success"] != null)
+        {
+            <div class="rnt-alert rnt-alert-success">@TempData["Success"]</div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="rnt-alert rnt-alert-danger">@TempData["Error"]</div>
+        }
+        @if (TempData["Info"] != null)
+        {
+            <div class="rnt-alert rnt-alert-info">@TempData["Info"]</div>
+        }
+        @* END: MESSAGE DISPLAY BLOCK *@
+
         <div class="rnt-card">
             <div class="rnt-header">
                 <div class="rnt-title">
@@ -22,7 +37,10 @@
 
             <div id="addRouteForm" style="display:none; margin-top:25px; padding-top:25px; border-top:1px solid #eee;">
                 <form action="/RouteNTrip/CreateRoute" method="post" style="display:grid; grid-template-columns: 100px 1fr 1fr 1fr 1fr auto; gap:15px;">
-                    <input value="@ViewBag.NextRouteId" class="rnt-input" readonly
+
+                    @Html.AntiForgeryToken()
+
+                    <input name="Id" value="@ViewBag.NextRouteId" class="rnt-input" readonly
                            style="background-color:#f0f2f5; color:#666; font-weight:bold; cursor:not-allowed;"
                            title="Auto-Generated ID" />
 

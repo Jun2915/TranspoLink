@@ -15,15 +15,23 @@
         <a href="/Vehicle/Vehicles" class="btn-back">← Back to Fleet</a>
     </div>
 
-    <div class="vehicle-form-card">
+    <div class="vehicle-form-card" style="max-width: 600px;">
         <div class="form-header">
             <h2>Add New Vehicle</h2>
             <p>Register a new bus, train, or ferry to the fleet.</p>
         </div>
 
         <form method="post" asp-action="CreateVehicle">
-            <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
+            @Html.AntiForgeryToken()
 
+            <input type="hidden" asp-for="VehicleNumber" value="@Model.VehicleNumber" />
+
+            @* CRITICAL FIX: Keep this summary visible to diagnose future errors! *@
+            <div asp-validation-summary="All" class="validation-summary-errors"
+                 style="background-color: #ffebeb; border: 2px solid red; color: black; padding: 15px; margin-bottom: 20px;">
+            </div>
+
+            @* --- REVERTED LAYOUT --- *@
             <div class="form-group-row">
                 <div class="vehicle-input-group">
                     <label asp-for="Type">Vehicle Type</label>
@@ -58,12 +66,13 @@
 
                 <div class="vehicle-input-group">
                     <label asp-for="TotalSeats">Total Seats</label>
-                    <input asp-for="TotalSeats" type="number" class="vehicle-input" min="1" max="500" value="40">
+                    <input asp-for="TotalSeats" type="number" class="vehicle-input" min="1" max="500" value="@(Model.TotalSeats > 0 ? Model.TotalSeats : 40)">
                     <span asp-validation-for="TotalSeats" class="field-validation-error"></span>
                 </div>
             </div>
+            @* --- END REVERTED LAYOUT --- *@
 
-            <button type="submit" class="btn-save-vehicle">
+            <button type="submit" class="btn-save-vehicle" style="margin-top: 25px; width: 100%;">
                 💾 Save Vehicle
             </button>
         </form>

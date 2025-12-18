@@ -6,12 +6,13 @@ namespace TranspoLink.Models;
 
 #nullable disable warnings
 
+// 1. ChatMessage Model (Preserved from Old DB.cs)
 public class ChatMessage
 {
     public int Id { get; set; }
-    [MaxLength(100)] public string SenderId { get; set; }   
-    [MaxLength(100)] public string ReceiverId { get; set; } 
-    [MaxLength(100)] public string SenderName { get; set; } 
+    [MaxLength(100)] public string SenderId { get; set; }
+    [MaxLength(100)] public string ReceiverId { get; set; }
+    [MaxLength(100)] public string SenderName { get; set; }
     public string Message { get; set; }
     [MaxLength(200)] public string? PhotoUrl { get; set; }
     public DateTime Timestamp { get; set; } = DateTime.Now;
@@ -20,10 +21,11 @@ public class ChatMessage
 
 public class DB(DbContextOptions options) : DbContext(options)
 {
+    // Standard DbSets
     public DbSet<User> Users { get; set; }
     public DbSet<Admin> Admins { get; set; }
     public DbSet<Member> Members { get; set; }
-    public DbSet<Driver> Drivers { get; set; } 
+    public DbSet<Driver> Drivers { get; set; }
 
     public DbSet<Route> Routes { get; set; }
     public DbSet<RouteStop> RouteStops { get; set; }
@@ -31,7 +33,9 @@ public class DB(DbContextOptions options) : DbContext(options)
     public DbSet<TripStop> TripStops { get; set; }
     public DbSet<Vehicle> Vehicles { get; set; }
     public DbSet<Booking> Bookings { get; set; }
-    public DbSet<AuditLog> AuditLogs { get; set; }  
+    public DbSet<AuditLog> AuditLogs { get; set; }
+
+    // Chat DbSet (Preserved from Old DB.cs)
     public DbSet<ChatMessage> ChatMessages { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -44,7 +48,7 @@ public class DB(DbContextOptions options) : DbContext(options)
 
         // Relationships
         modelBuilder.Entity<Booking>()
-           .HasOne(b => b.Member).WithMany(m => m.Bookings).HasForeignKey(b => b.MemberId).OnDelete(DeleteBehavior.Restrict);
+            .HasOne(b => b.Member).WithMany(m => m.Bookings).HasForeignKey(b => b.MemberId).OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Booking>()
             .HasOne(b => b.Trip).WithMany(t => t.Bookings).HasForeignKey(b => b.TripId).OnDelete(DeleteBehavior.Restrict);
@@ -58,6 +62,7 @@ public class DB(DbContextOptions options) : DbContext(options)
         modelBuilder.Entity<RouteStop>()
             .HasOne(rs => rs.Route).WithMany(r => r.RouteStops).HasForeignKey(rs => rs.RouteId).OnDelete(DeleteBehavior.Cascade);
 
+        // Explicit TripStop configuration (Preserved from Old DB.cs for safety)
         modelBuilder.Entity<TripStop>()
             .HasOne(ts => ts.Trip).WithMany(t => t.TripStops).HasForeignKey(ts => ts.TripId).OnDelete(DeleteBehavior.Cascade);
 
@@ -109,8 +114,9 @@ public class Route
     [MaxLength(20)] public string TransportType { get; set; }
     public bool IsActive { get; set; } = true;
 
-    public virtual ICollection<Trip> Trips { get; set; }
-    public virtual ICollection<RouteStop> RouteStops { get; set; }
+    // Updated to use New DB.cs initialization
+    public virtual ICollection<Trip> Trips { get; set; } = new List<Trip>();
+    public virtual ICollection<RouteStop> RouteStops { get; set; } = new List<RouteStop>();
 }
 
 public class RouteStop
@@ -140,17 +146,21 @@ public class Trip
     public DateTime ArrivalTime { get; set; }
     public int AvailableSeats { get; set; }
     [Column(TypeName = ("decimal(10,2)"))] public decimal Price { get; set; }
-    [MaxLength(20)] public string Status { get; set; }
 
-    public virtual Route Route { get; set; }
-    public virtual Vehicle Vehicle { get; set; }
-    public virtual ICollection<Booking> Bookings { get; set; }
-    public virtual ICollection<TripStop> TripStops { get; set; }
+    [MaxLength(20)]
+    public string Status { get; set; } = "Scheduled"; // Default from New DB.cs
+
+    public virtual Route? Route { get; set; }
+    public virtual Vehicle? Vehicle { get; set; }
+
+    public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
+    public virtual ICollection<TripStop> TripStops { get; set; } = new List<TripStop>();
 }
 
 public class TripStop
 {
-    [Key, MaxLength(6)]
+    // Updated to MaxLength 7 (From New DB.cs)
+    [Key, MaxLength(7)]
     [DatabaseGenerated(DatabaseGeneratedOption.None)]
     public string Id { get; set; }
 
@@ -177,7 +187,7 @@ public class Vehicle
 
     public bool IsActive { get; set; } = true;
 
-    public virtual ICollection<Trip> Trips { get; set; }
+    public virtual ICollection<Trip> Trips { get; set; } = new List<Trip>();
     public virtual Driver? Driver { get; set; }
 }
 
@@ -205,4 +215,47 @@ public class AuditLog
     public DateTime Timestamp { get; set; } = DateTime.Now;
     [MaxLength(10)] public string Icon { get; set; }
     [MaxLength(20)] public string CssClass { get; set; }
+}
+
+// 2. DriverVM (Added from New DB.cs)
+public class DriverVM
+{
+    public string Id { get; set; }
+
+    [Required, MaxLength(100)]
+    public string Name { get; set; }
+
+    [MaxLength(100), EmailAddress]
+    public string? Email { get; set; }
+
+    [MaxLength(20), Phone]
+    public string? Phone { get; set; }
+
+    [Required, MaxLength(20)]
+    [Display(Name = "License Number")]
+    public string LicenseNumber { get; set; }
+
+    [DataType(DataType.Password)]
+    public string? Password { get; set; }
+
+    [DataType(DataType.Password)]
+    [Compare("Password", ErrorMessage = "The passwords do not match.")]
+    public string? ConfirmPassword { get; set; }
+
+    public bool IsBlocked { get; set; } = false;
+
+    [Display(Name = "Profile Photo")]
+    public IFormFile? Photo { get; set; }
+    public string? ExistingPhotoURL { get; set; }
+}
+
+public class Passenger //
+{
+    public int Id { get; set; }
+    public int BookingId { get; set; }
+    public Booking Booking { get; set; }
+    public string Name { get; set; }
+    public int Age { get; set; }
+    public string SeatNumber { get; set; }
+    public string TicketType { get; set; }
 }
