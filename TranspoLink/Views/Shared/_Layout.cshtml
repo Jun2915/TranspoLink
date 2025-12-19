@@ -12,6 +12,10 @@
         {
             Context.SignOutAsync("Cookies");
             Context.Response.Redirect("/Account/Login");
+
+            IgnoreSection("head");
+            IgnoreSection("scripts");
+            IgnoreSection("foot");
             return;
         }
     }

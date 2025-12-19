@@ -10,7 +10,7 @@
 }
 
 <div class="alert alert-danger" role="alert">
-    @Html.ValidationSummary(false, "提交失败，请检查以下问题：", new { @class = "text-danger" })
+    @Html.ValidationSummary(false, "Submit Failed. Please check again.", new { @class = "text-danger" })
 </div>
 
 <div class="booking-container">
@@ -30,134 +30,132 @@
                 @Html.AntiForgeryToken()
                 <input type="hidden" asp-for="TripId" />
                 <input type="hidden" id="formSelectedSeats" name="SelectedSeats" />
-
-                <!-- 🛠️ 添加调试输出 -->
                 <div id="debugOutput" style="display: none;"></div>
 
                 <input type="hidden" asp-for="MemberId" value="@User.Identity.Name" />
 
 
-            <div class="seat-map-diagram">
-                @{
-                    var allSeats = Model.AvailableSeats?.Keys?.ToList() ?? new List<string>();
+                <div class="seat-map-diagram">
+                    @{
+                        var allSeats = Model.AvailableSeats?.Keys?.ToList() ?? new List<string>();
 
-                    var columnA = new List<string>();
-                    var columnB = new List<string>();
-                    var columnC = new List<string>();
-                    // 拆分座位到各自的列... (代码省略，保持原有逻辑)
-                    foreach (var seat in allSeats)
-                    {
-                        if (string.IsNullOrEmpty(seat)) continue;
-                        if (seat.EndsWith("A", StringComparison.OrdinalIgnoreCase))
+                        var columnA = new List<string>();
+                        var columnB = new List<string>();
+                        var columnC = new List<string>();
+                        foreach (var seat in allSeats)
                         {
-                            columnA.Add(seat);
+                            if (string.IsNullOrEmpty(seat))
+                                continue;
+                            if (seat.EndsWith("A", StringComparison.OrdinalIgnoreCase))
+                            {
+                                columnA.Add(seat);
+                            }
+                            else if (seat.EndsWith("B", StringComparison.OrdinalIgnoreCase))
+                            {
+                                columnB.Add(seat);
+                            }
+                            else if (seat.EndsWith("C", StringComparison.OrdinalIgnoreCase))
+                            {
+                                columnC.Add(seat);
+                            }
                         }
-                        else if (seat.EndsWith("B", StringComparison.OrdinalIgnoreCase))
+                        columnA = columnA.OrderBy(s =>
                         {
-                            columnB.Add(seat);
-                        }
-                        else if (seat.EndsWith("C", StringComparison.OrdinalIgnoreCase))
+                            var number = new string(s.Where(char.IsDigit).ToArray());
+                            return int.TryParse(number, out int num) ? num : 0;
+                        }).ToList();
+                        columnB = columnB.OrderBy(s =>
                         {
-                            columnC.Add(seat);
-                        }
+                            var number = new string(s.Where(char.IsDigit).ToArray());
+                            return int.TryParse(number, out int num) ? num : 0;
+                        }).ToList();
+                        columnC = columnC.OrderBy(s =>
+                        {
+                            var number = new string(s.Where(char.IsDigit).ToArray());
+                            return int.TryParse(number, out int num) ? num : 0;
+                        }).ToList();
                     }
-                    // 排序逻辑... (代码省略，保持原有逻辑)
-                    columnA = columnA.OrderBy(s =>
-                    {
-                        var number = new string(s.Where(char.IsDigit).ToArray());
-                        return int.TryParse(number, out int num) ? num : 0;
-                    }).ToList();
-                    columnB = columnB.OrderBy(s =>
-                    {
-                        var number = new string(s.Where(char.IsDigit).ToArray());
-                        return int.TryParse(number, out int num) ? num : 0;
-                    }).ToList();
-                    columnC = columnC.OrderBy(s =>
-                    {
-                        var number = new string(s.Where(char.IsDigit).ToArray());
-                        return int.TryParse(number, out int num) ? num : 0;
-                    }).ToList();
-                }
 
-                <div class="seat-column column-a">
-                    @foreach (var seat in columnA)
-                    {
-                        var isAvailable = Model.AvailableSeats != null &&
+                    <div class="seat-column column-a">
+                        @foreach (var seat in columnA)
+                        {
+                            var isAvailable = Model.AvailableSeats != null &&
                             Model.AvailableSeats.ContainsKey(seat) &&
                             Model.AvailableSeats[seat];
-                        var isSelected = Model.SelectedSeats != null &&
+                            var isSelected = Model.SelectedSeats != null &&
                             Model.SelectedSeats.Contains(seat);
-                        <div class="seat-row">
-                            <div class="seat-item @(isAvailable ? "seat-available" : "booked") @(isSelected ? "selected" : "")"
-                                 data-seat="@seat"
-                                 data-available="@isAvailable.ToString().ToLower()">@seat
+                            <div class="seat-row">
+                                <div class="seat-item @(isAvailable ? "seat-available" : "booked") @(isSelected ? "selected" : "")"
+                                     data-seat="@seat"
+                                     data-available="@isAvailable.ToString().ToLower()">
+                                    @seat
+                                </div>
                             </div>
-                        </div>
-                    }
-                </div>
+                        }
+                    </div>
 
-                <div class="seat-column column-b">
-                    @foreach (var seat in columnB)
-                    {
-                        var isAvailable = Model.AvailableSeats != null &&
+                    <div class="seat-column column-b">
+                        @foreach (var seat in columnB)
+                        {
+                            var isAvailable = Model.AvailableSeats != null &&
                             Model.AvailableSeats.ContainsKey(seat) &&
                             Model.AvailableSeats[seat];
-                        var isSelected = Model.SelectedSeats != null &&
+                            var isSelected = Model.SelectedSeats != null &&
                             Model.SelectedSeats.Contains(seat);
-                        <div class="seat-row">
-                            <div class="seat-item @(isAvailable ? "seat-available" : "booked") @(isSelected ? "selected" : "")"
-                                 data-seat="@seat"
-                                 data-available="@isAvailable.ToString().ToLower()">
-                                @seat
+                            <div class="seat-row">
+                                <div class="seat-item @(isAvailable ? "seat-available" : "booked") @(isSelected ? "selected" : "")"
+                                     data-seat="@seat"
+                                     data-available="@isAvailable.ToString().ToLower()">
+                                    @seat
+                                </div>
                             </div>
-                        </div>
-                    }
-                </div>
+                        }
+                    </div>
 
-                <div class="seat-column column-c">
-                    @foreach (var seat in columnC)
-                    {
-                        var isAvailable = Model.AvailableSeats != null &&
+                    <div class="seat-column column-c">
+                        @foreach (var seat in columnC)
+                        {
+                            var isAvailable = Model.AvailableSeats != null &&
                             Model.AvailableSeats.ContainsKey(seat) &&
                             Model.AvailableSeats[seat];
-                        var isSelected = Model.SelectedSeats != null &&
+                            var isSelected = Model.SelectedSeats != null &&
                             Model.SelectedSeats.Contains(seat);
-                        <div class="seat-row">
-                            <div class="seat-item @(isAvailable ? "seat-available" : "booked") @(isSelected ? "selected" : "")"
-                                 data-seat="@seat"
-                                 data-available="@isAvailable.ToString().ToLower()">
-                                @seat
+                            <div class="seat-row">
+                                <div class="seat-item @(isAvailable ? "seat-available" : "booked") @(isSelected ? "selected" : "")"
+                                     data-seat="@seat"
+                                     data-available="@isAvailable.ToString().ToLower()">
+                                    @seat
+                                </div>
                             </div>
-                        </div>
-                    }
+                        }
+                    </div>
                 </div>
-            </div>
 
-            <div class="seat-legends">
-                <div class="legend-item">
-                    <div class="legend-seat selected"></div>
-                    <span>Selected</span>
+                <div class="seat-legends">
+                    <div class="legend-item">
+                        <div class="legend-seat selected"></div>
+                        <span>Selected</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-seat available"></div>
+                        <span>Available</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-seat booked"></div>
+                        <span>Booked</span>
+                    </div>
                 </div>
-                <div class="legend-item">
-                    <div class="legend-seat available"></div>
-                    <span>Available</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-seat booked"></div>
-                    <span>Booked</span>
-                </div>
-            </div>
 
-            <div class="checkout-actions">
-                <span class="text-danger" id="seatError" style="display:block; text-align:center; margin-top: 10px;">@Html.ValidationMessage("SelectedSeats")</span>
+                <div class="checkout-actions">
+                    <span class="text-danger" id="seatError" style="display:block; text-align:center; margin-top: 10px;">@Html.ValidationMessage("SelectedSeats")</span>
 
-                <button type="submit" form="seatForm" class="btn-rnt btn-rnt-success" style="width:100%; padding: 15px; margin-top: 20px;">
-                    Proceed to Passenger Details
-                </button>
-            </div>
+                    <button type="submit" form="seatForm" class="btn-rnt btn-rnt-success" style="width:100%; padding: 15px; margin-top: 20px;">
+                        Proceed to Passenger Details
+                    </button>
+                </div>
             </form>
         </div>
-        
+
     </div>
 
     <div class="sidebar">
@@ -210,7 +208,6 @@
     <script src="/js/booking.js"></script>
 
     <script>
-        // 初始化选座数据供 booking.js 使用
         window.selectedSeats = @Html.Raw(Json.Serialize(Model.SelectedSeats ?? new List<string>()));
     </script>
 

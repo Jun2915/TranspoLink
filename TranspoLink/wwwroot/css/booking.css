@@ -92,18 +92,18 @@
     user-select: none;
 }
 
-.seat-item.booked {
-    background-color: #667eea; /* Color for booked seats (New: Blue/Purple) */
-    color: white;              /* Text color for booked seats */
-    cursor: not-allowed;
-    text-decoration: line-through;
-}
+    .seat-item.booked {
+        background-color: #667eea; /* Color for booked seats (New: Blue/Purple) */
+        color: white; /* Text color for booked seats */
+        cursor: not-allowed;
+        text-decoration: line-through;
+    }
 
-.seat-item.selected {
-    background-color: #ccc;    /* Color for selected seats (New: Light Grey) */
-    color: #333;               /* Text color for selected seats */
-    border: 2px solid #999;
-}
+    .seat-item.selected {
+        background-color: #ccc; /* Color for selected seats (New: Light Grey) */
+        color: #333; /* Text color for selected seats */
+        border: 2px solid #999;
+    }
 
 .seat-seating {
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"/><path fill="%23667eea" d="M4 18v3h3v-3H4zm6 0v3h3v-3h-3zm-6-5v3h3v-3H4zm6 0v3h3v-3h-3zm-6-5v3h3V8H4zm6 0v3h3V8h-3zm-6-5v3h3V3H4zm6 0v3h3V3h-3zm12 0H14v18h8V3zm-2 2h-4v14h4V5z"/></svg>');
@@ -246,6 +246,7 @@
     padding-top: 10px;
     margin-top: 15px;
 }
+
 .error {
     border-color: #ff4757 !important;
     background-color: #fff5f5 !important;

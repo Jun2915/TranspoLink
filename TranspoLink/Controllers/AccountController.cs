@@ -202,7 +202,8 @@ public class AccountController(DB db,
                     if (u is Member member)
                     {
                         member.PhotoURL = hp.SavePhotoFromUrl(photoUrl, "images");
-                        if (member.Name == "Google User" && !string.IsNullOrEmpty(name)) member.Name = name;
+                        if (member.Name == "Google User" && !string.IsNullOrEmpty(name))
+                            member.Name = name;
 
                         db.SaveChanges();
                     }
@@ -290,7 +291,8 @@ public class AccountController(DB db,
         if (vm.Photo != null)
         {
             var err = hp.ValidatePhoto(vm.Photo);
-            if (err != "") ModelState.AddModelError("Photo", err);
+            if (err != "")
+                ModelState.AddModelError("Photo", err);
         }
 
         if (ModelState.IsValid)
@@ -332,7 +334,8 @@ public class AccountController(DB db,
         var identifier = User.Identity!.Name;
         var u = db.Users.FirstOrDefault(u => u.Email == identifier || u.Phone == identifier);
 
-        if (u == null) return RedirectToAction("Index", "Home");
+        if (u == null)
+            return RedirectToAction("Index", "Home");
 
         if (!hp.VerifyPassword(u.Hash, vm.Current))
         {
@@ -357,7 +360,8 @@ public class AccountController(DB db,
         var identifier = User.Identity!.Name;
         var u = db.Users.FirstOrDefault(u => u.Email == identifier || u.Phone == identifier);
 
-        if (u == null) return RedirectToAction("Index", "Home");
+        if (u == null)
+            return RedirectToAction("Index", "Home");
 
         var vm = new UpdateProfileVM
         {
@@ -366,8 +370,10 @@ public class AccountController(DB db,
             Name = u.Name,
         };
 
-        if (u is Member m) vm.PhotoURL = m.PhotoURL;
-        else if (u is Admin a) vm.PhotoURL = a.PhotoURL;
+        if (u is Member m)
+            vm.PhotoURL = m.PhotoURL;
+        else if (u is Admin a)
+            vm.PhotoURL = a.PhotoURL;
 
         return View(vm);
     }
@@ -379,7 +385,8 @@ public class AccountController(DB db,
         var identifier = User.Identity!.Name;
         var u = db.Users.FirstOrDefault(u => u.Email == identifier || u.Phone == identifier);
 
-        if (u == null) return RedirectToAction("Index", "Home");
+        if (u == null)
+            return RedirectToAction("Index", "Home");
 
         if (!string.IsNullOrEmpty(vm.Email) && db.Users.Any(x => x.Id != u.Id && x.Email == vm.Email))
         {
@@ -394,7 +401,8 @@ public class AccountController(DB db,
         if (vm.Photo != null)
         {
             var err = hp.ValidatePhoto(vm.Photo);
-            if (err != "") ModelState.AddModelError("Photo", err);
+            if (err != "")
+                ModelState.AddModelError("Photo", err);
         }
 
         if (ModelState.IsValid)
@@ -434,8 +442,10 @@ public class AccountController(DB db,
             return RedirectToAction();
         }
 
-        if (u is Member m2) vm.PhotoURL = m2.PhotoURL;
-        else if (u is Admin a2) vm.PhotoURL = a2.PhotoURL;
+        if (u is Member m2)
+            vm.PhotoURL = m2.PhotoURL;
+        else if (u is Admin a2)
+            vm.PhotoURL = a2.PhotoURL;
 
         return View(vm);
     }
@@ -558,7 +568,8 @@ public class AccountController(DB db,
 
     private void SendOtpEmail(User u, string otp)
     {
-        if (string.IsNullOrEmpty(u.Email)) return;
+        if (string.IsNullOrEmpty(u.Email))
+            return;
 
         var mail = new MailMessage();
         mail.To.Add(new MailAddress(u.Email, u.Name));

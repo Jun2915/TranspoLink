@@ -89,14 +89,15 @@
     top: 20px;
 }
 
-.pay-btn {
+.confirm-btn {
+    background: #ff4d4f; /* 匹配图片红色 */
+    color: white;
     width: 100%;
     padding: 15px;
-    background: #d84e55;
-    color: white;
     border: none;
-    border-radius: 5px;
-    font-size: 18px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 16px;
     cursor: pointer;
     margin-top: 20px;
 }
