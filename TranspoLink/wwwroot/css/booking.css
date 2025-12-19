@@ -15,7 +15,7 @@
     }
 }
 
-/* Base Booking Container */
+/* Base Booking Container (For Trip List / Seat Selection) */
 .booking-container {
     max-width: 1140px;
     margin: 40px auto;
@@ -38,7 +38,7 @@ body::before {
     /* Ensure this path is correct for your project */
     background: url('../images/about_background.png') no-repeat center center;
     background-size: cover;
-    opacity: 0.5; /* Semi-transparent background */
+    opacity: 0.5;
     z-index: -1;
     pointer-events: none;
     background-attachment: fixed;
@@ -66,8 +66,8 @@ body::before {
 .trip-header,
 .table-responsive,
 .d-flex.justify-content-between.align-items-center {
-    background: rgba(255, 255, 255, 0.85); /* Milky transparent white */
-    backdrop-filter: blur(12px); /* The frosted glass effect */
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-radius: 16px;
     border: 1px solid rgba(255, 255, 255, 0.6);
@@ -314,7 +314,7 @@ body::before {
     text-transform: uppercase;
 }
 
-/* Standard Inputs (Not Search) */
+/* Standard Inputs */
 .details-form .form-control {
     border: 1px solid #e1e1e1;
     border-radius: 10px;
@@ -389,7 +389,7 @@ body::before {
     }
 
 /* ==========================================================================
-   AVAILABLE TRIPS PAGE (Specific Enhancements)
+   AVAILABLE TRIPS PAGE (Enhancements)
    ========================================================================== */
 
 /* 1. Container for Search Bar */
@@ -399,7 +399,7 @@ body::before {
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
-    justify-content: space-between; /* Ensures separation */
+    justify-content: space-between;
 }
 
 /* Title Styling */
@@ -415,7 +415,7 @@ body::before {
 
 /* 2. SEARCH INPUT Styling */
 .d-flex form .form-control {
-    border-radius: 50px; /* Pill shape */
+    border-radius: 50px;
     padding: 12px 25px;
     border: 2px solid rgba(102, 126, 234, 0.2);
     min-width: 300px;
@@ -430,12 +430,12 @@ body::before {
         background-color: #fff;
         box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
         outline: none;
-        width: 320px; /* Subtle expand on focus */
+        width: 320px;
     }
 
 /* 3. SEARCH BUTTON Styling */
 .d-flex form .btn-primary {
-    border-radius: 50px; /* Pill shape */
+    border-radius: 50px;
     padding: 10px 30px;
     margin-left: 10px;
     font-weight: 600;
@@ -478,7 +478,6 @@ body::before {
 }
 
 .table thead.table-dark {
-    background: #2c3e50;
     background: linear-gradient(to right, #2c3e50, #34495e);
     color: #fff;
 }
@@ -524,12 +523,12 @@ body::before {
         border: 1px solid #f5b7b1;
     }
 
-/* BOOK NOW BUTTON (The Star of the Table) */
+/* BOOK NOW BUTTON */
 .btn-sm.btn-primary {
-    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); /* Horizontal Gradient */
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
     border: none;
     padding: 10px 24px;
-    border-radius: 50px; /* Pill Shape */
+    border-radius: 50px;
     font-size: 0.85rem;
     font-weight: 700;
     text-transform: uppercase;
@@ -552,7 +551,193 @@ body::before {
     }
 
 /* ==========================================================================
-   RESPONSIVE DESIGN
+   NEW: MY BOOKING HISTORY PAGE (Index.cshtml)
+   ========================================================================== */
+
+.my-bookings-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.07);
+    animation: fadeIn 0.6s ease-out;
+}
+
+.my-bookings-header {
+    text-align: center;
+    margin-bottom: 30px;
+    font-weight: 800;
+    font-size: 2rem;
+    color: #2c3e50;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    background: -webkit-linear-gradient(45deg, #2c3e50, #667eea);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.empty-booking-state {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+    .empty-booking-state p {
+        font-size: 1.2rem;
+        color: #5d6d7e;
+        margin-bottom: 25px;
+    }
+
+.btn-book-now {
+    display: inline-block;
+    padding: 12px 30px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 50px;
+    font-weight: 600;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+    .btn-book-now:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        color: white;
+    }
+
+/* Specific Table for History */
+.my-bookings-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 0;
+}
+
+    .my-bookings-table thead {
+        background: linear-gradient(to right, #2c3e50, #34495e);
+        color: white;
+    }
+
+    .my-bookings-table th {
+        padding: 18px 15px;
+        text-align: left;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+    }
+
+        .my-bookings-table th.center-align,
+        .my-bookings-table td.center-align {
+            text-align: center;
+        }
+
+    .my-bookings-table tbody tr {
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        transition: background-color 0.2s ease;
+        background-color: rgba(255, 255, 255, 0.5);
+    }
+
+        .my-bookings-table tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .my-bookings-table tbody tr:hover {
+            background-color: rgba(102, 126, 234, 0.08);
+        }
+
+    .my-bookings-table td {
+        padding: 20px 15px;
+        vertical-align: middle;
+        color: #495057;
+        font-size: 0.95rem;
+    }
+
+.ref-no {
+    font-family: monospace;
+    font-weight: bold;
+    color: #667eea;
+}
+
+.journey-info {
+    display: flex;
+    flex-direction: column;
+}
+
+    .journey-info strong {
+        font-size: 1rem;
+        color: #2c3e50;
+        margin-bottom: 5px;
+    }
+
+.journey-date {
+    font-size: 0.85rem;
+    color: #7f8c8d;
+}
+
+.vehicle-type {
+    display: block;
+}
+
+.vehicle-number {
+    font-size: 12px;
+    color: #888;
+}
+
+.total-price {
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: inline-block;
+}
+
+.status-confirmed, .status-paid, .status-Paid {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.status-pending, .status-Pending {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+}
+
+.status-cancelled, .status-Cancelled {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.btn-view-booking {
+    display: inline-block;
+    padding: 8px 18px;
+    border: 2px solid #667eea;
+    color: #667eea;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+    .btn-view-booking:hover {
+        background-color: #667eea;
+        color: white;
+        box-shadow: 0 4px 10px rgba(102, 126, 234, 0.2);
+    }
+
+/* ==========================================================================
+   RESPONSIVE DESIGN (Shared)
    ========================================================================== */
 @media (max-width: 900px) {
     .booking-container {
