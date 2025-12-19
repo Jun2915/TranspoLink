@@ -1,0 +1,93 @@
+﻿@model List<TranspoLink.Models.Trip>
+
+@{
+    ViewBag.Title += " | Available Trips";
+}
+
+@section head {
+    <link rel="stylesheet" href="/css/booking.css" asp-append-version="true" />
+}
+
+<div class="container" style="padding-top: 50px;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Available Trips</h2>
+
+        <form method="get" class="d-flex" style="gap: 10px;">
+            <input type="text" name="search" class="form-control" placeholder="Search Origin or Destination..." value="@ViewBag.Search" />
+            <button type="submit" class="btn btn-primary">Search</button>
+            @if (!string.IsNullOrEmpty(ViewBag.Search))
+            {
+                <a href="/Booking/TripList" class="btn btn-outline-secondary">Reset</a>
+            }
+        </form>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-warning">
+            No upcoming trips found available for booking at the moment.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Route</th>
+                        <th>Date & Time</th>
+                        <th>Vehicle</th>
+                        <th>Price</th>
+                        <th>Seats</th>
+                        <th class="text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                <strong>@item.Route?.Origin</strong> ➝ <strong>@item.Route?.Destination</strong>
+                                <br />
+                                <small class="text-muted">@item.Route?.TransportType</small>
+                            </td>
+                            <td>
+                                @item.DepartureTime.ToString("dd MMM yyyy") <br />
+                                <span class="badge bg-light text-dark">@item.DepartureTime.ToString("hh:mm tt")</span>
+                            </td>
+                            <td>
+                                @(item.Vehicle?.Type ?? "Standard") <br />
+                                <small class="text-muted">@item.Vehicle?.VehicleNumber</small>
+                            </td>
+                            <td class="fw-bold text-primary">
+                                RM @item.Price.ToString("N2")
+                            </td>
+                            <td>
+                                @if (item.AvailableSeats > 0)
+                                {
+                                    <span class="badge bg-success">@item.AvailableSeats Seats Left</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Sold Out</span>
+                                }
+                            </td>
+                            <td class="text-center">
+                                @if (item.AvailableSeats > 0)
+                                {
+                                    <a asp-action="Book" asp-route-id="@item.Id" class="btn btn-sm btn-primary">
+                                        Book Now
+                                    </a>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-sm btn-secondary" disabled>Full</button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

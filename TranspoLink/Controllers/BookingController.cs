@@ -34,6 +34,32 @@ public class BookingController(DB db, Helper hp) : Controller
         return View(myBookings);
     }
 
+    // =========================================================================
+    // NEW ACTION: List of Available Trips
+    // =========================================================================
+    [HttpGet]
+    public IActionResult TripList(string search)
+    {
+        // 1. Filter for trips that are "Scheduled" and in the future
+        var query = db.Trips
+            .Include(t => t.Route)
+            .Include(t => t.Vehicle)
+            .Where(t => t.Status == "Scheduled" && t.DepartureTime > DateTime.Now)
+            .AsQueryable();
+
+        // 2. Optional: Simple search by Origin or Destination
+        if (!string.IsNullOrEmpty(search))
+        {
+            query = query.Where(t => t.Route.Origin.Contains(search) ||
+                                     t.Route.Destination.Contains(search));
+        }
+
+        var trips = query.OrderBy(t => t.DepartureTime).ToList();
+
+        ViewBag.Search = search;
+        return View(trips);
+    }
+
     // Step 1: Seat Selection (GET)
     [HttpGet]
     public IActionResult Book(string id)
