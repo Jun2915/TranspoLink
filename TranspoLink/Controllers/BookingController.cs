@@ -12,6 +12,7 @@ namespace TranspoLink.Controllers;
 [Authorize(Roles = "Member")]
 public class BookingController(DB db, Helper hp) : Controller
 {
+    // Define constant Session Keys
     public const string SESSION_BOOKING_PROCESS_VM = "BookingProcessVM";
     public const string SESSION_BOOKING_SEATS = "BookingSeats";
     public const string SESSION_SELECTED_SEATS = "SelectedSeats";
@@ -19,48 +20,8 @@ public class BookingController(DB db, Helper hp) : Controller
     public const string SESSION_ERROR = "ErrorMessage";
     public const string SESSION_INFO = "InfoMessage";
 
-    // View Order List (Index)
-    [HttpGet]
-    public IActionResult Index()
-    {
-        var memberId = User.Identity?.Name;
-        var myBookings = db.Bookings
-            .Include(b => b.Trip).ThenInclude(t => t.Route)
-            .Include(b => b.Trip).ThenInclude(t => t.Vehicle)
-            .Where(b => b.MemberId == memberId)
-            .OrderByDescending(b => b.BookingDate)
-            .ToList();
-
-        return View(myBookings);
-    }
-
-    // =========================================================================
-    // NEW ACTION: List of Available Trips
-    // =========================================================================
-    [HttpGet]
-    public IActionResult TripList(string search)
-    {
-        // 1. Filter for trips that are "Scheduled" and in the future
-        var query = db.Trips
-            .Include(t => t.Route)
-            .Include(t => t.Vehicle)
-            .Where(t => t.Status == "Scheduled" && t.DepartureTime > DateTime.Now)
-            .AsQueryable();
-
-        // 2. Optional: Simple search by Origin or Destination
-        if (!string.IsNullOrEmpty(search))
-        {
-            query = query.Where(t => t.Route.Origin.Contains(search) ||
-                                     t.Route.Destination.Contains(search));
-        }
-
-        var trips = query.OrderBy(t => t.DepartureTime).ToList();
-
-        ViewBag.Search = search;
-        return View(trips);
-    }
-
-    // Step 1: Seat Selection (GET)
+  
+    // STEP 1: Seat Selection (GET)
     [HttpGet]
     public IActionResult Book(string id)
     {
@@ -69,16 +30,16 @@ public class BookingController(DB db, Helper hp) : Controller
             .Include(t => t.Vehicle).ThenInclude(v => v.Driver)
             .FirstOrDefault(t => t.Id == id);
 
-        if (trip == null)
-        {
-            HttpContext.Session.SetString(SESSION_ERROR, "Trip not found or no longer available.");
-            return RedirectToAction("Index", "Home");
-        }
+        if (trip == null) return RedirectToAction("Index", "Home");
 
         var totalSeats = trip.Vehicle?.TotalSeats ?? 40;
-        var bookedSeats = hp.GetBookedSeatsForTrip(id);
+
+        // 🛠️ 关键修改：传入 db 获取真实的已定座位列表
+        var bookedSeats = hp.GetBookedSeatsForVehicle(id, db);
+
         var allSeats = hp.GenerateSeatLayout(totalSeats);
 
+        // 将这些座位在 AvailableSeats 字典中标记为 false
         var availableSeats = allSeats.ToDictionary(
             seat => seat,
             seat => !bookedSeats.Contains(seat)
@@ -89,21 +50,21 @@ public class BookingController(DB db, Helper hp) : Controller
             TripId = trip.Id,
             Trip = trip,
             AvailableSeats = availableSeats,
-            SelectedSeats = HttpContext.Session.Get<List<string>>(SESSION_SELECTED_SEATS) ?? []
+            SelectedSeats = HttpContext.Session.Get<List<string>>(SESSION_SELECTED_SEATS) ?? new List<string>(),
         };
-
-        HttpContext.Session.Remove(SESSION_SELECTED_SEATS);
 
         return View(vm);
     }
 
-    // Step 1: Seat Selection (POST)
+    // STEP 1: Seat Selection (POST) - 处理座位选择表单提交
     [HttpPost]
     [ValidateAntiForgeryToken]
     public IActionResult Book(SeatSelectionVM vm)
     {
+        // 1. 模型验证
         if (!ModelState.IsValid || vm.SelectedSeats == null || vm.SelectedSeats.Count == 0)
         {
+            // --- 🛠️ 补全：重新加载 Trip 数据以供视图显示 ---
             vm.Trip = db.Trips
                 .Include(t => t.Route)
                 .Include(t => t.Vehicle).ThenInclude(v => v.Driver)
@@ -111,8 +72,9 @@ public class BookingController(DB db, Helper hp) : Controller
 
             if (vm.Trip != null)
             {
+                // 重新生成座位图数据
                 var totalSeats = vm.Trip.Vehicle?.TotalSeats ?? 40;
-                var bookedSeats = hp.GetBookedSeatsForTrip(vm.TripId);
+                var bookedSeats = hp.GetBookedSeatsForVehicle(vm.TripId, db);
                 var allSeats = hp.GenerateSeatLayout(totalSeats);
 
                 vm.AvailableSeats = allSeats.ToDictionary(
@@ -129,19 +91,24 @@ public class BookingController(DB db, Helper hp) : Controller
             return View(vm);
         }
 
-        vm.MemberId = User.Identity?.Name;
 
-        if (string.IsNullOrEmpty(vm.MemberId))
+
+        // 🛠️ 获取 MemberId
+        vm.MemberEmail = User.Identity?.Name;
+
+        if (string.IsNullOrEmpty(vm.MemberEmail))
         {
-            HttpContext.Session.SetString(SESSION_ERROR, "Session expired.");
+            HttpContext.Session.SetString(SESSION_ERROR, "Member session expired or ID missing.");
             return RedirectToAction("Index", "Home");
         }
 
+        // 2. 从 Session 中获取或初始化 BookingVM
         var actualSeats = new List<string>();
         foreach (var s in vm.SelectedSeats)
         {
             if (s.Contains(','))
             {
+                // 如果是 "2C, 6C"，拆分为 ["2C", "6C"]
                 actualSeats.AddRange(s.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()));
             }
             else
@@ -151,36 +118,39 @@ public class BookingController(DB db, Helper hp) : Controller
         }
 
         var trip = db.Trips.FirstOrDefault(t => t.Id == vm.TripId);
-        if (trip == null)
-            return RedirectToAction("Index", "Home");
+        if (trip == null) return RedirectToAction("Index", "Home");
 
+        // 初始化 BookingVM
         var sessionVm = new BookingVM
         {
             TripId = vm.TripId,
             BasePricePerTicket = trip.Price,
-            Passengers = []
+            Passengers = new List<PassengerVM>()
         };
 
-        foreach (var seat in actualSeats)
+        // 为拆分后的每一个座位创建一个独立的乘客
+        for (int i = 0; i < actualSeats.Count; i++)
         {
             sessionVm.Passengers.Add(new PassengerVM
             {
-                SeatNumber = seat,
+                SeatNumber = actualSeats[i], // 这里保证每个乘客只有一个座号
                 Name = "",
                 Age = 0,
                 TicketType = "Adult"
             });
         }
 
+        // 使用你定义的扩展方法存储 Session
         HttpContext.Session.Set(SESSION_BOOKING_PROCESS_VM, sessionVm);
 
         return RedirectToAction("ReviewAndPay");
     }
 
-    // Step 2: Review and Pay (GET)
+
     [HttpGet]
     public IActionResult ReviewAndPay()
     {
+        // 统一使用 Get<T> 扩展方法，避免手动解析 JSON 字符串
         var sessionVm = HttpContext.Session.Get<BookingVM>(SESSION_BOOKING_PROCESS_VM);
 
         if (sessionVm == null)
@@ -189,158 +159,179 @@ public class BookingController(DB db, Helper hp) : Controller
             return RedirectToAction("Index", "Home");
         }
 
-        var trip = db.Trips
+
+        sessionVm.Trip = db.Trips
             .Include(t => t.Route)
             .Include(t => t.Vehicle).ThenInclude(v => v.Driver)
             .FirstOrDefault(t => t.Id == sessionVm.TripId);
 
-        if (trip == null)
-        {
-            HttpContext.Session.SetString(SESSION_ERROR, "Trip unavailable.");
-            return RedirectToAction("Index", "Home");
-        }
-
-        sessionVm.Trip = trip;
-
-        if (sessionVm.Passengers.Count == 0)
-        {
-            HttpContext.Session.SetString(SESSION_ERROR, "No seats selected.");
-            return RedirectToAction("Book", new { id = sessionVm.TripId });
-        }
+        if (sessionVm.Trip == null) return RedirectToAction("Index", "Home");
 
         return View(sessionVm);
     }
 
-    // Step 2: Review and Pay (POST) - Saves data to Session and moves to Payment
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public IActionResult ReviewAndPay(BookingVM vm)
     {
         var sessionVm = HttpContext.Session.Get<BookingVM>(SESSION_BOOKING_PROCESS_VM);
-        if (sessionVm == null)
-            return RedirectToAction("Index", "Home");
+        if (sessionVm == null) return RedirectToAction("Index", "Home");
 
-        // Sync Data
+        // 同步数据
         sessionVm.ContactEmail = vm.ContactEmail;
         sessionVm.ContactPhone = vm.ContactPhone;
         sessionVm.HasTravelInsurance = vm.HasTravelInsurance;
         sessionVm.HasBoardingPass = vm.HasBoardingPass;
         sessionVm.Passengers = vm.Passengers;
 
-        if (!ModelState.IsValid)
+        // 🛠️ 手动移除那些在当前页面没有输入、但会导致验证失败的错误
+        ModelState.Remove("PaymentMethod");
+        ModelState.Remove("CardNumber");
+        ModelState.Remove("ExpiryDate");
+        ModelState.Remove("CVV");
+        ModelState.Remove("Trip"); // 虽有 ValidateNever 但手动移除更保险
+
+        if (ModelState.IsValid)
         {
-            sessionVm.Trip = db.Trips.Include(t => t.Route).FirstOrDefault(t => t.Id == sessionVm.TripId);
-            return View(sessionVm);
+            sessionVm.Trip = null;
+            HttpContext.Session.Set(SESSION_BOOKING_PROCESS_VM, sessionVm);
+            // ✅ 验证通过后，将成功重定向到 Payment 页面
+            return RedirectToAction("Payment");
         }
 
-        // Save updated data to session
-        sessionVm.Trip = null; // Clear circular reference
-        HttpContext.Session.Set(SESSION_BOOKING_PROCESS_VM, sessionVm);
-
-        return RedirectToAction("Payment");
+        // ❌ 如果还是验证失败，重新加载 Trip 返回 View
+        sessionVm.Trip = db.Trips.Include(t => t.Route).FirstOrDefault(t => t.Id == sessionVm.TripId);
+        return View(sessionVm);
     }
 
-    // Step 3: Payment (GET)
+    // STEP 3: Payment (GET)
     [HttpGet]
     public IActionResult Payment()
     {
         var sessionVm = HttpContext.Session.Get<BookingVM>(SESSION_BOOKING_PROCESS_VM);
-        if (sessionVm == null)
-            return RedirectToAction("Index", "Home");
+        if (sessionVm == null) return RedirectToAction("Index", "Home");
 
+        // 加载支付页面所需数据
         sessionVm.Trip = db.Trips.Include(t => t.Route).FirstOrDefault(t => t.Id == sessionVm.TripId);
 
         return View(sessionVm);
     }
 
-    // Step 3: Process Payment (POST) - Finalizes Booking and Saves to DB
+    // STEP 3: 处理最终支付 (POST)
     [HttpPost]
     public IActionResult ProcessPayment()
     {
         var sessionVm = HttpContext.Session.Get<BookingVM>(SESSION_BOOKING_PROCESS_VM);
-        if (sessionVm == null)
-            return Json(new { success = false, message = "Session Expired" });
+        if (sessionVm == null) return Json(new { success = false });
 
+        using var transaction = db.Database.BeginTransaction();
         try
         {
-            // 1. Create Booking
             var newBooking = new Booking
             {
                 BookingReference = hp.GenerateBookingRef(),
                 TripId = sessionVm.TripId,
-                MemberId = User.Identity?.Name ?? "Guest",
+                MemberEmail = User.Identity?.Name,
                 Status = "Paid",
                 TotalAmount = sessionVm.FinalTotal,
                 CreatedAt = DateTime.Now,
-                BookingDate = DateTime.Now,
-                NumberOfSeats = sessionVm.Passengers.Count
+                NumberOfSeats = sessionVm.Passengers.Count // 记录座位数
             };
 
             db.Bookings.Add(newBooking);
-            db.SaveChanges(); // Save to get Booking ID
+            db.SaveChanges();
 
-            // 2. Create Passengers
-            if (sessionVm.Passengers != null)
+            // 🛠️ 关键：将每个乘客和座位保存到数据库
+            foreach (var p in sessionVm.Passengers)
             {
-                foreach (var pvm in sessionVm.Passengers)
+                db.Passengers.Add(new Passenger
                 {
-                    var passenger = new Passenger
-                    {
-                        BookingId = newBooking.Id,
-                        Name = pvm.Name,
-                        Age = pvm.Age,
-                        SeatNumber = pvm.SeatNumber,
-                        TicketType = pvm.TicketType
-                    };
-                    db.Passengers.Add(passenger);
-                }
-                db.SaveChanges();
+                    BookingId = newBooking.Id,
+                    Name = p.Name,
+                    Age = p.Age,
+                    SeatNumber = p.SeatNumber,
+                    TicketType = p.TicketType
+                });
             }
+            db.SaveChanges();
+            transaction.Commit();
 
-            HttpContext.Session.Set(SESSION_BOOKING_SEATS,
-                sessionVm.Passengers.ToDictionary(p => p.SeatNumber, p => p.Name));
-
-            HttpContext.Session.SetString(SESSION_SUCCESS, "Payment Successful!");
             HttpContext.Session.Remove(SESSION_BOOKING_PROCESS_VM);
-
-            // Return Success with Redirect URL
-            return Json(new { success = true, redirectUrl = Url.Action("Confirmation", new { @ref = newBooking.BookingReference }) });
+            return Json(new { success = true });
         }
         catch (Exception ex)
         {
+            transaction.Rollback();
             return Json(new { success = false, message = ex.Message });
         }
     }
 
+
+    // 查看订单列表
     [HttpGet]
-    public IActionResult Confirmation(string @ref)
+    public IActionResult BookingList()
     {
-        var booking = db.Bookings
-            .Include(b => b.Trip).ThenInclude(t => t.Route)
-            .Include(b => b.Trip).ThenInclude(t => t.Vehicle).ThenInclude(v => v.Driver)
-            .FirstOrDefault(b => b.BookingReference == @ref);
+        var userEmail = User.Identity?.Name;
+        if (string.IsNullOrEmpty(userEmail)) return RedirectToAction("Login", "Account");
 
-        var seatsData = HttpContext.Session.Get<Dictionary<string, string>>(SESSION_BOOKING_SEATS);
-        HttpContext.Session.Remove(SESSION_BOOKING_SEATS);
+        // 使用 LINQ 投影 (Projection) 直接填充你的新模型
+        var bookings = db.Bookings
+            .Include(b => b.Trip).ThenInclude(t => t.Route) // 确保预加载关联数据
+            .Where(b => b.MemberEmail == userEmail)
+            .OrderByDescending(b => b.CreatedAt)
+            .Select(b => new BookingListVM
+            {
+                BookingId = b.Id,
+                BookingReference = b.BookingReference,
+                Status = b.Status,
+                TotalAmount = b.TotalAmount,
+                NumberOfSeats = b.NumberOfSeats,
+                CreatedAt = b.CreatedAt,
+                // 这里的导航属性必须在 DB.cs 中定义好 virtual
+                Origin = b.Trip.Route.Origin,
+                Destination = b.Trip.Route.Destination,
+                DepartureTime = b.Trip.DepartureTime
+            })
+            .ToList();
 
-        if (booking == null)
-        {
-            return RedirectToAction("Index", "Home");
-        }
-
-        ViewBag.SeatsData = seatsData;
-        return View(booking);
+        return View(bookings);
     }
 
+    // 取消订单
     [HttpPost]
     public IActionResult CancelBooking(int id)
     {
         var booking = db.Bookings.Find(id);
-        if (booking != null && booking.MemberId == User.Identity.Name)
+        if (booking != null && booking.MemberEmail == User.Identity.Name)
         {
-            booking.Status = "Cancelled";
+            // 将状态改为 Refund Pending，这样 Admin 才能看到审批按钮
+            booking.Status = "Refund Pending";
             db.SaveChanges();
+
+            TempData["RefundMessage"] = "Refund money will be processed in 1-3 working days.";
         }
-        return RedirectToAction("Index");
+        return RedirectToAction("BookingList");
     }
+
+
+    [HttpGet]
+    public IActionResult GetBookingDetails(int id)
+    {
+        var userEmail = User.Identity?.Name;
+
+        // 💡 确保查询逻辑正确：根据 BookingId 查找该订单下的所有乘客姓名
+        var passengers = db.Passengers
+            .Include(p => p.Booking)
+            .Where(p => p.BookingId == id && p.Booking.MemberEmail == userEmail)
+            .Select(p => new {
+                p.Name
+            })
+            .ToList();
+
+        if (passengers == null || !passengers.Any()) return NotFound();
+
+        return Json(passengers);
+    }
+
 }

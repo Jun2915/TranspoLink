@@ -1,0 +1,125 @@
+﻿/* 容器与背景 */
+.booking-list-container {
+    background-color: #f8faff;
+    min-height: 100vh;
+}
+
+/* 现代化表格容器 */
+.table-responsive-custom {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.03); /* 柔和的阴影 */
+    padding: 15px;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+/* 表格标题行样式 */
+.custom-table thead th {
+    border: none;
+    color: #8c98a4;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 20px 15px;
+    letter-spacing: 0.5px;
+}
+
+/* 表格行样式 */
+.custom-table tbody tr {
+    transition: background 0.2s ease;
+}
+
+    .custom-table tbody tr:hover {
+        background-color: #fcfdfe;
+    }
+
+.custom-table tbody td {
+    border-bottom: 1px solid #f1f4f8;
+    padding: 18px 15px;
+    vertical-align: middle;
+}
+
+/* 状态标签样式基础 */
+.status-badge {
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    display: inline-block;
+    border: 1px solid transparent;
+}
+
+    /* 状态颜色定义  */
+    .status-badge.paid {
+        background-color: #e6f7ff;
+        color: #1890ff;
+        border-color: #91d5ff;
+    }
+
+    .status-badge.cancelled {
+        background-color: #fff1f0;
+        color: #f5222d;
+        border-color: #ffa39e;
+    }
+
+    .status-badge.refund-pending {
+        background-color: #fff7e6;
+        color: #faad14;
+        border-color: #ffe58f;
+        animation: pulse-orange 2s infinite; /* 呼吸灯特效，提醒审批 */
+    }
+
+    .status-badge.refunded {
+        background-color: #f6ffed;
+        color: #52c41a;
+        border-color: #b7eb8f;
+    }
+
+/* 审批按钮设计  */
+.btn-approve-custom {
+    background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+    color: white !important;
+    border: none;
+    box-shadow: 0 4px 10px rgba(40, 167, 69, 0.2);
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+
+    .btn-approve-custom:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(40, 167, 69, 0.3);
+    }
+
+.btn-reject-custom {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    color: white !important;
+    border: none;
+    box-shadow: 0 4px 10px rgba(220, 53, 69, 0.2);
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+
+    .btn-reject-custom:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(220, 53, 69, 0.3);
+    }
+
+/* 呼吸灯动画：让 Pending Approval 更显眼 */
+@keyframes pulse-orange {
+    0% {
+        box-shadow: 0 0 0 0 rgba(250, 173, 20, 0.4);
+    }
+
+    70% {
+        box-shadow: 0 0 0 6px rgba(250, 173, 20, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(250, 173, 20, 0);
+    }
+}
+
+/* 辅助文字样式 */
+.x-small {
+    font-size: 0.65rem;
+}

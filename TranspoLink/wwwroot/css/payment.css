@@ -1,6 +1,7 @@
-﻿.payment-container {
-    padding: 50px 0;
-    background: #f4f4f4;
+﻿/* 基础背景与容器 */
+.payment-container {
+    padding: 40px 0;
+    background: #f8f9fa; /* 浅灰色背景，让白色卡片更突出 */
     min-height: 80vh;
 }
 
@@ -19,85 +20,116 @@
     flex: 1;
 }
 
+/* 支付方式卡片 - 还原图片中的圆角阴影效果 */
 .pay-method-box {
     background: white;
-    border-radius: 8px;
-    padding: 20px;
+    border-radius: 12px;
+    padding: 24px;
     margin-bottom: 20px;
-    border: 2px solid transparent;
-    transition: 0.3s;
+    border: 1.5px solid #eee; /* 默认浅色边框 */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
 }
 
+    /* 激活状态：匹配图片中的蓝色系 */
     .pay-method-box.active {
-        border-color: #d84e55;
+        border-color: #7d97f4;
+        box-shadow: 0 4px 15px rgba(125, 151, 244, 0.15);
     }
 
 .pay-header {
     font-size: 18px;
-    font-weight: bold;
+    font-weight: 600;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
+    color: #333;
 }
 
-.pay-content {
+/* 重点：还原图片中的现代输入框 (Modern Input) */
+.input-group {
     margin-top: 20px;
 }
 
-.input-group {
-    margin-bottom: 15px;
+.modern-input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1.5px solid #eee; /* 初始边框颜色较浅 */
+    border-radius: 8px;
+    font-size: 16px;
+    color: #333;
+    transition: all 0.2s ease;
+    outline: none;
+    background: #fff;
+    box-sizing: border-box;
 }
 
-    .input-group label {
-        display: block;
-        margin-bottom: 5px;
-        color: #666;
+    /* 输入框获得焦点时的蓝色外边框 - 完美还原图片 */
+    .modern-input:focus {
+        border-color: #7d97f4;
+        box-shadow: 0 0 0 3px rgba(125, 151, 244, 0.1);
     }
 
-    .input-group input {
-        width: 100%;
-        padding: 12px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-    }
-
+/* 输入框行布局 */
 .input-row {
     display: flex;
     gap: 15px;
+    margin-top: 15px;
 }
 
-.mock-qr {
-    width: 200px;
-    height: 200px;
-    background: #222;
-    color: #00ff00;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 20px auto;
-    font-size: 24px;
-    border-radius: 10px;
-    border: 5px solid #fff;
+.half {
+    width: 50%;
 }
 
+/* 分割线 */
+.divider {
+    border: 0;
+    border-top: 1px solid #f0f0f0;
+    margin: 20px 0;
+}
+
+/* 右侧价格卡片 */
 .price-summary {
     background: white;
     padding: 25px;
-    border-radius: 8px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     position: sticky;
     top: 20px;
 }
 
+    .price-summary h4 {
+        margin-bottom: 15px;
+        font-weight: bold;
+    }
+
+.total-price {
+    font-size: 24px;
+    color: #ff4d4f; /* 醒目的红色价格 */
+    font-weight: bold;
+}
+
+/* 红色确认按钮 - 匹配图片 */
 .confirm-btn {
-    background: #ff4d4f; /* 匹配图片红色 */
+    background: #ff4d4f;
     color: white;
     width: 100%;
-    padding: 15px;
+    padding: 16px;
     border: none;
     border-radius: 8px;
     font-weight: bold;
     font-size: 16px;
     cursor: pointer;
     margin-top: 20px;
+    transition: background 0.3s ease;
 }
+
+    .confirm-btn:hover {
+        background: #e6393b;
+    }
+
+    .confirm-btn:disabled {
+        background: #ffa39e;
+        cursor: not-allowed;
+    }

@@ -1,0 +1,236 @@
+﻿/* 容器布局 */
+.booking-list-container {
+    max-width: 900px;
+    margin: 50px auto;
+    padding: 0 20px;
+}
+
+.list-header {
+    margin-bottom: 30px;
+}
+
+/* 退款提示框 - 现代化设计 */
+.refund-alert {
+    background: #fffbe6;
+    border: 1px solid #ffe58f;
+    border-radius: 8px;
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+    animation: slideIn 0.5s ease;
+}
+
+/* 订单卡片设计 */
+.booking-card {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05); /* 与支付页一致的阴影 */
+    border: 1px solid #eee;
+    transition: transform 0.2s;
+}
+
+    .booking-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+    }
+
+.cancelled-card {
+    background: #fafafa;
+    border-style: dashed;
+}
+
+/* 路由信息样式 */
+.route-info {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 10px 0;
+    color: #333;
+}
+
+.city {
+    color: #2c3e50;
+}
+
+.arrow {
+    color: #7d97f4;
+    margin: 0 10px;
+}
+
+/* 状态标签 */
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+    .status-badge.paid {
+        background: #e6f7ff;
+        color: #1890ff;
+    }
+
+    .status-badge.cancelled {
+        background: #fff1f0;
+        color: #f5222d;
+    }
+
+/* 取消按钮链接感设计 */
+.btn-cancel-link {
+    background: none;
+    border: none;
+    color: #ff4d4f;
+    text-decoration: underline;
+    font-size: 0.9rem;
+    cursor: pointer;
+    padding: 0;
+    margin-top: 10px;
+}
+
+    .btn-cancel-link:hover {
+        color: #cf1322;
+    }
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+body {
+    background-color: #f8faff;
+}
+
+/* 现代化表格容器 - 参考参考图 image_80ee8a */
+.table-responsive-custom {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.03);
+    padding: 10px;
+    border: 1px solid rgba(0,0,0,0.02);
+}
+
+.custom-table {
+    margin-bottom: 0;
+}
+
+    .custom-table thead th {
+        border: none;
+        color: #8c98a4;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        padding: 20px 15px;
+        letter-spacing: 0.5px;
+    }
+
+    .custom-table tbody td {
+        border-bottom: 1px solid #f8f9fa;
+        padding: 20px 15px;
+        vertical-align: middle;
+        font-weight: 600;
+        color: #1e2022;
+    }
+
+/* 城市路线样式优化 */
+.route-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.city-name {
+    font-weight: 700;
+}
+
+.destination-highlight {
+    color: #6777ef; /* 现代化蓝色 */
+}
+
+/* 动作按钮样式 - 参考 image_80ee8a */
+.btn-action-group {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.btn-details-custom {
+    background-color: #6777ef;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 16px;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+}
+
+    .btn-details-custom:hover {
+        background-color: #4e5ed4;
+        box-shadow: 0 4px 12px rgba(103, 119, 239, 0.3);
+        color: white;
+    }
+
+.btn-delete-custom {
+    background-color: #ff5252;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 16px;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+}
+
+    .btn-delete-custom:hover {
+        background-color: #e64545;
+        box-shadow: 0 4px 12px rgba(255, 82, 82, 0.3);
+        color: white;
+    }
+/* 状态标签配色方案 */
+.status-badge.paid {
+    background-color: #e6f7ff;
+    color: #1890ff;
+}
+
+.status-badge.cancelled {
+    background-color: #fff1f0;
+    color: #f5222d;
+}
+
+/* 🔴 新增：退款中与已退款 */
+.status-badge.refund-pending {
+    background-color: #fff7e6;
+    color: #faad14; /* 橙色，警示 Admin 需要操作 */
+    border: 1px solid #ffe58f;
+}
+
+.status-badge.refunded {
+    background-color: #f6ffed;
+    color: #52c41a; /* 绿色，表示退款流程结束 */
+}
+.modal-sm {
+    max-width: 300px; /* 限制宽度，使其更像小卡片 */
+}
+
+.modal-content {
+    overflow: hidden; /* 确保圆角效果 */
+}
+
+.status-badge.cancelled {
+    background-color: #ffe5e5;
+    color: #ff5252;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}

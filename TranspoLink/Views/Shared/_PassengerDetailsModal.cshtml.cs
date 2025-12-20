@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace TranspoLink.Views.Booking
+namespace TranspoLink.Views.Shared
 {
-    public class ConfirmationModel : PageModel
+    public class _PassengerDetailsModalModel : PageModel
     {
         public void OnGet()
         {

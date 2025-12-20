@@ -157,6 +157,7 @@ public class SeatSelectionVM
     public List<string> SelectedSeats { get; set; } = new List<string>();
 
     public string? MemberId { get; set; }
+    public string? MemberEmail { get; set; }
 }
 
 public class PassengerVM
@@ -181,7 +182,7 @@ public class BookingVM
     public bool HasRefundGuarantee { get; set; }
     public bool HasBoardingPass { get; set; } = true;
     public string PaymentMethod { get; set; }
-
+    
     public decimal InsurancePrice { get; set; } = 2.00M;
     public decimal RefundGuaranteePrice { get; set; } = 4.00M;
     public decimal BoardingPassPrice { get; set; } = 1.00M;

@@ -1,183 +1,106 @@
 ﻿@model TranspoLink.Models.BookingVM
-@using System.Globalization
-
 @{
-    var trip = Model.Trip;
-    var origin = trip?.Route?.Origin ?? "N/A";
-    var destination = trip?.Route?.Destination ?? "N/A";
-    ViewBag.Title = $"Review & Pay | {origin} ➝ {destination}";
+    ViewBag.Title = "Payment";
 }
-
 @section head {
     <link rel="stylesheet" href="/css/RNT.css" asp-append-version="true" />
     <link rel="stylesheet" href="/css/RAP.css" asp-append-version="true" />
+    <link rel="stylesheet" href="/css/payment.css" asp-append-version="true" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 }
 
-@* --- 步骤指示器 (Stepper) --- *@
+@* 步骤指示器：现在 3. Payment 是激活状态 *@
 <div class="stepper-header-container">
     <div class="stepper-header">
         <ol>
             <li class="active-step">
-                <a asp-controller="Booking" asp-action="Book" asp-route-id="@Model.TripId" style="text-decoration: none; color: inherit;">
+                @* 链接回第 1 步：选座 *@
+                <a asp-controller="Booking"
+                   asp-action="Book"
+                   asp-route-id="@Model.TripId"
+                   style="text-decoration: none; color: inherit;">
                     1. Select seats
                 </a>
             </li>
-            <li class="current-step">2. Passenger Information</li>
-            <li class="disabled-step">3. Payment</li>
+            <li class="active-step">
+                @* 🛠️ 新增：链接回第 2 步：个人信息详情 *@
+                <a asp-controller="Booking"
+                   asp-action="ReviewAndPay"
+                   style="text-decoration: none; color: inherit;">
+                    2. Passenger Information
+                </a>
+            </li>
+            <li class="current-step">3. Payment</li>
         </ol>
     </div>
 </div>
 
-<form method="post" id="reviewForm" asp-controller="Booking" asp-action="ReviewAndPay">
-    @Html.AntiForgeryToken()
+<div class="booking-container rap-main-content">
+    <div class="booking-left rap-left-column">
+        <h3 class="payment-title">Select Payment Method</h3>
 
+        <div class="payment-selection-card">
+            <div class="method-group active">
+                <label class="radio-label">
+                    <input type="radio" name="payMethod" value="Card" checked>
+                    <span class="custom-radio"></span>
+                    Credit/Debit card
+                </label>
 
-    <input type="hidden" asp-for="TripId" />
-
-    <div class="booking-container rap-main-content">
-        <div class="booking-left rap-left-column">
-            <h3 class="section-title card-title">Contact details</h3>
-            <div class="rnt-card form-section">
-                <div class="form-group">
-                    <input asp-for="ContactEmail" class="rnt-input" placeholder="Email ID *" />
-                    <span asp-validation-for="ContactEmail" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <div class="input-group">
-                        <span class="country-code">+60 (MY)</span>
-                        <input asp-for="ContactPhone" class="rnt-input" placeholder="Phone *" />
+                <div id="card-fields" class="method-details">
+                    <div class="input-wrapper">
+                        <input type="text" id="cardNumber" class="modern-input"
+                               placeholder="xxxx xxxx xxxx xxxx" maxlength="19">
                     </div>
-                    <span asp-validation-for="ContactPhone" class="text-danger"></span>
+
+                    <div class="input-row">
+                        <div class="input-wrapper half">
+                            <input type="text" id="expiry" class="modern-input"
+                                   placeholder="MM/YY" maxlength="5">
+                        </div>
+                        <div class="input-wrapper half">
+                            <input type="password" id="cvv" class="modern-input"
+                                   placeholder="CVV" maxlength="3">
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <h3 class="section-title card-title">Passenger details</h3>
-            @if (Model.Passengers != null && Model.Passengers.Count > 0)
-            {
-                @for (int i = 0; i < Model.Passengers.Count; i++)
-                {
-                    <div class="rnt-card passenger-card" style="margin-bottom: 20px;">
-                        <div class="card-header">
-                            <h4>Passenger @(i + 1)</h4>
-                            <span class="seat-info">Seat @Model.Passengers[i].SeatNumber</span>
-                            <input type="hidden" asp-for="Passengers[i].SeatNumber" />
-                            <input type="hidden" asp-for="Passengers[i].TicketType" value="Adult" />
-                        </div>
-                        <div class="form-group">
-                            <input asp-for="Passengers[i].Name" class="rnt-input" placeholder="Name *" />
-                            <span asp-validation-for="Passengers[i].Name" class="text-danger"></span>
-                        </div>
-                        <div class="form-group">
-                            <input asp-for="Passengers[i].Age" type="number" class="rnt-input" placeholder="Age *" min="1" max="100" />
-                            <span asp-validation-for="Passengers[i].Age" class="text-danger"></span>
-                        </div>
-                    </div>
-                }
-            }
-            else
-            {
-                <div class="alert alert-danger">乘客信息丢失，请返回重新选择座位。</div>
-            }
+            <hr class="divider" />
 
-            @* 3. 旅行保险 *@
-            <h3 class="section-title card-title">Travel Insurance</h3>
-            <div class="rnt-card insurance-card">
-                <div class="toggle-options">
-                    <label class="toggle-option insurance-yes">
-                        <input type="radio" asp-for="HasTravelInsurance" value="true" />
-                        <div class="toggle-text">
-                            <p>Yes, Protect my trip at RM @Model.InsurancePrice.ToString("N2") (per passenger)</p>
-                        </div>
-                    </label>
-                    <label class="toggle-option insurance-no">
-                        <input type="radio" asp-for="HasTravelInsurance" value="false" />
-                        <div class="toggle-text">
-                            <h5>No, I would like to proceed without insurance</h5>
-                        </div>
+            <h4 class="payment-title">Third-Party Payment Method</h4>
+            <div class="pay-method-box" id="tng-section">
+                <div class="pay-header">
+                    <label>
+                        <input type="radio" name="payMethod" value="TNG">
+                        <span>TNG eWallet</span> 
                     </label>
                 </div>
-            </div>
 
-            @* 4. 登车费 *@
-            <h3 class="section-title card-title">Boarding pass</h3>
-            <div class="rnt-card boarding-pass-card">
-                <p class="pass-info">Boarding pass & facility charges are collected on behalf of the terminal.</p>
-                <div class="toggle-switch-container">
-                    <span>Add Boarding Pass</span>
-                    <label class="switch">
-                        <input type="checkbox" asp-for="HasBoardingPass" id="hasBoardingPass" />
-                        <span class="slider round"></span>
-                    </label>
-                </div>
-                <p class="guarantee-cost">RM @Model.BoardingPassPrice.ToString("N2") x @(Model.Passengers?.Count ?? 0) pax</p>
-            </div>
-        </div>
-
-        <div class="booking-right rap-right-column">
-            <div class="rnt-card trip-summary-fixed price-summary-card">
-                <div class="trip-info">
-                    <h5 class="card-title">@origin → @destination</h5>
-                    <div class="info-row">
-                        <span class="info-label">Departure</span>
-                        <span class="info-value">@trip?.DepartureTime.ToString("dd MMM yyyy, HH:mm")</span>
+                <div id="tng-fields" style="display:none; text-align:center; padding:20px;">
+                    <div id="qrcode-container" style="display: flex; justify-content: center; margin: 10px auto;">
+                        @* 二维码将由 JS 渲染到这里 *@
                     </div>
-                    <div class="info-row">
-                        <span class="info-label">Selected Seats</span>
-                        <span class="info-value">@(Model.Passengers != null ? string.Join(", ", Model.Passengers.Select(p => p.SeatNumber)) : "")</span>
-                    </div>
-                </div>
-
-                <div class="fare-breakdown">
-                    <h4 class="breakdown-title">Fare Breakdown</h4>
-                    <div class="breakdown-row">
-                        <span class="breakdown-label">Base Fare (@(Model.Passengers?.Count ?? 0) seats)</span>
-                        <span class="breakdown-value" id="fare-base">RM @Model.TotalBaseFare.ToString("N2")</span>
-                    </div>
-
-                    <div class="breakdown-row insurance-row" style="@(Model.HasTravelInsurance ? "" : "display:none;")">
-                        <span class="breakdown-label">Insurance Fee</span>
-                        <span class="breakdown-value" id="fare-insurance">RM @Model.TotalInsuranceFee.ToString("N2")</span>
-                    </div>
-
-                    <div class="breakdown-row boarding-pass-row" style="@(Model.HasBoardingPass ? "" : "display:none;")">
-                        <span class="breakdown-label">Boarding Pass Fee</span>
-                        <span class="breakdown-value" id="fare-boardingpass">RM @Model.TotalBoardingPassFee.ToString("N2")</span>
-                    </div>
-                </div>
-
-                <div class="breakdown-total">
-                    <span class="total-label">Total Amount</span>
-                    <span class="total-value" id="finalTotal">RM @Model.FinalTotal.ToString("N2")</span>
-                </div>
-
-                <div class="pay-button-fixed">
-
-                    <button type="submit" class="btn-rnt btn-rnt-danger pay-now-btn">
-                        <span class="btn-text">Pay Now</span>
-                        <span class="btn-amount">RM @Model.FinalTotal.ToString("N2")</span>
-                    </button>
+                    <p style="margin-top: 15px; font-weight: bold; color: #6610f2;">Please scan to complete payment</p> 
                 </div>
             </div>
         </div>
     </div>
-</form>
 
-@section scripts {
-    <script src="/js/jquery.min.js"></script>
-    @* 引入验证库 *@
-    <script src="/js/jquery.validate.min.js"></script>
-    <script src="/js/jquery.validate.unobtrusive.min.js"></script>
+    <div class="booking-right rap-right-column">
+        <div class="rnt-card price-summary-card">
+            <h4>Fare Breakdown</h4>
+            <div class="info-row">
+                <span>Total Amount</span>
+                <span class="total-price">RM @Model.FinalTotal.ToString("N2")</span> 
+            </div>
+            <button type="button" id="finalPayBtn" class="confirm-btn">
+                Confirm Payment
+            </button> 
+        </div>
+    </div>
+</div>
 
-    @* --- 关键部分：定义 window.bookingData --- *@
-    <script>
-        window.bookingData = {
-            basePricePerTicket: parseFloat('@Model.BasePricePerTicket.ToString("F2")'),
-            insurancePrice: parseFloat('@Model.InsurancePrice.ToString("F2")'),
-            refundGuaranteePrice: parseFloat('@Model.RefundGuaranteePrice.ToString("F2")'),
-            boardingPassPrice: parseFloat('@Model.BoardingPassPrice.ToString("F2")'),
-            passengerCount: parseInt('@(Model.Passengers?.Count ?? 0)')
-        };
-        console.log("Booking Data Initialized:", window.bookingData);
-    </script>
-    <script src="/js/RAP.js" asp-append-version="true"></script>
+@section Scripts {
+    <script src="/js/payment.js"></script>
 }

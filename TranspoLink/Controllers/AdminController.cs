@@ -422,7 +422,7 @@ public class AdminController(DB db, Helper hp) : Controller
             return RedirectToAction("Members");
         }
 
-        if (db.Bookings.Any(b => b.MemberId == member.Id))
+        if (db.Bookings.Any(b => b.MemberEmail == member.Id))
         {
             TempData["Info"] = "Cannot delete member with existing bookings.";
             return RedirectToAction("Members");
@@ -467,34 +467,6 @@ public class AdminController(DB db, Helper hp) : Controller
     // ============================================================================
     // BOOKING MANAGEMENT
     // ============================================================================
-
-    public IActionResult Bookings(string status = "", int page = 1)
-    {
-        var query = db.Bookings
-            .Include(b => b.Member)
-            .Include(b => b.Trip)
-            .ThenInclude(t => t.Route)
-            .AsQueryable();
-
-        if (!string.IsNullOrEmpty(status))
-        {
-            query = query.Where(b => b.Status == status);
-        }
-
-        ViewBag.SelectedStatus = status;
-
-        int pageSize = 20;
-        var bookings = query
-            .OrderByDescending(b => b.BookingDate)
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToList();
-
-        ViewBag.TotalPages = (int)Math.Ceiling(query.Count() / (double)pageSize);
-        ViewBag.CurrentPage = page;
-
-        return View(bookings);
-    }
 
     public IActionResult BookingDetails(int id)
     {
@@ -617,5 +589,60 @@ public class AdminController(DB db, Helper hp) : Controller
         ViewBag.MonthlyRevenue = monthlyRevenue;
 
         return View();
+    }
+    // 审批退款：确认退款并标记
+    [HttpPost]
+    public IActionResult ApproveRefund(int id)
+    {
+        var booking = db.Bookings.Include(b => b.Trip).FirstOrDefault(b => b.Id == id);
+        if (booking != null && booking.Status == "Refund Pending")
+        {
+            booking.Status = "Refunded"; // 对应前端显示的 Refund Successful [cite: 101]
+            if (booking.Trip != null)
+            {
+                booking.Trip.AvailableSeats += booking.NumberOfSeats; // 释放座位 [cite: 101]
+        }
+            db.SaveChanges();
+        TempData["Info"] = "Refund approved and seats released."; 
+    }
+        return RedirectToAction("Bookings");
+    }
+
+    [HttpPost]
+    public IActionResult RejectRefund(int id)
+    {
+        var booking = db.Bookings.Find(id);
+        if (booking != null && booking.Status == "Refund Pending")
+        {
+            booking.Status = "Paid"; 
+            db.SaveChanges();
+             TempData["Info"] = "Refund request rejected. Ticket remains valid.";
+    }
+        return RedirectToAction("Bookings");
+    }
+
+    // 全局订单列表入口
+    [Authorize(Roles = "Admin")]
+    public IActionResult Bookings()
+    {
+        var allBookings = db.Bookings
+            .Include(b => b.Trip).ThenInclude(t => t.Route)
+            .OrderByDescending(b => b.CreatedAt)
+            .Select(b => new BookingListVM
+            {
+                BookingId = b.Id,
+                BookingReference = b.BookingReference,
+                Status = b.Status,
+                TotalAmount = b.TotalAmount,
+                NumberOfSeats = b.NumberOfSeats,
+                CreatedAt = b.CreatedAt,
+                Origin = b.Trip.Route.Origin,
+                Destination = b.Trip.Route.Destination,
+                DepartureTime = b.Trip.DepartureTime,
+                MemberEmail = b.MemberEmail
+            })
+            .ToList();
+
+        return View(allBookings);
     }
 }

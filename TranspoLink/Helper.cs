@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using System.Net;
@@ -260,7 +261,26 @@ public class Helper(IWebHostEnvironment en,
     }
 
     public List<string> GetSeatsForBooking(int bookingId) => [];
-    public List<string> GetBookedSeatsForTrip(string tripId) => [""];
+    // Helper.cs
+    public List<string> GetBookedSeatsForVehicle(string tripId, DB db)
+    {
+        // 1. 先找到当前行程对应的车辆 ID 和出发时间
+        var currentTrip = db.Trips.FirstOrDefault(t => t.Id == tripId);
+        if (currentTrip == null) return new List<string>();
+
+        var vehicleId = currentTrip.VehicleId;
+        var tripDate = currentTrip.DepartureTime.Date;
+
+        // 2. 查找该车在该日期下，所有行程中已支付的座位号
+        return db.Passengers
+            .Include(p => p.Booking).ThenInclude(b => b.Trip)
+            .Where(p => p.Booking.Trip.VehicleId == vehicleId &&
+                        p.Booking.Trip.DepartureTime.Date == tripDate &&
+                        p.Booking.Status == "Paid")
+            .Select(p => p.SeatNumber)
+            .Distinct() // 去重
+            .ToList();
+    }
 
     public List<string> GenerateSeatLayout(int totalSeats)
     {

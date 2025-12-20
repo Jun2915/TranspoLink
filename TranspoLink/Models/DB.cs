@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -51,7 +52,7 @@ public class DB(DbContextOptions options) : DbContext(options)
 
         // Relationships
         modelBuilder.Entity<Booking>()
-            .HasOne(b => b.Member).WithMany(m => m.Bookings).HasForeignKey(b => b.MemberId).OnDelete(DeleteBehavior.Restrict);
+            .HasOne(b => b.Member).WithMany(m => m.Bookings).HasPrincipalKey(u => u.Email).HasForeignKey(b => b.MemberEmail).OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Booking>()
             .HasOne(b => b.Trip).WithMany(t => t.Bookings).HasForeignKey(b => b.TripId).OnDelete(DeleteBehavior.Restrict);
@@ -185,7 +186,10 @@ public class Vehicle
 public class Booking
 {
     [Key] public int Id { get; set; }
-    [MaxLength(5)] public string MemberId { get; set; }
+
+    [MaxLength(100)]
+    [DisplayName("User Email")]
+    public string MemberEmail { get; set; }
     [MaxLength(5)] public string TripId { get; set; }
     public DateTime BookingDate { get; set; } = DateTime.Now;
     public int NumberOfSeats { get; set; } = 1;
@@ -193,13 +197,16 @@ public class Booking
     [MaxLength(20)] public string Status { get; set; }
     public bool IsPaid { get; set; } = false;
     [MaxLength(50)] public string? BookingReference { get; set; }
+    [DisplayName("Total Amount")]
     public decimal TotalAmount { get; set; }
-    public DateTime CreatedAt { get; set; } = DateTime.Now;
 
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
+    [ForeignKey("MemberEmail")]
     public virtual Member Member { get; set; }
     public virtual Trip Trip { get; set; }
     public virtual ICollection<Passenger> Passengers { get; set; } = new List<Passenger>();
 }
+
 
 public class Passenger
 {
@@ -221,4 +228,23 @@ public class AuditLog
     public DateTime Timestamp { get; set; } = DateTime.Now;
     [MaxLength(10)] public string Icon { get; set; }
     [MaxLength(20)] public string CssClass { get; set; }
+}
+public class BookingListVM
+{
+    public int BookingId { get; set; }
+    public string? BookingReference { get; set; }
+    public string Status { get; set; }
+    public decimal TotalAmount { get; set; }
+    public int NumberOfSeats { get; set; }
+    public DateTime CreatedAt { get; set; }
+
+    // 路线信息 (来自 Route)
+    public string Origin { get; set; }
+    public string Destination { get; set; }
+
+    // 时间信息 (来自 Trip)
+    public DateTime DepartureTime { get; set; }
+
+    public string? MemberEmail { get; set; } // 用于 Admin 识别下单会员
+    public bool IsCancelled => Status == "Cancelled";
 }
