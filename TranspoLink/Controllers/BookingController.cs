@@ -220,10 +220,32 @@ public class BookingController(DB db, Helper hp) : Controller
 
     // STEP 3: 处理最终支付 (POST)
     [HttpPost]
-    public IActionResult ProcessPayment()
+    public IActionResult ProcessPayment(string expiryDate) // 接收前端传来的日期
     {
         var sessionVm = HttpContext.Session.Get<BookingVM>(SESSION_BOOKING_PROCESS_VM);
-        if (sessionVm == null) return Json(new { success = false });
+        if (sessionVm == null) return Json(new { success = false, message = "Session expired." });
+
+        // 🛠️ 后端日期验证逻辑
+        if (!string.IsNullOrEmpty(expiryDate) && expiryDate.Contains('/'))
+        {
+            try
+            {
+                var parts = expiryDate.Split('/');
+                int month = int.Parse(parts[0]);
+                int year = int.Parse("20" + parts[1]);
+
+                var now = DateTime.Now;
+                if (year < now.Year || (year == now.Year && month < now.Month))
+                {
+                    // 如果过期，返回特定标志以便前端刷新
+                    return Json(new { success = false, isExpired = true, message = "Card Expired. Re-booking required." });
+                }
+            }
+            catch
+            {
+                return Json(new { success = false, message = "Invalid date format." });
+            }
+        }
 
         using var transaction = db.Database.BeginTransaction();
         try

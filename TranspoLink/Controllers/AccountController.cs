@@ -285,6 +285,11 @@ public class AccountController(DB db,
                 {
                     ModelState.AddModelError("Input", "This Phone Number is already registered.");
                 }
+
+                if (ModelState.IsValid)
+                {
+                    email = $"phone_{phone.Replace("+", "").Replace(" ", "")}@transpolink.local";
+                }
             }
         }
 

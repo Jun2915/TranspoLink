@@ -71,17 +71,23 @@
     });
 
  
-    function processOrder() {
+    function processOrder(expiryDate = "") {
         const payBtn = $('#finalPayBtn');
         payBtn.prop('disabled', true).text("Processing...");
 
-        $.post('/Booking/ProcessPayment', function (res) {
+        // 向后端发送 expiryDate 进行二次校验
+        $.post('/Booking/ProcessPayment', { expiryDate: expiryDate }, function (res) {
             if (res.success) {
-                alert("Payment Successful! Scan recognized.");
+                alert("Payment Successful!");
                 window.location.href = '/Home/Index';
             } else {
                 alert("Payment failed: " + res.message);
-                payBtn.prop('disabled', false).text("Confirm Payment");
+                // 如果后端返回过期标志，则刷新页面
+                if (res.isExpired) {
+                    window.location.reload();
+                } else {
+                    payBtn.prop('disabled', false).text("Confirm Payment");
+                }
             }
         });
     }
@@ -95,10 +101,38 @@
                 alert("Please enter a valid 16-digit card number.");
                 return;
             }
-            processOrder();
+            const expiryVal = $('#expiry').val(); // 格式为 MM/YY
+            if (!/^\d{2}\/\d{2}$/.test(expiryVal)) {
+                alert("Please enter expiry date in MM/YY format.");
+                return;
+            }
+
+            const parts = expiryVal.split('/');
+            const month = parseInt(parts[0], 10);
+            const year = parseInt("20" + parts[1], 10); // 补全为 20XX 年
+
+            // 验证月份合法性
+            if (month < 1 || month > 12) {
+                alert("Invalid month! Please enter 01-12.");
+                return;
+            }
+
+            // 验证是否过期
+            const now = new Date();
+            const currentMonth = now.getMonth() + 1;
+            const currentYear = now.getFullYear();
+
+            if (year < currentYear || (year === currentYear && month < currentMonth)) {
+                alert("The card has expired. Please use a valid card.");
+                // 如果你希望在过期时刷新页面，取消下面这一行的注释：
+                // window.location.reload(); 
+                return;
+            }
+
+            processOrder(expiryVal); // 将有效期传给处理函数
         } else if (method === 'TNG') {
-            
             processOrder();
         }
     });
+           
 });

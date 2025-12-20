@@ -274,3 +274,30 @@ input:checked + .slider {
     font-weight: bold;
     font-size: 1.1em;
 }
+
+/* Background Setup */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Ensure this path is correct for your project */
+    background: url('../images/about_background.png') no-repeat center center;
+    background-size: cover;
+    opacity: 0.5;
+    z-index: -1;
+    pointer-events: none;
+    background-attachment: fixed;
+}
+
+.main-content {
+    flex-grow: 1;
+    min-width: 60%;
+}
+
+.sidebar {
+    width: 35%;
+    min-width: 350px;
+}
