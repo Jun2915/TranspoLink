@@ -106,7 +106,7 @@
                                     <a href="/RouteNTrip/RouteStop/@r.Id" class="btn-rnt btn-rnt-primary" style="padding: 6px 15px; font-size: 13px;">Manage Stops</a>
                                 </td>
                                 <td>
-                                    <form action="/Admin/DeleteRoute" method="post" onsubmit="return confirm('Delete route @r.Id?');">
+                                    <form action="/RouteNTrip/DeleteRoute" method="post" onsubmit="return confirm('Delete route @r.Id?');">
                                         <input type="hidden" name="id" value="@r.Id" />
                                         <button class="btn-rnt btn-rnt-danger" style="padding: 6px 15px; font-size: 13px;">Delete</button>
                                     </form>

@@ -1,0 +1,26 @@
+@model TranspoLink.Models.Booking
+
+<div class="container py-4">
+    <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-header bg-white py-3">
+            <h5 class="mb-0 fw-bold">Booking Details: #@Model.Id</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Customer Info</h6>
+                    <p>Name: @Model.Member.Name<br>Email: @Model.MemberEmail</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <h6>Total Amount</h6>
+                    <h3 class="text-primary">RM @Model.TotalAmount.ToString("N2")</h3>
+                </div>
+            </div>
+            <hr>
+            <h6>Trip: @Model.Trip.Route.Origin to @Model.Trip.Route.Destination</h6>
+            <p>Departure: @Model.Trip.DepartureTime.ToString("F")</p>
+            
+            <a href="/Admin/Bookings" class="btn btn-secondary mt-3">Back to List</a>
+        </div>
+    </div>
+</div>

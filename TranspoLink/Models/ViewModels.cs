@@ -235,3 +235,4 @@ public class DriverVM
     [Display(Name = "Profile Photo")] public IFormFile? Photo { get; set; }
     public string? ExistingPhotoURL { get; set; }
 }
+

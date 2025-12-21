@@ -1,4 +1,5 @@
-﻿@{
+﻿
+@{
     ViewBag.Title += " | Analytics";
 
     // Retrieve data from ViewBag
@@ -94,12 +95,30 @@
     </style>
 }
 
-<div class="admin-container">
-    <div class="admin-header">
+<div class="admin-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+    <div>
         <h1>📊 Analytics & Reports</h1>
         <p>Overview of revenue, popular routes, and business performance.</p>
     </div>
 
+    <form asp-controller="Admin" asp-action="DownloadMonthlyReport" method="get">
+        <button type="submit" class="btn-send-report" style="background: #2ed573; color: white; border: none; padding: 12px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.3s; box-shadow: 0 4px 12px rgba(46, 213, 115, 0.2);">
+            <i class="bi bi-file-earmark-spreadsheet-fill"></i>
+            <span>Download Excel Report</span>
+        </button>
+    </form>
+</div>
+
+<style>
+    .btn-send-report:hover {
+        background: #764ba2;
+        transform: translateY(-2px);
+    }
+
+    .btn-send-report:active {
+        transform: translateY(0);
+    }
+</style>
     <div class="report-grid">
 
         <div class="report-card">
@@ -134,6 +153,8 @@
             }
         </div>
 
+        
+
         <div class="report-card">
             <div class="report-header">
                 <span>🔥</span> Top 10 Popular Routes
@@ -166,6 +187,21 @@
             }
         </div>
 
+        <div class="report-grid">
+            <div class="report-card" style="border-left: 5px solid #2ed573;">
+                <div class="report-header"><span>💰</span> Confirmed Revenue</div>
+                <h2 style="color: #2ed573; margin: 0;">RM @ViewBag.TotalRevenue.ToString("N2")</h2>
+                <p style="color: #888; font-size: 13px; margin-top: 5px;">From @ViewBag.TotalTicketsSold paid tickets</p>
+            </div>
+
+            <div class="report-card" style="border-left: 5px solid #ff4757;">
+                <div class="report-header"><span>📉</span> Revenue Loss</div>
+                <h2 style="color: #ff4757; margin: 0;">RM @ViewBag.TotalLoss.ToString("N2")</h2>
+                <p style="color: #888; font-size: 13px; margin-top: 5px;">From @ViewBag.CancelledCount cancellations</p>
+            </div>
+
+        </div>
+
         <div class="report-card" style="grid-column: 1 / -1;">
             <div class="report-header">
                 <span>📈</span> Monthly Revenue (@DateTime.Now.Year)
@@ -176,7 +212,11 @@
                 {
                     // Find max value to scale bars
                     decimal maxRev = 0;
-                    foreach (var m in monthlyRevenue) { if (m.Revenue > maxRev) maxRev = m.Revenue; }
+                    foreach (var m in monthlyRevenue) 
+                    { 
+                        if (m.Revenue > maxRev) maxRev = m.Revenue;
+                    }
+
                     if (maxRev == 0) maxRev = 1; // Prevent division by zero
 
                     foreach (var item in monthlyRevenue)
@@ -196,6 +236,9 @@
                 }
             </div>
         </div>
-
+        
     </div>
 </div>
+
+    
+    

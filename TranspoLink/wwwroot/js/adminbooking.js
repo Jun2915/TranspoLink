@@ -1,26 +1,24 @@
-﻿// adminbooking.js
+﻿
 function showDetails(bookingId, ref) {
     const modalRef = document.getElementById('modalRef');
-    if (modalRef) modalRef.innerText = ref;
+    [cite_start]if (modalRef) modalRef.innerText = ref;
 
     const list = document.getElementById('passengerList');
     if (list) {
-        list.innerHTML = '<div class="text-center p-4"><div class="spinner-border text-primary" role="status"></div><p class="mt-2 mb-0">Loading manifest...</p></div>';
+        [cite_start]list.innerHTML = '<div class="text-center p-4"><div class="spinner-border text-primary" role="status"></div><p class="mt-2 mb-0">Loading manifest...</p></div>';[cite: 37]
     }
 
-    // 确保显示 Modal
     const modalElement = document.getElementById('detailsModal');
     if (modalElement) {
         const myModal = new bootstrap.Modal(modalElement);
-        myModal.show();
+        [cite_start]myModal.show();
     }
 
-    // 调用 API 获取详情
-    fetch('/Booking/GetBookingDetails/' + bookingId)
+    [cite_start]fetch('/Booking/GetBookingDetails/' + bookingId)
         .then(response => {
-            if (!response.ok) throw new Error('Failed to load passenger data');
-            return response.json();
-        })
+        if (!response.ok) throw new Error('Failed to load passenger data');
+        return response.json();
+    })
         .then(data => {
             if (!list) return;
             let html = '';
@@ -43,4 +41,27 @@ function showDetails(bookingId, ref) {
         .catch(error => {
             if (list) list.innerHTML = `<div class="alert alert-danger m-3 small">${error.message}</div>`;
         });
+}
+
+
+function handleReject(bookingId) {
+
+    let reason = prompt("Please enter the reason for rejection:");
+
+
+    if (reason === null) return;
+
+
+    if (reason.trim() === "") {
+       alert("You must provide a reason to reject the refund.");
+        return;
+    }
+
+    const reasonInput = document.getElementById('reason-' + bookingId);
+    const form = document.getElementById('rejectForm-' + bookingId);
+
+    if (reasonInput && form) {
+        reasonInput.value = reason;
+        form.submit();
+    }
 }

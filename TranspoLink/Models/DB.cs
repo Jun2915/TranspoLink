@@ -205,6 +205,8 @@ public class Booking
     public virtual Member Member { get; set; }
     public virtual Trip Trip { get; set; }
     public virtual ICollection<Passenger> Passengers { get; set; } = new List<Passenger>();
+    [MaxLength(255)]
+    public string? StatusNote { get; set; }
 }
 
 
@@ -238,13 +240,12 @@ public class BookingListVM
     public int NumberOfSeats { get; set; }
     public DateTime CreatedAt { get; set; }
 
-    // 路线信息 (来自 Route)
     public string Origin { get; set; }
     public string Destination { get; set; }
 
-    // 时间信息 (来自 Trip)
     public DateTime DepartureTime { get; set; }
 
+    public string? StatusNote { get; set; }
     public string? MemberEmail { get; set; } // 用于 Admin 识别下单会员
     public bool IsCancelled => Status == "Cancelled";
 }

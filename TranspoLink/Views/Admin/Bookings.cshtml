@@ -8,8 +8,11 @@
 
 <div class="container py-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold"><i class="bi bi-clipboard-data me-2"></i>Local Bookings</h2>
-        <div class="badge bg-indigo p-2 px-3 rounded-pill shadow-sm">Total: @Model.Count() Orders</div>
+        <h2 class="fw-bold"><i class="bi bi-currency-dollar me-2"></i>Manage Payment</h2>
+        <div class="d-flex gap-2">
+            <div class="badge bg-indigo p-2 px-3 rounded-pill shadow-sm">Total: @Model.Count() Orders</div>
+           
+        </div>
     </div>
 
     @if (TempData["Info"] != null)
@@ -22,12 +25,14 @@
 
     <div class="table-responsive-custom shadow-sm border-0 rounded-4 overflow-hidden bg-white p-2">
         <table class="table custom-table align-middle">
+
             <thead class="bg-light">
                 <tr class="text-secondary small fw-bold text-uppercase">
                     <th class="ps-4">Trip ID</th>
                     <th>Customer</th>
                     <th>Route</th>
                     <th>Departure</th>
+                    <th>Amount</th> 
                     <th class="text-center">Status</th>
                     <th class="text-end pe-4">Manage</th>
                 </tr>
@@ -37,78 +42,49 @@
                 {
                     <tr>
                         <td class="ps-4">
-                            <span class="text-dark fw-bold">@item.BookingReference?.Substring(0, Math.Min(item.BookingReference.Length, 7))</span>
-                        </td>
+                            <span class="text-dark fw-bold">@item.BookingReference</span></td>
+                        <td><div class="small fw-bold">@item.MemberEmail</div></td>
+                        <td><div class="small fw-bold">@item.Origin <i class="bi bi-arrow-right"></i> @item.Destination</div></td>
+                        <td><div class="small fw-bold">@item.DepartureTime.ToString("dd MMM HH:mm")</div></td>
                         <td>
-                            <div class="small fw-bold text-dark">@item.MemberEmail</div>
-                            <div class="text-muted x-small">Seats: @item.NumberOfSeats</div>
+                            <div class="fw-bold text-dark">RM @item.TotalAmount.ToString("N2")</div> <div class="text-muted x-small">@item.NumberOfSeats Seat(s)</div>
                         </td>
-                        <td>
-                            <div class="d-flex align-items-center small">
-                                <span class="fw-bold">@item.Origin</span>
-                                <i class="bi bi-arrow-right mx-2 text-muted"></i>
-                                <span class="text-primary fw-bold">@item.Destination</span>
+                        <td class="text-center">
+                            <span class="status-badge @item.Status?.ToLower().Replace(" ", "-") rounded-pill px-3">@item.Status?.ToUpper()</span>
+                        </td>
+                        <td class="text-end pe-4">
+                            <div class="btn-action-group d-flex justify-content-end gap-2">
+                                @if (item.Status == "Refund Pending")
+                                {
+                                    <form asp-action="ApproveRefund" asp-controller="Admin" method="post" style="display:inline;">
+                                        <input type="hidden" name="id" value="@item.BookingId" />
+                                        <button type="submit" class="btn btn-approve-custom btn-sm px-3 py-2 rounded-3"
+                                                onclick="return confirm('Confirm approve this refund?')">
+                                            <i class="bi bi-check-circle-fill action-icon"></i> Approve
+                                        </button>
+                                    </form>
+
+                                    <form asp-action="RejectRefund" asp-controller="Admin" method="post" style="display:inline;">
+                                        <input type="hidden" name="id" value="@item.BookingId" />
+                                        <button type="submit" class="btn btn-reject-custom btn-sm px-3 py-2 rounded-3"
+                                                onclick="return confirm('Are you sure you want to reject this refund?')">
+                                            <i class="bi bi-x-circle-fill action-icon"></i> Reject
+                                        </button>
+                                    </form>
+                                }
+                                else if (item.Status == "Refunded")
+                                {
+                                    <div class="d-flex align-items-center text-success fw-bold">
+                                        <i class="bi bi-patch-check-fill me-1 fs-5"></i>
+                                        <span class="small">Refund Successful</span>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small italic">No Action Required</span>
+                                }
                             </div>
                         </td>
-                        <td>
-                            <div class="small fw-bold">@item.DepartureTime.ToString("dd MMM HH:mm")</div>
-                        </td>
-
-                        @* --- 状态显示列逻辑 --- *@
-                        <td class="text-center">
-                            @if (item.Status == "Refunded")
-                            {
-                                <span class="status-badge refunded rounded-pill px-3">
-                                    Refund Successful
-                                </span>
-                            }
-                            else if (item.Status == "Refund Pending")
-                            {
-                                <span class="status-badge refund-pending rounded-pill px-3">
-                                    Pending Approval
-                                </span>
-                            }
-                            else
-                            {
-                                <span class="status-badge @item.Status?.ToLower().Replace(" ", "-") rounded-pill px-3">
-                                    @item.Status?.ToUpper()
-                                </span>
-                            }
-                        </td>
-
-                            <td class="text-end pe-4">
-                                <div class="btn-action-group d-flex justify-content-end gap-2">
-                                    @if (item.Status == "Refund Pending")
-                                    {
-                                        <form asp-action="ApproveRefund" asp-controller="Admin" method="post" style="display:inline;">
-                                            <input type="hidden" name="id" value="@item.BookingId" />
-                                            <button type="submit" class="btn btn-approve-custom btn-sm px-3 py-2 rounded-3"
-                                                    onclick="return confirm('Confirm approve this refund?')">
-                                                <i class="bi bi-check-circle-fill action-icon"></i> Approve
-                                            </button>
-                                        </form>
-
-                                        <form asp-action="RejectRefund" asp-controller="Admin" method="post" style="display:inline;">
-                                            <input type="hidden" name="id" value="@item.BookingId" />
-                                            <button type="submit" class="btn btn-reject-custom btn-sm px-3 py-2 rounded-3"
-                                                    onclick="return confirm('Are you sure you want to reject this refund?')">
-                                                <i class="bi bi-x-circle-fill action-icon"></i> Reject
-                                            </button>
-                                        </form>
-                                    }
-                                    else if (item.Status == "Refunded")
-                                    {
-                                        <div class="d-flex align-items-center text-success fw-bold">
-                                            <i class="bi bi-patch-check-fill me-1 fs-5"></i>
-                                            <span class="small">Refund Successful</span>
-                                        </div>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted small italic">No Action Required</span>
-                                    }
-                                </div>
-                            </td>
                     </tr>
                 }
             </tbody>

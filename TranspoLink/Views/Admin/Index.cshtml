@@ -31,10 +31,7 @@
             <div class="stat-label">📋 Total Bookings</div>
             <div class="stat-value">@ViewBag.TotalBookings</div>
         </div>
-        <div class="stat-card pending">
-            <div class="stat-label">⏳ Pending Bookings</div>
-            <div class="stat-value">@ViewBag.PendingBookings</div>
-        </div>
+        
         <div class="stat-card today">
             <div class="stat-label">📅 Today's Bookings</div>
             <div class="stat-value">@ViewBag.TodayBookings</div>
@@ -64,7 +61,8 @@
                 <a href="/RouteNTrip/Routes" class="dropdown-item"><span>🗺️</span> Routes</a>
                 <a href="/Vehicle/Vehicles" class="dropdown-item"><span>🚌</span> Vehicles</a>
                 <a href="/Admin/Trips" class="dropdown-item"><span>🎫</span> Trips</a>
-                <a href="/Admin/Bookings" class="dropdown-item"><span>📋</span> Bookings</a>
+                <a href="/Admin/BookingHistory" class="dropdown-item"><span>📋</span> BookingHistory</a>
+                <a href="/Admin/Bookings" class="dropdown-item"><span>💰</span> Payment</a>
 
             </div>
         </div>
@@ -90,7 +88,7 @@
                         <th>Seats</th>
                         <th>Total Price</th>
                         <th>Status</th>
-                        <th>Action</th>
+                        
                     </tr>
                 </thead>
                 <tbody>
@@ -102,15 +100,13 @@
                             <td>@booking.Trip.Route.Origin → @booking.Trip.Route.Destination</td>
                             <td>@booking.BookingDate.ToString("dd MMM yyyy")</td>
                             <td>@booking.NumberOfSeats</td>
-                            <td>RM @booking.TotalPrice.ToString("N2")</td>
+                            <td>RM @booking.TotalAmount.ToString("N2")</td>
                             <td>
                                 <span class="status-badge status-@booking.Status.ToLower()">
                                     @booking.Status
                                 </span>
                             </td>
-                            <td>
-                                <a href="/Admin/BookingDetails/@booking.Id" class="btn-view">View</a>
-                            </td>
+    
                         </tr>
                     }
                 </tbody>

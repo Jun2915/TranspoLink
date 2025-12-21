@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
+using TranspoLink.Models;
 
 namespace TranspoLink.Controllers;
 
@@ -538,59 +540,6 @@ public class AdminController(DB db, Helper hp) : Controller
         return RedirectToAction("BookingDetails", new { id });
     }
 
-    // ============================================================================
-    // REPORTS & ANALYTICS
-    // ============================================================================
-
-    public IActionResult Reports()
-    {
-        var revenueByType = db.Bookings
-            .Include(b => b.Trip)
-            .ThenInclude(t => t.Route)
-            .Where(b => b.IsPaid)
-            .GroupBy(b => b.Trip.Route.TransportType)
-            .Select(g => new
-            {
-                Type = g.Key,
-                Revenue = g.Sum(b => b.TotalPrice),
-                Count = g.Count()
-            })
-            .ToList();
-
-        ViewBag.RevenueByType = revenueByType;
-
-        var topRoutes = db.Bookings
-            .Include(b => b.Trip)
-            .ThenInclude(t => t.Route)
-            .GroupBy(b => new { b.Trip.Route.Origin, b.Trip.Route.Destination })
-            .Select(g => new
-            {
-                Route = g.Key.Origin + " → " + g.Key.Destination,
-                BookingCount = g.Count(),
-                Revenue = g.Sum(b => b.TotalPrice)
-            })
-            .OrderByDescending(x => x.BookingCount)
-            .Take(10)
-            .ToList();
-
-        ViewBag.TopRoutes = topRoutes;
-
-        var monthlyRevenue = db.Bookings
-            .Where(b => b.IsPaid && b.BookingDate.Year == DateTime.Now.Year)
-            .GroupBy(b => b.BookingDate.Month)
-            .Select(g => new
-            {
-                Month = g.Key,
-                Revenue = g.Sum(b => b.TotalPrice)
-            })
-            .OrderBy(x => x.Month)
-            .ToList();
-
-        ViewBag.MonthlyRevenue = monthlyRevenue;
-
-        return View();
-    }
-    // 审批退款：确认退款并标记
     [HttpPost]
     public IActionResult ApproveRefund(int id)
     {
@@ -601,10 +550,10 @@ public class AdminController(DB db, Helper hp) : Controller
             if (booking.Trip != null)
             {
                 booking.Trip.AvailableSeats += booking.NumberOfSeats; // 释放座位 [cite: 101]
-        }
+            }
             db.SaveChanges();
-        TempData["Info"] = "Refund approved and seats released."; 
-    }
+            TempData["Info"] = "Refund approved and seats released.";
+        }
         return RedirectToAction("Bookings");
     }
 
@@ -614,10 +563,10 @@ public class AdminController(DB db, Helper hp) : Controller
         var booking = db.Bookings.Find(id);
         if (booking != null && booking.Status == "Refund Pending")
         {
-            booking.Status = "Paid"; 
+            booking.Status = "Paid";
             db.SaveChanges();
-             TempData["Info"] = "Refund request rejected. Ticket remains valid.";
-    }
+            TempData["Info"] = "Refund request rejected. Ticket remains valid.";
+        }
         return RedirectToAction("Bookings");
     }
 
@@ -645,4 +594,122 @@ public class AdminController(DB db, Helper hp) : Controller
 
         return View(allBookings);
     }
+
+    // ============================================================================
+    // REPORTS & ANALYTICS
+    // ============================================================================
+
+    [Authorize(Roles = "Admin")]
+    public IActionResult Reports()
+    {
+        // 1. Basic Stats
+        ViewBag.TotalUsers = db.Users.Count();
+        ViewBag.TotalRoutes = db.Routes.Count();
+        ViewBag.TotalTrips = db.Trips.Count();
+        ViewBag.TotalVehicles = db.Vehicles.Count();
+
+        // 2. Financial Analytics - Revenue (Paid Only)
+        // Filter at the database level using IQueryable to allow Include()
+        var paidBookingsQuery = db.Bookings
+            .Include(b => b.Trip)
+                .ThenInclude(t => t.Route)
+            .Where(b => b.Status == "Paid" || b.IsPaid == true);
+
+        var paidBookings = paidBookingsQuery.ToList(); // Execute once here
+
+        ViewBag.TotalRevenue = paidBookings.Sum(b => b.TotalAmount);
+        ViewBag.TotalTicketsSold = paidBookings.Count();
+
+        // --- NEW: Loss/Refunds Analytics (Cancelled/Refunded) ---
+        var lostBookings = db.Bookings
+            .Where(b => b.Status == "Cancelled" || b.Status == "Refunded" || b.Status == "Refund Successful")
+            .ToList();
+
+        ViewBag.TotalLoss = lostBookings.Sum(b => b.TotalAmount);
+        ViewBag.CancelledCount = lostBookings.Count();
+
+        // 3. Revenue by Transport Type (Fixing CS1061 by using the already-included list)
+        ViewBag.RevenueByType = paidBookings
+            .Where(b => b.Trip?.Route != null)
+            .GroupBy(b => b.Trip.Route.TransportType)
+            .Select(g => new
+            {
+                Type = g.Key ?? "Other",
+                Count = g.Count(),
+                Revenue = g.Sum(b => b.TotalAmount)
+            }).ToList();
+
+        // 4. Top 10 Popular Routes
+        ViewBag.TopRoutes = paidBookings
+            .Where(b => b.Trip?.Route != null)
+            .GroupBy(b => new { b.Trip.Route.Origin, b.Trip.Route.Destination })
+            .Select(g => new
+            {
+                Route = g.Key.Origin + " → " + g.Key.Destination,
+                BookingCount = g.Count(),
+                Revenue = g.Sum(b => b.TotalAmount)
+            })
+            .OrderByDescending(x => x.BookingCount).Take(10).ToList();
+
+        // 5. Monthly Revenue Trend (Forcing all 12 months)
+        var currentYear = DateTime.Now.Year;
+        var rawMonthlyRevenue = paidBookings
+            .Where(b => b.BookingDate.Year == currentYear)
+            .GroupBy(b => b.BookingDate.Month)
+            .Select(g => new { Month = g.Key, Revenue = g.Sum(b => b.TotalAmount) })
+            .ToList();
+
+        ViewBag.MonthlyRevenue = Enumerable.Range(1, 12).Select(m => new
+        {
+            Month = m,
+            Revenue = rawMonthlyRevenue.FirstOrDefault(r => r.Month == m)?.Revenue ?? 0m
+        }).ToList();
+
+        return View(); // CRITICAL FIX: Ensures all code paths return a value
+    }
+
+
+   
+
+[Authorize(Roles = "Admin")]
+public IActionResult DownloadMonthlyReport()
+{
+    // 1. Fetch data for calculations
+    var confirmedBookings = db.Bookings
+        .Where(b => b.Status == "Paid" || b.IsPaid == true)
+        .ToList();
+
+    var lostBookings = db.Bookings
+        .Where(b => b.Status == "Cancelled" || b.Status == "Refunded" || b.Status == "Refund Successful")
+        .ToList();
+
+    decimal totalRevenue = confirmedBookings.Sum(b => b.TotalAmount);
+    decimal totalLoss = lostBookings.Sum(b => b.TotalAmount);
+    string monthName = DateTime.Now.ToString("MMMM_yyyy");
+
+    // 2. Build CSV Content
+    var csv = new StringBuilder();
+    csv.AppendLine("TranspoLink Monthly Business Report");
+    csv.AppendLine($"Generated Date,{DateTime.Now:dd/MM/yyyy HH:mm}");
+    csv.AppendLine("");
+    csv.AppendLine("Metric,Value");
+    csv.AppendLine($"Confirmed Revenue,RM {totalRevenue:N2}");
+    csv.AppendLine($"Revenue Loss,RM {totalLoss:N2}");
+    csv.AppendLine($"Net Income,RM {(totalRevenue - totalLoss):N2}");
+    csv.AppendLine($"Paid Tickets Count,{confirmedBookings.Count}");
+    csv.AppendLine($"Cancelled Tickets Count,{lostBookings.Count}");
+    csv.AppendLine("");
+
+    // Detailed list of paid transactions for the admin
+    csv.AppendLine("Detailed Paid Transactions:");
+    csv.AppendLine("Booking ID,Trip ID,Date,Amount");
+    foreach (var b in confirmedBookings)
+    {
+        csv.AppendLine($"{b.Id},{b.TripId},{b.BookingDate:yyyy-MM-dd},RM {b.TotalAmount:N2}");
+    }
+
+    // 3. Return File for Download
+    byte[] buffer = Encoding.UTF8.GetBytes(csv.ToString());
+    return File(buffer, "text/csv", $"TranspoLink_Report_{monthName}.csv");
+}
 }
